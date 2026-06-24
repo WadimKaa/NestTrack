@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_title">Профиль</string>
+    <string name="edit_name">Изменить имя</string>
+    <string name="your_details">Ваши данные</string>
+    <string name="date_of_birth">Дата рождения</string>
+    <string name="edit_date">Изменить дату</string>
+    <string name="avatar">Аватар</string>
+    <string name="edit_avatar">Сменить аватар</string>
+    <string name="family_member">Участник</string>
+</resources>
