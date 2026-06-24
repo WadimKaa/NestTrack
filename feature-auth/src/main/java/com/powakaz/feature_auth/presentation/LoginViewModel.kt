@@ -10,7 +10,8 @@ import javax.inject.Inject
 
 data class LoginUiState(
     val token: String = "",
-    val isTokenVisible: Boolean = true
+    val isTokenVisible: Boolean = true,
+    val isButtonVisible : Boolean = true
 ) {
     val isButtonLoginEnabled = token.length > 5
 }
@@ -18,6 +19,8 @@ data class LoginUiState(
 
 sealed interface LoginUiEvent {
     data class TokenChanged(val token: String) : LoginUiEvent
+
+    object ClickLoginButoon : LoginUiEvent
     object ChangeTokenVisibility : LoginUiEvent
 }
 
@@ -39,6 +42,8 @@ class LoginViewModel @Inject constructor() : ViewModel() {
                     it.copy(isTokenVisible = !it.isTokenVisible)
                 }
             }
+
+            LoginUiEvent.ClickLoginButoon -> TODO()
         }
 
     }
