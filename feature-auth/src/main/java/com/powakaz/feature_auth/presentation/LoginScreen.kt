@@ -61,7 +61,7 @@ fun LoginScreen(
 @Preview(showBackground = true, device = "id:pixel_7")
 @Composable
 fun LoginScreenPreview() {
-    val uiState = LoginUiState(currentState = LoginState.NORMAL)
+    val uiState = LoginUiState(currentState = LoginState.TOKEN_RIGHT)
 
     LoginContent(
         uiState = uiState,
@@ -81,11 +81,15 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
                 .background(color = Color(0XFFf7f5fc)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            HeadLogin()
-            InputTextLogin(uiState, onEvent)
+            HeadLogin(uiState)
+            if (uiState.currentState != LoginState.TOKEN_RIGHT) InputTextLogin(uiState, onEvent)
             when (uiState.currentState) {
                 LoginState.TOKEN_CHECK -> LoadingCheckToken()
-                LoginState.TOKEN_RIGHT -> TokenRightMark()
+                LoginState.TOKEN_RIGHT -> {
+                    TokenRightMark()
+                    LoginButton(uiState, onEvent)
+                }
+
                 else -> LoginButton(uiState, onEvent)
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -97,7 +101,7 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
 
 
 @Composable
-fun HeadLogin() {
+fun HeadLogin(uiState: LoginUiState) {
     val isPreview = androidx.compose.ui.platform.LocalInspectionMode.current
     val AuthFontFamily = if (isPreview) {
         FontFamily.Default
@@ -109,6 +113,17 @@ fun HeadLogin() {
         )
     }
 
+    val painter =
+        if (uiState.currentState == LoginState.TOKEN_RIGHT) painterResource(R.drawable.img_login_head)
+        else painterResource(R.drawable.img_login_shield)
+
+    val headText =
+        if (uiState.currentState == LoginState.TOKEN_RIGHT) "Добро пожаловать!"
+        else "Вход по токену"
+
+    val bodyText =
+        if (uiState.currentState == LoginState.TOKEN_RIGHT) "Вход выполнен успешно"
+        else "Введите ваш персональный токен для доступа к приложению"
 
     Text(
         text = "Nest Tracker",
@@ -128,18 +143,18 @@ fun HeadLogin() {
         lineHeight = 18.sp
     )
     Image(
-        painter = painterResource(R.drawable.img_login_head),
+        painter = painter,
         contentDescription = null
     )
     Text(
-        text = "Вход по токену",
+        text = headText,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
         //fontFamily = AuthFontFamily,
         color = Color(0XFF05063d)
     )
     Text(
-        text = "Введите ваш персональный токен для доступа к приложению",
+        text = bodyText,
         textAlign = TextAlign.Center,
         color = Color(0XFF7a7c9c),
         fontWeight = FontWeight.SemiBold,
@@ -175,7 +190,7 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
     val visualTransformation =
         if (uiState.isTokenVisible) VisualTransformation.None else PasswordVisualTransformation()
 
-    val errorText = when(uiState.currentState){
+    val errorText = when (uiState.currentState) {
         LoginState.NETWORK_ERROR -> "Нет соединения с интернетом. Проверьте подключение и попробуйте снова"
         LoginState.ERROR -> "Произошла ошибка"
         LoginState.TOKEN_WRONG -> "Неверный токен. Проверьте и попробуйте снова"
