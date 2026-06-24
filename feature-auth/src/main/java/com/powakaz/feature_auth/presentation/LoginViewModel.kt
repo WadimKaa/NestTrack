@@ -10,13 +10,15 @@ import javax.inject.Inject
 
 data class LoginUiState(
     val token: String = "",
-    val isTokenVisible: Boolean = true) {
-
+    val isTokenVisible: Boolean = true
+) {
+    val isButtonLoginEnabled = token.length > 5
 }
 
 
 sealed interface LoginUiEvent {
-    data class TokenChanged(val token : String) : LoginUiEvent
+    data class TokenChanged(val token: String) : LoginUiEvent
+    object ChangeTokenVisibility : LoginUiEvent
 }
 
 class LoginViewModel @Inject constructor() : ViewModel() {
@@ -24,11 +26,17 @@ class LoginViewModel @Inject constructor() : ViewModel() {
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
 
-    fun onEvent(event : LoginUiEvent){
-        when(event){
+    fun onEvent(event: LoginUiEvent) {
+        when (event) {
             is LoginUiEvent.TokenChanged -> {
                 _uiState.update {
                     it.copy(token = event.token)
+                }
+            }
+
+            LoginUiEvent.ChangeTokenVisibility -> {
+                _uiState.update {
+                    it.copy(isTokenVisible = !it.isTokenVisible)
                 }
             }
         }

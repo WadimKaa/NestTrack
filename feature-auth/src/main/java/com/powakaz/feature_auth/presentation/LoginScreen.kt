@@ -1,10 +1,14 @@
 package com.powakaz.feature_auth.presentation
 
 
+import androidx.compose.foundation.BorderStroke
 import com.powakaz.feature_auth.R
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,7 +59,7 @@ fun LoginScreen(
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "id:pixel_7")
 @Composable
 fun LoginScreenPreview() {
     val uiState = LoginUiState()
@@ -108,16 +113,17 @@ fun HeadLogin() {
         modifier = Modifier.padding(top = 86.dp),
         fontSize = 44.sp,
         fontWeight = FontWeight.Bold,
-        fontFamily = AuthFontFamily,
+        //fontFamily = AuthFontFamily,
         color = Color(0XFF05063d)
     )
     Text(
         text = "Для учета времени и семейных финансов",
-        modifier = Modifier.widthIn(max = 250.dp),
+        modifier = Modifier.widthIn(max = 300.dp),
         textAlign = TextAlign.Center,
         color = Color(0XFF7a7c9c),
-        fontFamily = AuthFontFamily,
-        fontWeight = FontWeight.SemiBold
+        //fontFamily = AuthFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 18.sp
     )
     Image(
         painter = painterResource(R.drawable.img_login_head),
@@ -127,7 +133,7 @@ fun HeadLogin() {
         text = "Вход по токену",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        fontFamily = AuthFontFamily,
+        //fontFamily = AuthFontFamily,
         color = Color(0XFF05063d)
     )
     Text(
@@ -135,10 +141,11 @@ fun HeadLogin() {
         textAlign = TextAlign.Center,
         color = Color(0XFF7a7c9c),
         fontWeight = FontWeight.SemiBold,
-        fontFamily = AuthFontFamily,
+        lineHeight = 18.sp,
+        //fontFamily = AuthFontFamily,
         modifier = Modifier
             .padding(top = 4.dp)
-            .widthIn(max = 250.dp)
+            .widthIn(max = 300.dp)
     )
 }
 
@@ -158,6 +165,11 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
         )
     }
 
+    val visibilityPainter =
+        if (uiState.isTokenVisible) painterResource(R.drawable.ic_visibility_on) else painterResource(
+            R.drawable.ic_visibility_off
+        )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -176,7 +188,7 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
                 Text(
                     text = "Введите токен",
                     color = Color(0XFF7a7c9c),
-                    fontFamily = AuthFontFamily,
+                    //fontFamily = AuthFontFamily,
                     fontWeight = FontWeight.SemiBold
                 )
             },
@@ -197,9 +209,14 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
             },
             trailingIcon = {
                 Icon(
-                    painter = painterResource(R.drawable.ic_visibility_on),
+                    painter = visibilityPainter,
                     contentDescription = null,
-                    tint = Color(0XFFc4c4d9)
+                    tint = Color(0XFFc4c4d9),
+                    modifier = Modifier.clickable(
+                        onClick = { onEvent(LoginUiEvent.ChangeTokenVisibility) },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    )
                 )
             }
         )
@@ -258,15 +275,15 @@ fun BottomLoginCard() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 24.dp)
-            .border(width = 1.dp, color = Color(0XFFf9f8fd)),
+            .padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 24.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0XFFf9f8fd)
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 0.5.dp
-        )
+        ),
+        border = BorderStroke(width = 1.dp, color = Color(0XFFf9f8fd))
     ) {
         Row() {
             Image(
@@ -284,17 +301,17 @@ fun BottomLoginCard() {
             ) {
                 Text(
                     text = "Ваши данные защищены", fontWeight = FontWeight.SemiBold,
-                    fontFamily = AuthFontFamily,
+                    //fontFamily = AuthFontFamily,
                     fontSize = 12.sp
                 )
                 Text(
                     text = "Доступ к приложению возможен только по вашему уникальному токену",
                     fontWeight = FontWeight.Normal,
-                    fontFamily = AuthFontFamily,
+                    //fontFamily = AuthFontFamily,
                     color = Color(0XFF7a7c9c),
                     fontSize = 12.sp,
+                    lineHeight = 14.sp,
                     modifier = Modifier
-                        .padding(top = 2.dp)
                         .sizeIn(maxWidth = 250.dp)
                 )
             }
