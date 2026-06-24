@@ -61,7 +61,7 @@ fun LoginScreen(
 @Preview(showBackground = true, device = "id:pixel_7")
 @Composable
 fun LoginScreenPreview() {
-    val uiState = LoginUiState(isButtonVisible = true)
+    val uiState = LoginUiState(currentState = LoginState.NORMAL)
 
     LoginContent(
         uiState = uiState,
@@ -83,7 +83,11 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
         ) {
             HeadLogin()
             InputTextLogin(uiState, onEvent)
-            if (uiState.isButtonVisible) LoginButton(uiState, onEvent) else LoadingCheckToken()
+            when (uiState.currentState) {
+                LoginState.TOKEN_CHECK -> LoadingCheckToken()
+                LoginState.TOKEN_RIGHT -> TokenRightMark()
+                else -> LoginButton(uiState, onEvent)
+            }
             Spacer(modifier = Modifier.weight(1f))
             BottomLoginCard()
         }
@@ -168,62 +172,94 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
             R.drawable.ic_visibility_off
         )
 
-    var visualTransformation =
+    val visualTransformation =
         if (uiState.isTokenVisible) VisualTransformation.None else PasswordVisualTransformation()
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 24.dp, start = 24.dp, end = 24.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 0.5.dp
-        ),
-        shape = RoundedCornerShape(size = 20.dp)
-    ) {
-        OutlinedTextField(
-            value = uiState.token,
-            onValueChange = { onEvent(LoginUiEvent.TokenChanged(it)) },
-            modifier = Modifier
-                .fillMaxWidth(),
-            placeholder = {
-                Text(
-                    text = "Введите токен",
-                    color = Color(0XFF7a7c9c),
-                    //fontFamily = AuthFontFamily,
-                    fontWeight = FontWeight.SemiBold
-                )
-            },
-            shape = RoundedCornerShape(20.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFFf9f8fd),
-                unfocusedContainerColor = Color(0xFFf9f8fd),
-                focusedBorderColor = Color(0xFFFFFFFF),
-                unfocusedBorderColor = Color(0xFFFFFFFF),
-                errorBorderColor = Color(0xFFE53935),
-            ),
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_lock),
-                    contentDescription = null,
-                    tint = Color(0XFFc4c4d9)
-                )
-            },
-            trailingIcon = {
-                Icon(
-                    painter = visibilityPainter,
-                    contentDescription = null,
-                    tint = Color(0XFFc4c4d9),
-                    modifier = Modifier.clickable(
-                        onClick = { onEvent(LoginUiEvent.ChangeTokenVisibility) },
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    )
-                )
-            },
-            visualTransformation = visualTransformation
-        )
+    val errorText = when(uiState.currentState){
+        LoginState.NETWORK_ERROR -> "Нет соединения с интернетом. Проверьте подключение и попробуйте снова"
+        LoginState.ERROR -> "Произошла ошибка"
+        LoginState.TOKEN_WRONG -> "Неверный токен. Проверьте и попробуйте снова"
+        else -> ""
     }
 
+    val hintTextColor = if (uiState.isNeedShowError) Color(0XFFEB5757) else Color(0XFFc4c4d9)
+    val iconColor = if (uiState.isNeedShowError) Color(0XFFEB5757) else Color(0XFFc4c4d9)
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp, start = 24.dp, end = 24.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 0.5.dp
+            ),
+            shape = RoundedCornerShape(size = 20.dp)
+        ) {
+            OutlinedTextField(
+                value = uiState.token,
+                onValueChange = { onEvent(LoginUiEvent.TokenChanged(it)) },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                isError = uiState.isNeedShowError,
+                placeholder = {
+                    Text(
+                        text = "Введите токен",
+                        color = hintTextColor,
+                        //fontFamily = AuthFontFamily,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFFf9f8fd),
+                    errorContainerColor = Color(0xFFf9f8fd),
+                    unfocusedContainerColor = Color(0xFFf9f8fd),
+                    focusedBorderColor = Color(0xFFFFFFFF),
+                    unfocusedBorderColor = Color(0xFFFFFFFF),
+                    errorBorderColor = Color(0xFFE53935),
+                ),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_lock),
+                        contentDescription = null,
+                        tint = iconColor
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        painter = visibilityPainter,
+                        contentDescription = null,
+                        tint = iconColor,
+                        modifier = Modifier.clickable(
+                            onClick = { onEvent(LoginUiEvent.ChangeTokenVisibility) },
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        )
+                    )
+                },
+                visualTransformation = visualTransformation
+            )
+        }
+        if (uiState.isNeedShowError) {
+            Row(modifier = Modifier.padding(top = 10.dp, start = 24.dp)) {
+                if (uiState.isNeedShowErrorGear) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_gear),
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                Text(
+                    text = errorText,
+                    color = Color(0XFFEB5757),
+                    //fontFamily = AuthFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
+            }
+        }
+    }
 }
 
 
@@ -241,6 +277,8 @@ fun LoginButton(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
         )
     }
 
+    val buttonText = if (uiState.currentState == LoginState.NORMAL) "Войти" else "Продолжить"
+
     Button(
         onClick = { onEvent(LoginUiEvent.ClickLoginButoon) },
         shape = RoundedCornerShape(12.dp),
@@ -256,7 +294,7 @@ fun LoginButton(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
             .padding(top = 12.dp, start = 24.dp, end = 24.dp)
     ) {
         Text(
-            text = "Войти", fontWeight = FontWeight.SemiBold,
+            text = buttonText, fontWeight = FontWeight.SemiBold,
             fontFamily = AuthFontFamily,
         )
     }
@@ -266,13 +304,34 @@ fun LoginButton(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
 @Composable
 fun LoadingCheckToken() {
     Row(modifier = Modifier.padding(top = 24.dp)) {
-        CircularProgressIndicator(color = Color(0XFF7769c2), trackColor = Color(0XFFebe8f9), modifier = Modifier.size(30.dp))
+        CircularProgressIndicator(
+            color = Color(0XFF7769c2),
+            trackColor = Color(0XFFebe8f9),
+            modifier = Modifier.size(30.dp)
+        )
         Text(
             text = "Проверяем токен...",
             color = Color(0XFF7a7c9c),
             //fontFamily = AuthFontFamily,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(start = 16.dp).align(alignment = Alignment.CenterVertically)
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .align(alignment = Alignment.CenterVertically)
+        )
+    }
+}
+
+@Composable
+fun TokenRightMark() {
+    Row(modifier = Modifier.padding(top = 24.dp)) {
+        Image(painter = painterResource(R.drawable.ic_check), contentDescription = null)
+        Text(
+            text = "Токен действителен",
+            color = Color(0XFF50B36C),
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .align(alignment = Alignment.CenterVertically)
         )
     }
 }
