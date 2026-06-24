@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.powakaz.nesttrack"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.powakaz.nesttrack"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "com.powakaz.feature_auth"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
 
 
@@ -23,6 +23,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    buildFeatures {
+        compose = true
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
