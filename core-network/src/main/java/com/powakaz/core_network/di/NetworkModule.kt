@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
@@ -24,15 +25,42 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    @PublicClient
+    fun providePublicOkHttpClient(): OkHttpClient {
+        return OkHttpFactory.createOkHttpClient()
+    }
+
+
+    @Provides
+    @Singleton
+    @AuthenticatedClient
+    fun provideAuthenticatedOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
         return OkHttpFactory.createOkHttpClient(authInterceptor)
+
+
     }
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @PublicClient
+    fun providePublicRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return RetrofitFactory.createRetrofit("", okHttpClient)
     }
+
+    @Provides
+    @Singleton
+    @PublicClient
+    fun provideAuthenticatedRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return RetrofitFactory.createRetrofit("", okHttpClient)
+    }
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class AuthenticatedClient
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class PublicClient
 
 
 }
