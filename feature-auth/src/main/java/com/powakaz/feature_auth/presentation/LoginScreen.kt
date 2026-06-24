@@ -1,7 +1,6 @@
 package com.powakaz.feature_auth.presentation
 
 
-import android.widget.Button
 import com.powakaz.feature_auth.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,18 +19,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -40,6 +39,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LoginContent(uiState = state, onEvent = viewModel::onEvent)
+
+}
 
 
 @Preview(showBackground = true)
@@ -47,7 +59,7 @@ import androidx.compose.ui.unit.sp
 fun LoginScreenPreview() {
     val uiState = LoginUiState()
 
-    LoginScreen(
+    LoginContent(
         uiState = uiState,
         onEvent = {}
     )
@@ -56,7 +68,7 @@ fun LoginScreenPreview() {
 
 
 @Composable
-fun LoginScreen(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
+fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
@@ -66,7 +78,7 @@ fun LoginScreen(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HeadLogin()
-            InputTextLogin(uiState)
+            InputTextLogin(uiState, onEvent)
             LoginButton()
             Spacer(modifier = Modifier.weight(1f))
             BottomLoginCard()
@@ -132,7 +144,7 @@ fun HeadLogin() {
 
 
 @Composable
-fun InputTextLogin(uiState: LoginUiState) {
+fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
     val isPreview = androidx.compose.ui.platform.LocalInspectionMode.current
 
 
@@ -156,8 +168,8 @@ fun InputTextLogin(uiState: LoginUiState) {
         shape = RoundedCornerShape(size = 20.dp)
     ) {
         OutlinedTextField(
-            value = uiState.text,
-            onValueChange = {},
+            value = uiState.token,
+            onValueChange = { onEvent(LoginUiEvent.TokenChanged(it)) },
             modifier = Modifier
                 .fillMaxWidth(),
             placeholder = {
@@ -165,7 +177,7 @@ fun InputTextLogin(uiState: LoginUiState) {
                     text = "Введите токен",
                     color = Color(0XFF7a7c9c),
                     fontFamily = AuthFontFamily,
-                    fontWeight = FontWeight.Normal
+                    fontWeight = FontWeight.SemiBold
                 )
             },
             shape = RoundedCornerShape(20.dp),
