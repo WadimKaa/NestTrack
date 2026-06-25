@@ -24,7 +24,8 @@ data class LoginUiState(
     val isNeedShowError =
         currentState == LoginState.TOKEN_WRONG || currentState == LoginState.NETWORK_ERROR || currentState == LoginState.ERROR
     val isNeedShowErrorGear =
-         currentState == LoginState.NETWORK_ERROR || currentState == LoginState.ERROR
+        currentState == LoginState.NETWORK_ERROR || currentState == LoginState.ERROR
+    val isInputOn = currentState != LoginState.TOKEN_CHECK
 }
 
 
@@ -45,8 +46,10 @@ class LoginViewModel @Inject constructor(val checkTokenUseCase: CheckTokenUseCas
     fun onEvent(event: LoginUiEvent) {
         when (event) {
             is LoginUiEvent.TokenChanged -> {
+                val newState = if (_uiState.value.isNeedShowError) LoginState.NORMAL else _uiState.value.currentState
+
                 _uiState.update {
-                    it.copy(token = event.token)
+                    it.copy(token = event.token, currentState = newState)
                 }
             }
 
@@ -56,22 +59,34 @@ class LoginViewModel @Inject constructor(val checkTokenUseCase: CheckTokenUseCas
                 }
             }
 
-            //TODO обработать ответы
-
             LoginUiEvent.ClickLoginButon -> {
-                viewModelScope.launch {
-                   val response = checkTokenUseCase(uiState.value.token)
+                if (uiState.value.currentState == LoginState.TOKEN_RIGHT){
 
-                    when(response){
-                        is NetworkResult.Success -> {
-                            Log.e("LOL", response.data.name)
-                        }
+                }else{
+                    _uiState.update {
+                        it.copy(currentState = LoginState.TOKEN_CHECK)
+                    }
+                    viewModelScope.launch {
+                        val response = checkTokenUseCase(uiState.value.token)
 
-                        is NetworkResult.Error -> {
-                            Log.e("LOL", response.message.toString())
-                        }
-                        is NetworkResult.Exception -> {
-                            Log.e("LOL", response.e.message.toString())
+                        when (response) {
+                            is NetworkResult.Success -> {
+                                _uiState.update {
+                                    it.copy(currentState = LoginState.TOKEN_RIGHT)
+                                }
+                            }
+
+                            is NetworkResult.Error -> {
+                                _uiState.update {
+                                    it.copy(currentState = LoginState.TOKEN_WRONG)
+                                }
+                            }
+
+                            is NetworkResult.Exception -> {
+                                _uiState.update {
+                                    it.copy(currentState = LoginState.NETWORK_ERROR)
+                                }
+                            }
                         }
                     }
                 }

@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -48,6 +51,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
+// TODO:  Строки
+// TODO:  Поднятие над клавиатурой
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
@@ -61,7 +67,7 @@ fun LoginScreen(
 @Preview(showBackground = true, device = "id:pixel_7")
 @Composable
 fun LoginScreenPreview() {
-    val uiState = LoginUiState(currentState = LoginState.TOKEN_RIGHT)
+    val uiState = LoginUiState(currentState = LoginState.TOKEN_RIGHT, token = "retertert")
 
     LoginContent(
         uiState = uiState,
@@ -78,9 +84,12 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(color = Color(0XFFf7f5fc)),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+                .background(color = Color(0XFFf7f5fc))
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
             HeadLogin(uiState)
             if (uiState.currentState != LoginState.TOKEN_RIGHT) InputTextLogin(uiState, onEvent)
             when (uiState.currentState) {
@@ -92,7 +101,7 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
 
                 else -> LoginButton(uiState, onEvent)
             }
-            Spacer(modifier = Modifier.weight(1f))
+            //Spacer(modifier = Modifier.weight(1f))
             BottomLoginCard()
         }
     }
@@ -102,20 +111,9 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
 
 @Composable
 fun HeadLogin(uiState: LoginUiState) {
-    val isPreview = androidx.compose.ui.platform.LocalInspectionMode.current
-    val AuthFontFamily = if (isPreview) {
-        FontFamily.Default
-    } else {
-        FontFamily(
-            Font(R.font.nunito_regular, FontWeight.Normal),
-            Font(R.font.nunito_bold, FontWeight.Bold),
-            Font(R.font.nunito_semibold, FontWeight.SemiBold)
-        )
-    }
-
     val painter =
-        if (uiState.currentState == LoginState.TOKEN_RIGHT) painterResource(R.drawable.img_login_head)
-        else painterResource(R.drawable.img_login_shield)
+        if (uiState.currentState == LoginState.TOKEN_RIGHT) painterResource(R.drawable.img_login_shield)
+        else painterResource(R.drawable.img_login_head)
 
     val headText =
         if (uiState.currentState == LoginState.TOKEN_RIGHT) "Добро пожаловать!"
@@ -124,6 +122,9 @@ fun HeadLogin(uiState: LoginUiState) {
     val bodyText =
         if (uiState.currentState == LoginState.TOKEN_RIGHT) "Вход выполнен успешно"
         else "Введите ваш персональный токен для доступа к приложению"
+
+
+
 
     Text(
         text = "Nest Tracker",
@@ -169,19 +170,6 @@ fun HeadLogin(uiState: LoginUiState) {
 
 @Composable
 fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
-    val isPreview = androidx.compose.ui.platform.LocalInspectionMode.current
-
-
-    val AuthFontFamily = if (isPreview) {
-        FontFamily.Default
-    } else {
-        FontFamily(
-            Font(R.font.nunito_regular, FontWeight.Normal),
-            Font(R.font.nunito_bold, FontWeight.Bold),
-            Font(R.font.nunito_semibold, FontWeight.SemiBold)
-        )
-    }
-
     val visibilityPainter =
         if (uiState.isTokenVisible) painterResource(R.drawable.ic_visibility_on) else painterResource(
             R.drawable.ic_visibility_off
@@ -200,6 +188,9 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
     val hintTextColor = if (uiState.isNeedShowError) Color(0XFFEB5757) else Color(0XFFc4c4d9)
     val iconColor = if (uiState.isNeedShowError) Color(0XFFEB5757) else Color(0XFFc4c4d9)
 
+
+
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
@@ -212,6 +203,7 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
         ) {
             OutlinedTextField(
                 value = uiState.token,
+                enabled = uiState.isInputOn,
                 onValueChange = { onEvent(LoginUiEvent.TokenChanged(it)) },
                 modifier = Modifier
                     .fillMaxWidth(),
