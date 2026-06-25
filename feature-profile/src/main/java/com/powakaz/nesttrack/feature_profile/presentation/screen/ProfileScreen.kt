@@ -1,11 +1,10 @@
-package com.powakaz.nesttrack.feature_profile.presentation
+package com.powakaz.nesttrack.feature_profile.presentation.screen
 
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,21 +15,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Badge
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,25 +36,45 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_profile.R
-import coil.compose.AsyncImage
-import org.jetbrains.annotations.Async
+import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditNameDialog
+import com.powakaz.nesttrack.feature_profile.presentation.mapper.getDefaultAvatar
+import com.powakaz.nesttrack.feature_profile.presentation.model.ProfileUiState
 
 
 private val shape20 = RoundedCornerShape(20.dp)
 
+
+@Composable
+fun ProfileScreen(
+    viewModel: ProfileScreenViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ProfileScreenContent(
+        onEditNameClick = viewModel::onEditNameClick,
+
+    )
+    if (uiState.isEditNameDialogVisible) {
+        EditNameDialog(
+            onDismiss = viewModel::closeEditNameDialog
+        )
+    }
+}
+
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun ProfileScreen() {
+fun ProfileScreenContent(onEditNameClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,7 +103,7 @@ fun ProfileScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            ShowGeneralCard()
+            ShowGeneralCard(onEditNameClick = onEditNameClick)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -324,9 +340,8 @@ fun EditAvatarCard() {
     }
 }
 
-
 @Composable
-fun ShowGeneralCard() {
+fun ShowGeneralCard(onEditNameClick: () -> Unit) {
 
     Spacer(modifier = Modifier.height(10.dp))
 
@@ -375,7 +390,7 @@ fun ShowGeneralCard() {
         Spacer(modifier = Modifier.height(10.dp))
 
         TextButton(
-            onClick = {},
+            onClick = onEditNameClick,
             modifier = Modifier.size(width = 140.dp, height = 36.dp),
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 6.dp
@@ -419,15 +434,13 @@ fun ShowDefaultAvatarCard() {
             modifier = Modifier
                 .fillMaxSize()
                 .clip(CircleShape)
-                .background(
+                /*.background(
                     brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFFFDF0F7),
-                            Color(0xFFE59DD3)
-                        )
+                        ///
                     )
-                    //0xFFEDF0FF - муж
-                )
+
+                )*/
+
         )
 
         Box(
@@ -535,4 +548,15 @@ fun ShowFamilyMemberCard() {
 
     }
 
+}
+
+
+
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreview() {
+    ProfileScreenContent(
+        onEditNameClick = { }
+    )
 }
