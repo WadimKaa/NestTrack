@@ -295,7 +295,7 @@ fun LoginButton(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
     val buttonText = if (uiState.currentState == LoginState.NORMAL) "Войти" else "Продолжить"
 
     Button(
-        onClick = { onEvent(LoginUiEvent.ClickLoginButoon) },
+        onClick = { onEvent(LoginUiEvent.ClickLoginButon) },
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0XFF7b4af7),

@@ -1,10 +1,16 @@
 package com.powakaz.feature_auth.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.feature_auth.domain.usecase.CheckTokenUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class LoginState { NORMAL, TOKEN_CHECK, TOKEN_RIGHT, TOKEN_WRONG, NETWORK_ERROR, ERROR }
@@ -25,11 +31,13 @@ data class LoginUiState(
 sealed interface LoginUiEvent {
     data class TokenChanged(val token: String) : LoginUiEvent
 
-    object ClickLoginButoon : LoginUiEvent
+    object ClickLoginButon : LoginUiEvent
     object ChangeTokenVisibility : LoginUiEvent
 }
 
-class LoginViewModel @Inject constructor() : ViewModel() {
+
+@HiltViewModel
+class LoginViewModel @Inject constructor(val checkTokenUseCase: CheckTokenUseCase) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
@@ -48,7 +56,26 @@ class LoginViewModel @Inject constructor() : ViewModel() {
                 }
             }
 
-            LoginUiEvent.ClickLoginButoon -> TODO()
+            //TODO обработать ответы
+
+            LoginUiEvent.ClickLoginButon -> {
+                viewModelScope.launch {
+                   val response = checkTokenUseCase(uiState.value.token)
+
+                    when(response){
+                        is NetworkResult.Success -> {
+                            Log.e("LOL", response.data.name)
+                        }
+
+                        is NetworkResult.Error -> {
+                            Log.e("LOL", response.message.toString())
+                        }
+                        is NetworkResult.Exception -> {
+                            Log.e("LOL", response.e.message.toString())
+                        }
+                    }
+                }
+            }
         }
 
     }

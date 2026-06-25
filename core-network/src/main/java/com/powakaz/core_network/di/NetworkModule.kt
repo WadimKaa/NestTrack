@@ -1,5 +1,7 @@
 package com.powakaz.core_network.di
 
+import android.os.Build
+import com.powakaz.core_network.BuildConfig
 import com.powakaz.core_network.factory.OkHttpFactory
 import com.powakaz.core_network.factory.RetrofitFactory
 import com.powakaz.core_network.interceptor.AuthInterceptor
@@ -43,15 +45,15 @@ object NetworkModule {
     @Provides
     @Singleton
     @PublicClient
-    fun providePublicRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return RetrofitFactory.createRetrofit("", okHttpClient)
+    fun providePublicRetrofit(@PublicClient okHttpClient: OkHttpClient): Retrofit {
+        return RetrofitFactory.createRetrofit(BuildConfig.BASE_URL, okHttpClient)
     }
 
     @Provides
     @Singleton
-    @PublicClient
-    fun provideAuthenticatedRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return RetrofitFactory.createRetrofit("", okHttpClient)
+    @AuthenticatedClient
+    fun provideAuthenticatedRetrofit(@AuthenticatedClient okHttpClient: OkHttpClient): Retrofit {
+        return RetrofitFactory.createRetrofit(BuildConfig.BASE_URL, okHttpClient)
     }
 
     @Qualifier
