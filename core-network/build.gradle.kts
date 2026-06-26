@@ -34,7 +34,6 @@ android {
 
 dependencies {
     implementation(project(":core-common"))
-    implementation(project(":core-datastore"))
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit.serialization)

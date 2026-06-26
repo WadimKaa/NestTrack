@@ -5,7 +5,9 @@ import android.content.SyncContext
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.powakaz.core_common.manager.SessionManager
 import com.powakaz.core_common.repository.TokenRepository
+import com.powakaz.core_datastore.SessionManagerImpl
 import com.powakaz.core_datastore.TokenRepositoryImpl
 import dagger.Binds
 import dagger.Module
@@ -25,6 +27,11 @@ abstract class DataStoreModule {
     @Binds
     @Singleton
     abstract fun bindTokenRepository(impl: TokenRepositoryImpl): TokenRepository
+
+
+    @Binds
+    @Singleton
+    abstract fun bindSessionManager(impl: SessionManagerImpl) : SessionManager
 
 
     companion object{

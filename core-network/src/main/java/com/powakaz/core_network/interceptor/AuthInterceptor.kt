@@ -1,7 +1,6 @@
 package com.powakaz.core_network.interceptor
 
 import com.powakaz.core_common.repository.TokenRepository
-import com.powakaz.core_datastore.TokenRepositoryImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
