@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.powakaz.core_datastore"
+    namespace = "com.powakaz.core_common"
     compileSdk = 36
 
     defaultConfig {
@@ -19,7 +19,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-common"))
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.hilt.android)
