@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.powakaz.core_common.repository.TokenRepository
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.feature_auth.domain.usecase.CheckTokenUseCase
+import com.powakaz.feature_auth.domain.usecase.GetTokenUseCase
+import com.powakaz.feature_auth.domain.usecase.SaveTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +28,7 @@ data class LoginUiState(
         currentState == LoginState.TOKEN_WRONG || currentState == LoginState.NETWORK_ERROR || currentState == LoginState.ERROR
     val isNeedShowErrorGear =
         currentState == LoginState.NETWORK_ERROR || currentState == LoginState.ERROR
-    val isInputOn = currentState != LoginState.TOKEN_CHECK
+    val isNeedShowInputText = currentState != LoginState.TOKEN_CHECK && currentState != LoginState.TOKEN_RIGHT
 }
 
 
@@ -41,10 +43,12 @@ sealed interface LoginUiEvent {
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     val checkTokenUseCase: CheckTokenUseCase,
-    val tokenRepository: TokenRepository
+    val saveTokenUseCase: SaveTokenUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+
 
 
     fun onEvent(event: LoginUiEvent) {
@@ -76,7 +80,9 @@ class LoginViewModel @Inject constructor(
 
                         when (response) {
                             is NetworkResult.Success -> {
-                                tokenRepository.saveToken(_uiState.value.token)
+                                viewModelScope.launch {
+                                    saveTokenUseCase(_uiState.value.token)
+                                }
                                 _uiState.update {
                                     it.copy(currentState = LoginState.TOKEN_RIGHT)
                                 }

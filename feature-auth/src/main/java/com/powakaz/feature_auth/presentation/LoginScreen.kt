@@ -67,7 +67,7 @@ fun LoginScreen(
 @Preview(showBackground = true, device = "id:pixel_7")
 @Composable
 fun LoginScreenPreview() {
-    val uiState = LoginUiState(currentState = LoginState.TOKEN_RIGHT, token = "retertert")
+    val uiState = LoginUiState(currentState = LoginState.TOKEN_CHECK, token = "retertert")
 
     LoginContent(
         uiState = uiState,
@@ -91,7 +91,7 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
 
             ) {
             HeadLogin(uiState)
-            if (uiState.currentState != LoginState.TOKEN_RIGHT) InputTextLogin(uiState, onEvent)
+            if (uiState.isNeedShowInputText) InputTextLogin(uiState, onEvent)
             when (uiState.currentState) {
                 LoginState.TOKEN_CHECK -> LoadingCheckToken()
                 LoginState.TOKEN_RIGHT -> {
@@ -203,7 +203,6 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
         ) {
             OutlinedTextField(
                 value = uiState.token,
-                enabled = uiState.isInputOn,
                 onValueChange = { onEvent(LoginUiEvent.TokenChanged(it)) },
                 modifier = Modifier
                     .fillMaxWidth(),
