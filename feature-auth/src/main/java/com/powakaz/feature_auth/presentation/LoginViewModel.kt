@@ -3,6 +3,7 @@ package com.powakaz.feature_auth.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.powakaz.core_common.repository.TokenRepository
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.feature_auth.domain.usecase.CheckTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +39,10 @@ sealed interface LoginUiEvent {
 
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(val checkTokenUseCase: CheckTokenUseCase) : ViewModel() {
+class LoginViewModel @Inject constructor(
+    val checkTokenUseCase: CheckTokenUseCase,
+    val tokenRepository: TokenRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
@@ -46,7 +50,8 @@ class LoginViewModel @Inject constructor(val checkTokenUseCase: CheckTokenUseCas
     fun onEvent(event: LoginUiEvent) {
         when (event) {
             is LoginUiEvent.TokenChanged -> {
-                val newState = if (_uiState.value.isNeedShowError) LoginState.NORMAL else _uiState.value.currentState
+                val newState =
+                    if (_uiState.value.isNeedShowError) LoginState.NORMAL else _uiState.value.currentState
 
                 _uiState.update {
                     it.copy(token = event.token, currentState = newState)
@@ -60,9 +65,9 @@ class LoginViewModel @Inject constructor(val checkTokenUseCase: CheckTokenUseCas
             }
 
             LoginUiEvent.ClickLoginButon -> {
-                if (uiState.value.currentState == LoginState.TOKEN_RIGHT){
+                if (uiState.value.currentState == LoginState.TOKEN_RIGHT) {
 
-                }else{
+                } else {
                     _uiState.update {
                         it.copy(currentState = LoginState.TOKEN_CHECK)
                     }
@@ -71,6 +76,7 @@ class LoginViewModel @Inject constructor(val checkTokenUseCase: CheckTokenUseCas
 
                         when (response) {
                             is NetworkResult.Success -> {
+                                tokenRepository.saveToken(_uiState.value.token)
                                 _uiState.update {
                                     it.copy(currentState = LoginState.TOKEN_RIGHT)
                                 }
