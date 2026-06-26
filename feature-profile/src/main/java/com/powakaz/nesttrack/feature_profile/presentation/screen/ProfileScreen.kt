@@ -60,12 +60,17 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ProfileScreenContent(
-        onEditNameClick = viewModel::onEditNameClick,
+        onEditNameClick = viewModel::showEditNameDialog,
 
     )
     if (uiState.isEditNameDialogVisible) {
         EditNameDialog(
-            onDismiss = viewModel::closeEditNameDialog
+            currentName = uiState.currentName,
+            textNewName = uiState.editedName,
+            onTextNewNameChange = viewModel::onNameChanged,
+            onDismiss = viewModel::closeEditNameDialog,
+            onSave = viewModel::saveName,
+            onReadyToSave = uiState.isSaveEnabled
         )
     }
 }

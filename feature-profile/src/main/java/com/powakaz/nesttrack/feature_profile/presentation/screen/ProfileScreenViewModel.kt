@@ -15,9 +15,12 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun onEditNameClick() {
+    fun showEditNameDialog() {
         _uiState.update {
-            it.copy(isEditNameDialogVisible = true)
+            it.copy(
+                isEditNameDialogVisible = true,
+                //editedName = it.currentName
+            )
         }
     }
 
@@ -26,7 +29,32 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
             it.copy(isEditNameDialogVisible = false)
         }
     }
+
+
+    fun onNameChanged(name: String) {
+        _uiState.update {
+            it.copy(editedName = name)
+        }
+    }
+
+    fun saveName() {
+        _uiState.update {
+            it.copy(
+                currentName = it.editedName,
+                editedName = "",
+                isEditNameDialogVisible = false
+            )
+        }
+    }
 }
+
 data class ProfileUiState(
+    val currentName: String = "",
+    val editedName: String = "",
     val isEditNameDialogVisible: Boolean = false
 )
+{
+    val isSaveEnabled: Boolean
+        get() = editedName.isNotBlank()&&
+                editedName != currentName
+}

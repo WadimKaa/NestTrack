@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,32 +28,49 @@ import com.powakaz.nesttrack.feature_profile.R
 fun SaveButton(
     text: String,
     onClick: () -> Unit,
+    onEnabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    SaveButtonContent(text
+    SaveButtonContent(
+        text, onClick, onEnabled
     )
 }
 
 @Composable
 fun SaveButtonContent(
-    text: String
-){
-    Box(
+    text: String,
+    onClick: () -> Unit,
+    onEnabled: Boolean,
+
+) {
+    TextButton(
+        onClick = onClick,
         modifier = Modifier
             .width(140.dp)
             .height(50.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(
-                Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFF6AECC),
-                        Color(0xFFDEB1FC),
-                        Color(0xFFA17CDE)
+                if (!onEnabled) {
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color(0xFFE0D8E5),
+                            Color(0xFFDED2F3),
+                            Color(0xFFACA4BB)
+                        )
                     )
-                )
+                } else {
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color(0xFFF6AECC),
+                            Color(0xFFDEB1FC),
+                            Color(0xFFA17CDE)
+                        )
+                    )
+                }
+
             )
-            .clickable { },
-        contentAlignment = Alignment.Center
+        ,
+        enabled = onEnabled
     ) {
         Text(
             text = text,
@@ -67,6 +85,6 @@ fun SaveButtonContent(
 
 @Preview(showBackground = true)
 @Composable
-fun SaveButtonPreview(){
-    SaveButtonContent(text = "")
+fun SaveButtonPreview() {
+    SaveButtonContent(text = "", onClick = {}, onEnabled = false)
 }
