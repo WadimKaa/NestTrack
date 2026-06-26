@@ -5,6 +5,9 @@ import android.content.SyncContext
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.powakaz.core_common.repository.TokenRepository
+import com.powakaz.core_datastore.TokenRepositoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,14 +18,20 @@ import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_prefs")
 
-
 @Module
 @InstallIn(SingletonComponent::class)
-object DataStoreModule {
+abstract class DataStoreModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideDataStore(@ApplicationContext context: Context) : DataStore<Preferences>{
-        return context.dataStore
+    abstract fun bindTokenRepository(impl: TokenRepositoryImpl): TokenRepository
+
+
+    companion object{
+        @Provides
+        @Singleton
+        fun provideDataStore(@ApplicationContext context: Context) : DataStore<Preferences>{
+            return context.dataStore
+        }
     }
 }
