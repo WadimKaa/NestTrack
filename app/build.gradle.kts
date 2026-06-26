@@ -32,6 +32,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
+
     }
     buildFeatures {
         compose = true
@@ -42,6 +44,8 @@ dependencies {
     implementation(project(":core-network"))
     implementation(project(":navigation-api"))
     implementation(project(":feature-profile"))
+
+
 
 
     implementation(platform(libs.androidx.compose.bom))

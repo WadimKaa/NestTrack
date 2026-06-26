@@ -9,9 +9,15 @@
     <string name="edit_avatar">Сменить аватар</string>
     <string name="family_member">Участник</string>
 
+
     <string name="current_name">Текущее имя</string>
     <string name="new_name">Новое имя</string>
     <string name="entered_name">Введите имя</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
+
+    <string name="change_date_of_birth">Изменить дату рождения</string>
+    <string name="current_date">Текущее дата</string>
+    <string name="new_date">Новая дата</string>
+    <string name="choose_new_date">Выбрать дату</string>
 </resources>

@@ -45,9 +45,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_profile.R
+import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.EditBirthDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditNameDialog
-import com.powakaz.nesttrack.feature_profile.presentation.mapper.getDefaultAvatar
-import com.powakaz.nesttrack.feature_profile.presentation.model.ProfileUiState
+import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.BirthdayDatePicker
 
 
 private val shape20 = RoundedCornerShape(20.dp)
@@ -61,8 +61,10 @@ fun ProfileScreen(
 
     ProfileScreenContent(
         onEditNameClick = viewModel::showEditNameDialog,
+        onEditBirthClick = viewModel::showEditBirthDialog
 
     )
+
     if (uiState.isEditNameDialogVisible) {
         EditNameDialog(
             currentName = uiState.currentName,
@@ -73,13 +75,28 @@ fun ProfileScreen(
             onReadyToSave = uiState.isSaveEnabled
         )
     }
+
+    if (uiState.isEditBirthDialogVisible) {
+        EditBirthDialog (
+            onDismiss = viewModel::closeEditBirthDialog,
+            onChooseDateClick = viewModel::showDatePicker
+        )
+    }
+
+    if (uiState.isDatePickerVisible) {
+        BirthdayDatePicker(
+            selectedDateMillis = uiState.editedBirthDateMillis,
+            onDismiss = viewModel::closeDatePicker,
+            onDateSelected = viewModel::onBirthDateSelected
+        )
+    }
 }
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreenContent(onEditNameClick: () -> Unit) {
+fun ProfileScreenContent(onEditNameClick: () -> Unit, onEditBirthClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -129,7 +146,7 @@ fun ProfileScreenContent(onEditNameClick: () -> Unit) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                ShowDateOfBirthCard()
+                ShowDateOfBirthCard(onEditBirthClick = onEditBirthClick)
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -146,7 +163,7 @@ fun ProfileScreenContent(onEditNameClick: () -> Unit) {
 }
 
 @Composable
-fun ShowDateOfBirthCard() {
+fun ShowDateOfBirthCard(onEditBirthClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(200.dp)
@@ -216,7 +233,7 @@ fun ShowDateOfBirthCard() {
         Spacer(modifier = Modifier.weight(1f))
 
         TextButton(
-            onClick = {},
+            onClick = onEditBirthClick,
             modifier = Modifier
                 .size(width = 120.dp, height = 32.dp),
             elevation = ButtonDefaults.buttonElevation(
@@ -562,6 +579,7 @@ fun ShowFamilyMemberCard() {
 @Composable
 fun ProfileScreenPreview() {
     ProfileScreenContent(
-        onEditNameClick = { }
+        onEditNameClick = { },
+        onEditBirthClick = { }
     )
 }

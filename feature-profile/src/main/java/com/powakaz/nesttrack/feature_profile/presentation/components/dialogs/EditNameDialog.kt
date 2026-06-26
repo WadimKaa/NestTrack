@@ -96,7 +96,7 @@ fun EditNameDialogContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Изменить имя",
+                text = stringResource(id = R.string.edit_name),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.DarkGray

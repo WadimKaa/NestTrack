@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,6 +15,56 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
+
+
+
+    fun showEditBirthDialog() {
+        _uiState.update {
+            it.copy(
+                isEditBirthDialogVisible = true
+            )
+        }
+    }
+
+    fun closeEditBirthDialog() {
+        _uiState.update {
+            it.copy(isEditBirthDialogVisible = false)
+        }
+    }
+
+    fun saveBirth() {
+        _uiState.update {
+            it.copy(
+                currentBirthDate = it.editedBirthDate,
+                isEditBirthDialogVisible = false
+            )
+        }
+    }
+
+    fun showDatePicker() {
+        _uiState.update {
+            it.copy(isDatePickerVisible = true)
+        }
+    }
+
+    fun closeDatePicker() {
+        _uiState.update {
+            it.copy(isDatePickerVisible = false)
+        }
+    }
+
+    fun onBirthDateSelected(dateMillis: Long) {
+        _uiState.update {
+            it.copy(
+                editedBirthDate = dateMillis,
+                isDatePickerVisible = false,
+
+            )
+        }
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     fun showEditNameDialog() {
         _uiState.update {
@@ -51,7 +102,14 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
 data class ProfileUiState(
     val currentName: String = "",
     val editedName: String = "",
-    val isEditNameDialogVisible: Boolean = false
+    val isEditNameDialogVisible: Boolean = false,
+
+    val isEditBirthDialogVisible: Boolean = false,
+    val isDatePickerVisible: Boolean = false,
+    val currentBirthDate: Long? = null,
+    val editedBirthDate: Long? = null,
+    val editedBirthDateMillis: Long? = null,
+    val currentBirthDateMillis: Long? = null,
 )
 {
     val isSaveEnabled: Boolean
