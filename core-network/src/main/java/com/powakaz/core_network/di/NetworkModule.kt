@@ -1,6 +1,7 @@
 package com.powakaz.core_network.di
 
-import android.os.Build
+import com.powakaz.core_common.repository.TokenRepository
+import com.powakaz.core_datastore.TokenRepositoryImpl
 import com.powakaz.core_network.BuildConfig
 import com.powakaz.core_network.factory.OkHttpFactory
 import com.powakaz.core_network.factory.RetrofitFactory
@@ -21,8 +22,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(): AuthInterceptor {
-        return AuthInterceptor("")
+    fun provideAuthInterceptor(tokenRepository: TokenRepository): AuthInterceptor {
+        return AuthInterceptor(tokenRepository)
     }
 
     @Provides
