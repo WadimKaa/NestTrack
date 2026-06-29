@@ -8,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.powakaz.feature_auth.presentation.LoginScreen
+import com.powakaz.feature_home.HomeScreen
 import com.powakaz.nesttrack.ui.theme.NestTrackTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,7 +19,7 @@ class DebugActivity: ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NestTrackTheme {
-                LoginScreen()
+                HomeScreen()
             }
         }
     }

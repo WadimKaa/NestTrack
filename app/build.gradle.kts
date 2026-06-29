@@ -40,6 +40,7 @@ android {
 
 dependencies {
     implementation(project(":feature-auth"))
+    implementation(project(":feature-home"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

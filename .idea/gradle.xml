@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/core-datastore" />
             <option value="$PROJECT_DIR$/core-network" />
             <option value="$PROJECT_DIR$/feature-auth" />
+            <option value="$PROJECT_DIR$/feature-home" />
             <option value="$PROJECT_DIR$/navigation-api" />
           </set>
         </option>
