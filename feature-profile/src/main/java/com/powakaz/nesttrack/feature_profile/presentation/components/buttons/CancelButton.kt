@@ -1,5 +1,6 @@
 package com.powakaz.nesttrack.feature_profile.presentation.components.buttons
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
@@ -23,14 +24,14 @@ fun CancelButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    CancelButtonContent(text, onClick)
+    CancelButtonContent(text, onClick, modifier)
 }
 
 @Composable
-fun CancelButtonContent(text: String, onClick: () -> Unit){
+fun CancelButtonContent(text: String, onClick: () -> Unit, modifier: Modifier){
     TextButton(
         onClick = onClick,
-        modifier = Modifier.size(width = 140.dp, height = 50.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFCFB8FF))
 
@@ -50,6 +51,8 @@ fun CancelButtonContent(text: String, onClick: () -> Unit){
 @Preview(showBackground = true)
 @Composable
 fun CancelButtonPreview(){
-    CancelButtonContent(text = "",
-        onClick = {})
+    CancelButtonContent(
+        text = "",
+        onClick = {},
+        modifier = Modifier)
 }

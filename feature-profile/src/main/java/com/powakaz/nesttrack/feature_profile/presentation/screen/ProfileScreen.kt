@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_profile.R
+import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditAvatarDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.EditBirthDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditNameDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.BirthdayDatePicker
@@ -61,7 +62,8 @@ fun ProfileScreen(
 
     ProfileScreenContent(
         onEditNameClick = viewModel::showEditNameDialog,
-        onEditBirthClick = viewModel::showEditBirthDialog
+        onEditBirthClick = viewModel::showEditBirthDialog,
+        onEditAvatarClick = viewModel::showEditAvatarDialog
 
     )
 
@@ -93,13 +95,26 @@ fun ProfileScreen(
             onDateSelected = viewModel::onBirthDateSelected
         )
     }
+
+    if (uiState.isEditAvatarDialogVisible) {
+        EditAvatarDialog(
+            onDismiss = viewModel::closeEditAvatarDialog,
+            onTakePhoto = {  },
+            onPickFromGallery = {},
+            onDeletePhoto = {}
+        )
+    }
 }
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreenContent(onEditNameClick: () -> Unit, onEditBirthClick: () -> Unit) {
+fun ProfileScreenContent(
+    onEditNameClick: () -> Unit,
+    onEditBirthClick: () -> Unit,
+    onEditAvatarClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -153,7 +168,7 @@ fun ProfileScreenContent(onEditNameClick: () -> Unit, onEditBirthClick: () -> Un
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                EditAvatarCard()
+                EditAvatarCard(onEditAvatarClick = onEditAvatarClick)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -273,7 +288,7 @@ fun ShowDateOfBirthCard(onEditBirthClick: () -> Unit) {
 }
 
 @Composable
-fun EditAvatarCard() {
+fun EditAvatarCard(onEditAvatarClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(200.dp)
@@ -330,7 +345,7 @@ fun EditAvatarCard() {
         Spacer(modifier = Modifier.weight(1f))
 
         TextButton(
-            onClick = {},
+            onClick = onEditAvatarClick,
             modifier = Modifier
                 .size(width = 120.dp, height = 32.dp),
             elevation = ButtonDefaults.buttonElevation(
@@ -459,12 +474,12 @@ fun ShowDefaultAvatarCard() {
             modifier = Modifier
                 .fillMaxSize()
                 .clip(CircleShape)
-                /*.background(
-                    brush = Brush.linearGradient(
-                        ///
-                    )
+            /*.background(
+                brush = Brush.linearGradient(
+                    ///
+                )
 
-                )*/
+            )*/
 
         )
 
@@ -576,13 +591,13 @@ fun ShowFamilyMemberCard() {
 }
 
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
     ProfileScreenContent(
-        onEditNameClick = { },
-        onEditBirthClick = { }
+        onEditNameClick = {},
+        onEditBirthClick = {},
+        onEditAvatarClick = {}
+
     )
 }

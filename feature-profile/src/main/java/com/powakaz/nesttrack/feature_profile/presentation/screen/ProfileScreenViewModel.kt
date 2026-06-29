@@ -17,6 +17,23 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
 
+    ///////////////////dialog avatar/////////////////////////////
+
+    fun showEditAvatarDialog() {
+        _uiState.update {
+            it.copy(
+                isEditAvatarDialogVisible = true
+            )
+        }
+    }
+
+    fun closeEditAvatarDialog() {
+        _uiState.update {
+            it.copy(isEditAvatarDialogVisible = false)
+        }
+    }
+
+    ////////////////////dialog Birth/////////////////////////////
     fun showEditBirthDialog() {
         _uiState.update {
             it.copy(
@@ -65,7 +82,7 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     }
 
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////dialog name///////////////////////////////////
 
     fun showEditNameDialog() {
         _uiState.update {
@@ -100,8 +117,6 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
 }
 
 data class ProfileUiState(
-    /*val currentName: String = "",
-    val currentBirthDate: Long? = null,*/
     val profile: UserProfile? = null,
 
     val editedName: String = "",
@@ -109,11 +124,9 @@ data class ProfileUiState(
 
     val isEditBirthDialogVisible: Boolean = false,
     val isDatePickerVisible: Boolean = false,
-
     val editedBirthDate: Long? = null,
 
-    /*val editedBirthDateMillis: Long? = null,
-    val currentBirthDateMillis: Long? = null,*/
+    val isEditAvatarDialogVisible: Boolean = false,
 ) {
     val isSaveEnabled: Boolean
         get() = editedName.isNotBlank() &&

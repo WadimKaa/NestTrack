@@ -20,4 +20,8 @@
     <string name="current_date">Текущее дата</string>
     <string name="new_date">Новая дата</string>
     <string name="choose_new_date">Выбрать дату</string>
+
+    <string name="make_photo">Сделать фото</string>
+    <string name="choose_photo_gallery">Выбрать из галереи</string>
+    <string name="delete_photo">Удалить фото</string>
 </resources>
