@@ -54,13 +54,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 // TODO:  Строки
 // TODO:  Поднятие над клавиатурой
 
+
+sealed interface LoginScreenAction {
+    object SuccessfulLogin : LoginScreenAction
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
+    onScreenAction: (LoginScreenAction) -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    LoginContent(uiState = state, onEvent = viewModel::onEvent)
+    LoginContent(uiState = state, onEvent = viewModel::onEvent, onScreenAction = onScreenAction)
 }
 
 
@@ -71,14 +77,18 @@ fun LoginScreenPreview() {
 
     LoginContent(
         uiState = uiState,
-        onEvent = {}
+        onEvent = {},
+        onScreenAction = {}
     )
 
 }
 
 
 @Composable
-fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
+fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit, onScreenAction: (LoginScreenAction) -> Unit) {
+
+    if (uiState.isNeedOpenNextScreen) onScreenAction(LoginScreenAction.SuccessfulLogin)
+
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
@@ -286,7 +296,11 @@ fun LoginButton(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
     val buttonText = if (uiState.currentState == LoginState.NORMAL) "Войти" else "Продолжить"
 
     Button(
-        onClick = { onEvent(LoginUiEvent.ClickLoginButon) },
+        onClick = {
+            if (uiState.currentState == LoginState.NORMAL) onEvent(LoginUiEvent.ClickLoginButon) else onEvent(
+                LoginUiEvent.ClickContinueButton
+            )
+        },
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0XFF7b4af7),
