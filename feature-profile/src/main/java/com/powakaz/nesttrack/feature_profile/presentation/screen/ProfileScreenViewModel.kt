@@ -17,7 +17,6 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
 
-
     fun showEditBirthDialog() {
         _uiState.update {
             it.copy(
@@ -35,8 +34,10 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     fun saveBirth() {
         _uiState.update {
             it.copy(
-                currentBirthDate = it.editedBirthDate,
-                isEditBirthDialogVisible = false
+                isEditBirthDialogVisible = false,
+                editedBirthDate = null,
+                //
+
             )
         }
     }
@@ -59,7 +60,7 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
                 editedBirthDate = dateMillis,
                 isDatePickerVisible = false,
 
-            )
+                )
         }
     }
 
@@ -70,7 +71,7 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
         _uiState.update {
             it.copy(
                 isEditNameDialogVisible = true,
-                //editedName = it.currentName
+                editedName = it.profile?.name.orEmpty()
             )
         }
     }
@@ -91,7 +92,6 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     fun saveName() {
         _uiState.update {
             it.copy(
-                currentName = it.editedName,
                 editedName = "",
                 isEditNameDialogVisible = false
             )
@@ -100,19 +100,28 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
 }
 
 data class ProfileUiState(
-    val currentName: String = "",
+    /*val currentName: String = "",
+    val currentBirthDate: Long? = null,*/
+    val profile: UserProfile? = null,
+
     val editedName: String = "",
     val isEditNameDialogVisible: Boolean = false,
 
     val isEditBirthDialogVisible: Boolean = false,
     val isDatePickerVisible: Boolean = false,
-    val currentBirthDate: Long? = null,
+
     val editedBirthDate: Long? = null,
-    val editedBirthDateMillis: Long? = null,
-    val currentBirthDateMillis: Long? = null,
-)
-{
+
+    /*val editedBirthDateMillis: Long? = null,
+    val currentBirthDateMillis: Long? = null,*/
+) {
     val isSaveEnabled: Boolean
-        get() = editedName.isNotBlank()&&
-                editedName != currentName
+        get() = editedName.isNotBlank() &&
+                editedName != profile?.name
 }
+
+data class UserProfile(
+    val id: Long,
+    val name: String,
+    val birthDate: Long?
+)

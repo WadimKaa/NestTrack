@@ -67,7 +67,7 @@ fun ProfileScreen(
 
     if (uiState.isEditNameDialogVisible) {
         EditNameDialog(
-            currentName = uiState.currentName,
+            currentName = uiState.profile?.name ?: "",
             textNewName = uiState.editedName,
             onTextNewNameChange = viewModel::onNameChanged,
             onDismiss = viewModel::closeEditNameDialog,
@@ -77,15 +77,18 @@ fun ProfileScreen(
     }
 
     if (uiState.isEditBirthDialogVisible) {
-        EditBirthDialog (
+        EditBirthDialog(
             onDismiss = viewModel::closeEditBirthDialog,
-            onChooseDateClick = viewModel::showDatePicker
+            onChooseDateClick = viewModel::showDatePicker,
+            onSave = viewModel::saveBirth,
+            currentDate = uiState.profile?.birthDate,
+            selectedDate = uiState.editedBirthDate
         )
     }
 
     if (uiState.isDatePickerVisible) {
         BirthdayDatePicker(
-            selectedDateMillis = uiState.editedBirthDateMillis,
+            selectedDateMillis = uiState.profile?.birthDate,
             onDismiss = viewModel::closeDatePicker,
             onDateSelected = viewModel::onBirthDateSelected
         )

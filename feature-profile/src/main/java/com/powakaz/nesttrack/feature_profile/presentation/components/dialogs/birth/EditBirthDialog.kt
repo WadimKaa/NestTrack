@@ -33,23 +33,39 @@ import androidx.compose.ui.window.Dialog
 import com.powakaz.nesttrack.feature_profile.R
 import com.powakaz.nesttrack.feature_profile.presentation.components.buttons.CancelButton
 import com.powakaz.nesttrack.feature_profile.presentation.components.buttons.SaveButton
+import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDate
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
 fun EditBirthDialog(
     onDismiss: () -> Unit,
+    onSave: () -> Unit,
     onChooseDateClick: () -> Unit,
-    ) {
+    currentDate: Long?,
+    selectedDate: Long?,
+) {
     Dialog(
         onDismissRequest = onDismiss,
     ) {
-        EditBirthDialogContent(onDismiss = onDismiss, onChooseDateClick)
+        EditBirthDialogContent(
+            onDismiss = onDismiss, onChooseDateClick, onSave, currentDate,
+            selectedDate)
     }
 }
 
 
 @Composable
-fun EditBirthDialogContent(onDismiss: () -> Unit, onChooseDateClick : () -> Unit) {
+fun EditBirthDialogContent(
+    onDismiss: () -> Unit, onChooseDateClick: () -> Unit, onSave: () -> Unit, currentDate: Long?,
+    selectedDate: Long?
+) {
+
+    val currentDateText = currentDate?.let(::formatDate).orEmpty()
+    val editedDateText = selectedDate?.let { formatDate(it) }
+        ?: stringResource(id = R.string.choose_new_date)
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -89,10 +105,10 @@ fun EditBirthDialogContent(onDismiss: () -> Unit, onChooseDateClick : () -> Unit
                 contentAlignment = Alignment.CenterStart
             ) {
                 Text(
+                    text = currentDateText,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 12.dp),
-                    text = "",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.DarkGray,
@@ -119,19 +135,22 @@ fun EditBirthDialogContent(onDismiss: () -> Unit, onChooseDateClick : () -> Unit
                     .fillMaxWidth()
                     .height(60.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(width = 2.dp,
+                    .border(
+                        width = 2.dp,
                         color = Color(0xFFA17CDE),
-                        shape = RoundedCornerShape(12.dp)),
+                        shape = RoundedCornerShape(12.dp)
+                    ),
                 shape = RoundedCornerShape(12.dp)
 
             ) {
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(id = R.string.choose_new_date),
+                        text = editedDateText,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFA17CDE),
@@ -161,7 +180,7 @@ fun EditBirthDialogContent(onDismiss: () -> Unit, onChooseDateClick : () -> Unit
 
                 SaveButton(
                     text = "Сохранить",
-                    onClick = {},
+                    onClick = onSave,
                     onEnabled = true,
                     modifier = Modifier.weight(1f)
                 )
@@ -174,5 +193,9 @@ fun EditBirthDialogContent(onDismiss: () -> Unit, onChooseDateClick : () -> Unit
 @Preview(showBackground = true)
 @Composable
 fun EditBirthDialogPreview() {
-    EditBirthDialogContent(onDismiss = {}, onChooseDateClick ={})
+    EditBirthDialogContent(onDismiss = {},
+        onChooseDateClick = {},
+        onSave = {},
+        currentDate = 123456L,
+        selectedDate = 123456L)
 }

@@ -59,47 +59,13 @@ fun BirthdayDatePickerContent(
 
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDateMillis)
 
-    /*DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            SaveButton(
-                text = "OK",
-                onClick = {
-                    datePickerState.selectedDateMillis?.let (onDateSelected)
-                },
-                onEnabled = true,
-                modifier = Modifier.size(80.dp)
-            )
-        },
-        dismissButton = {
-            CancelButton(
-                text = "Отмена",
-                onClick = onDismiss,
-                modifier = Modifier.size(80.dp)
-            )
-        }
-    ) {
-        DatePicker(
-            state = datePickerState,
-            colors = DatePickerDefaults.colors(
-                selectedDayContainerColor = Color(0xFFF1749E), // кружок выбранной даты
-                selectedDayContentColor = Color.White,         // цвет цифры
-
-                selectedYearContainerColor = Color(0xFFA17CDE),
-                selectedYearContentColor = Color.White
-            )
-        )
-    }*/
-
-
-
     Card {
         Column(modifier = Modifier.background(Color.White)) {
             DatePicker(
                 state = datePickerState,
                 colors = DatePickerDefaults.colors(
-                    selectedDayContainerColor = Color(0xFFF1749E), // кружок выбранной даты
-                    selectedDayContentColor = Color.White,         // цвет цифры
+                    selectedDayContainerColor = Color(0xFFF1749E),
+                    selectedDayContentColor = Color.White,
 
                     selectedYearContainerColor = Color(0xFFA17CDE),
                     selectedYearContentColor = Color.White,
