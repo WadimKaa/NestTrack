@@ -13,7 +13,13 @@ class SessionManagerImpl @Inject constructor(private val tokenRepository: TokenR
 
     override fun isLoggedIn(): Flow<Boolean?> {
         return tokenRepository.getAccessToken().map {
-            !it.isNullOrBlank()
+            if (it == null) {
+                null
+            } else if (it.isBlank()) {
+                false
+            } else {
+                true
+            }
         }
     }
 

@@ -17,14 +17,9 @@ fun AppNavHost(
     isLoggedIn: Boolean?
 ) {
 
-    if (isLoggedIn == null) return
-
-
     LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn == false) {
+        if (isLoggedIn == false || isLoggedIn == null) {
             navController.navigate(Screens.LoginScreen) {
-                Log.e("LOL", "nav")
-
                 popUpTo(0) { inclusive = true }
             }
         }
@@ -34,7 +29,7 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn!!) Screens.HomeScreen else Screens.LoginScreen
+        startDestination = if (isLoggedIn != null && isLoggedIn) Screens.HomeScreen else Screens.LoginScreen
     ) {
         composable<Screens.LoginScreen> {
             LoginScreen()

@@ -61,8 +61,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    Log.e("LOL", "screen")
-
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LoginContent(uiState = state, onEvent = viewModel::onEvent)
 }
@@ -83,8 +81,6 @@ fun LoginScreenPreview() {
 
 @Composable
 fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
-    Log.e("LOL", uiState.currentState.toString())
-
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier

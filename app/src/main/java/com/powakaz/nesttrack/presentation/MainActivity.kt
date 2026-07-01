@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
             NestTrackTheme {
                 val viewModel: MainActivityViewModel = hiltViewModel()
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
+
                 AppNavHost(isLoggedIn = state.isLoggedIn)
             }
         }

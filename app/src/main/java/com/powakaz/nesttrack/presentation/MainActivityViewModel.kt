@@ -32,10 +32,5 @@ class MainActivityViewModel @Inject constructor(sessionManager: SessionManager, 
                 }
             }
             .launchIn(viewModelScope)
-
-        viewModelScope.launch {
-
-        }
-
     }
 }
