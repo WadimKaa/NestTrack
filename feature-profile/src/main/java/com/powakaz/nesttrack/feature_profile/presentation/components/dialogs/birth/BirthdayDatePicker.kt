@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -83,7 +84,7 @@ fun BirthdayDatePickerContent(
                 CancelButton(
                     text = "Отмена",
                     onClick = onDismiss,
-                    modifier = Modifier.size(80.dp)
+                    modifier = Modifier.width(140.dp).height(50.dp)
                 )
 
                 Spacer(modifier = Modifier.weight(1f))

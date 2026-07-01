@@ -1,5 +1,6 @@
 package com.powakaz.nesttrack.feature_profile.presentation.screen
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.powakaz.nesttrack.feature_profile.presentation.model.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +31,14 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     fun closeEditAvatarDialog() {
         _uiState.update {
             it.copy(isEditAvatarDialogVisible = false)
+        }
+    }
+
+    fun onAvatarSelected(uri: Uri) {
+        _uiState.update {
+            it.copy(
+                selectedAvatar = uri
+            )
         }
     }
 
@@ -127,6 +136,7 @@ data class ProfileUiState(
     val editedBirthDate: Long? = null,
 
     val isEditAvatarDialogVisible: Boolean = false,
+    val selectedAvatar: Uri? = null,
 ) {
     val isSaveEnabled: Boolean
         get() = editedName.isNotBlank() &&
@@ -134,7 +144,8 @@ data class ProfileUiState(
 }
 
 data class UserProfile(
-    val id: Long,
+    val id: Int,
     val name: String,
-    val birthDate: Long?
+    val birthDate: Long?,
+    val avatarUrl: String? = null
 )

@@ -124,7 +124,7 @@ fun EditAvatarDialogContent(
                     .fillMaxWidth()
                     .height(40.dp)
                     .padding(horizontal = 16.dp)
-                    .clickable(onClick = onTakePhoto),
+                    .clickable(onClick = onPickFromGallery),
                 verticalAlignment = Alignment.CenterVertically
             )
             {
@@ -166,7 +166,7 @@ fun EditAvatarDialogContent(
                     .fillMaxWidth()
                     .height(40.dp)
                     .padding(horizontal = 16.dp)
-                    .clickable(onClick = onTakePhoto),
+                    .clickable(onClick = onDeletePhoto),
                 verticalAlignment = Alignment.CenterVertically
             )
             {
