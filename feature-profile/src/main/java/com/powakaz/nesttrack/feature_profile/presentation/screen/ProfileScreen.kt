@@ -63,6 +63,7 @@ import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.bir
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditNameDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.BirthdayDatePicker
 import com.powakaz.nesttrack.feature_profile.presentation.components.image.ImagePicker
+import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
 import com.powakaz.nesttrack.feature_profile.presentation.utils.createImageUri
 
 
@@ -90,9 +91,48 @@ fun ProfileScreen(
         avatar = uiState.selectedAvatar
 
     )
+        when (uiState.activeDialog) {
 
+            ProfileDialog.EditName -> EditNameDialog(
+                currentName = uiState.profile?.name ?: "",
+                textNewName = uiState.editedName,
+                onTextNewNameChange = viewModel::onNameChanged,
+                onDismiss = viewModel::dismissDialog,
+                onSave = viewModel::saveName,
+                onReadyToSave = uiState.isSaveEnabled
+            )
 
-        if (uiState.isEditNameDialogVisible) {
+            ProfileDialog.EditBirth -> EditBirthDialog(
+                onDismiss = viewModel::dismissDialog,
+                onChooseDateClick = viewModel::showDatePicker,
+                onSave = viewModel::saveBirth,
+                currentDate = uiState.profile?.birthDate,
+                selectedDate = uiState.editedBirthDate
+            )
+
+            ProfileDialog.EditAvatar -> EditAvatarDialog(
+                onDismiss = viewModel::dismissDialog,
+                onTakePhoto = {
+                    viewModel.dismissDialog()
+                    openCamera()
+                },
+                onPickFromGallery = {
+                    viewModel.dismissDialog()
+                    openGallery()
+                },
+                onDeletePhoto = {}
+            )
+
+            is ProfileDialog.DatePicker -> BirthdayDatePicker(
+                selectedDateMillis = uiState.profile?.birthDate,
+                onDismiss = viewModel::dismissDialog,
+                onDateSelected = viewModel::onBirthDateSelected
+            )
+
+            ProfileDialog.None -> {}
+        }
+
+        /*if (uiState.isEditNameDialogVisible) {
             EditNameDialog(
                 currentName = uiState.profile?.name ?: "",
                 textNewName = uiState.editedName,
@@ -134,7 +174,7 @@ fun ProfileScreen(
                 },
                 onDeletePhoto = {}
             )
-        }
+        }*/
     }
 }
 

@@ -3,6 +3,7 @@ package com.powakaz.nesttrack.feature_profile.presentation.screen
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.powakaz.nesttrack.feature_profile.presentation.model.ProfileUiState
+import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,19 +19,29 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
 
+    fun dismissDialog() {
+        _uiState.update { state ->
+            when (val dialog = state.activeDialog) {
+
+                is ProfileDialog.DatePicker -> {
+                    state.copy(activeDialog = dialog.returnTo)
+                }
+
+                else -> {
+                    state.copy(activeDialog = ProfileDialog.None)
+                }
+            }
+        }
+    }
+
+
     ///////////////////dialog avatar/////////////////////////////
 
     fun showEditAvatarDialog() {
         _uiState.update {
             it.copy(
-                isEditAvatarDialogVisible = true
+                activeDialog = ProfileDialog.EditAvatar
             )
-        }
-    }
-
-    fun closeEditAvatarDialog() {
-        _uiState.update {
-            it.copy(isEditAvatarDialogVisible = false)
         }
     }
 
@@ -43,71 +54,55 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     ////////////////////dialog Birth/////////////////////////////
+
     fun showEditBirthDialog() {
         _uiState.update {
             it.copy(
-                isEditBirthDialogVisible = true
+                activeDialog = ProfileDialog.EditBirth
             )
-        }
-    }
-
-    fun closeEditBirthDialog() {
-        _uiState.update {
-            it.copy(isEditBirthDialogVisible = false)
         }
     }
 
     fun saveBirth() {
         _uiState.update {
             it.copy(
-                isEditBirthDialogVisible = false,
+                activeDialog = ProfileDialog.None,
                 editedBirthDate = null,
-                //
-
             )
         }
     }
+    ///
 
     fun showDatePicker() {
         _uiState.update {
-            it.copy(isDatePickerVisible = true)
-        }
-    }
-
-    fun closeDatePicker() {
-        _uiState.update {
-            it.copy(isDatePickerVisible = false)
+            it.copy(
+                activeDialog = ProfileDialog.DatePicker(returnTo = ProfileDialog.EditBirth)
+            )
         }
     }
 
     fun onBirthDateSelected(dateMillis: Long) {
         _uiState.update {
-            it.copy(
-                editedBirthDate = dateMillis,
-                isDatePickerVisible = false,
-
+            val dialog = it.activeDialog
+            if (dialog is ProfileDialog.DatePicker) {
+                it.copy(
+                    editedBirthDate = dateMillis,
+                    activeDialog = dialog.returnTo
                 )
+            } else it
         }
     }
-
 
     ///////////////////////////dialog name///////////////////////////////////
 
     fun showEditNameDialog() {
         _uiState.update {
             it.copy(
-                isEditNameDialogVisible = true,
+                activeDialog = ProfileDialog.EditName,
                 editedName = it.profile?.name.orEmpty()
             )
         }
     }
-
-    fun closeEditNameDialog() {
-        _uiState.update {
-            it.copy(isEditNameDialogVisible = false)
-        }
-    }
-
 
     fun onNameChanged(name: String) {
         _uiState.update {
@@ -119,14 +114,16 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
         _uiState.update {
             it.copy(
                 editedName = "",
-                isEditNameDialogVisible = false
+                activeDialog = ProfileDialog.None
             )
         }
     }
+
 }
 
 data class ProfileUiState(
     val profile: UserProfile? = null,
+    val activeDialog: ProfileDialog = ProfileDialog.None,
 
     val editedName: String = "",
     val isEditNameDialogVisible: Boolean = false,
