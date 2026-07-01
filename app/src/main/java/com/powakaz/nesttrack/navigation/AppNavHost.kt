@@ -8,19 +8,30 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.powakaz.feature_auth.presentation.LoginScreen
+import com.powakaz.feature_auth.presentation.splash.SplashContent
 import com.powakaz.feature_home.HomeScreen
 import com.powakaz.navigation_api.Screens
+import com.powakaz.nesttrack.presentation.LoginState
 
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberNavController(),
-    isLoggedIn: Boolean?
+    loginState: LoginState
 ) {
 
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn == false || isLoggedIn == null) {
-            navController.navigate(Screens.LoginScreen) {
-                popUpTo(0) { inclusive = true }
+
+    LaunchedEffect(loginState) {
+        when(loginState){
+            LoginState.INITIAL -> {}
+            LoginState.LOGINED -> {
+                navController.navigate(Screens.HomeScreen) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            LoginState.NOT_LOGINED -> {
+                navController.navigate(Screens.LoginScreen) {
+                    popUpTo(0) { inclusive = true }
+                }
             }
         }
     }
@@ -29,8 +40,9 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn != null && isLoggedIn) Screens.HomeScreen else Screens.LoginScreen
+        startDestination = if (loginState == LoginState.LOGINED) Screens.HomeScreen else Screens.LoginScreen
     ) {
+
         composable<Screens.LoginScreen> {
             LoginScreen()
         }

@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 sealed interface Screens {
     @Serializable object LoginScreen : Screens
     @Serializable object HomeScreen : Screens
+    @Serializable object SplashScreen : Screens
 
 }
