@@ -19,7 +19,6 @@ data class LoginUiState(
     val token: String = "",
     val isTokenVisible: Boolean = true,
     val currentState: LoginState = LoginState.NORMAL,
-    val isNeedOpenNextScreen: Boolean = false
 ) {
     val isButtonLoginEnabled = token.length > 5
     val isNeedShowError =
@@ -78,7 +77,6 @@ class LoginViewModel @Inject constructor(
 
                         when (response) {
                             is NetworkResult.Success -> {
-                                saveTokenUseCase(_uiState.value.token)
                                 _uiState.update {
                                     it.copy(currentState = LoginState.TOKEN_RIGHT)
                                 }
@@ -101,8 +99,8 @@ class LoginViewModel @Inject constructor(
             }
 
             LoginUiEvent.ClickContinueButton -> {
-                _uiState.update {
-                    it.copy(isNeedOpenNextScreen = true)
+                viewModelScope.launch {
+                    saveTokenUseCase(_uiState.value.token)
                 }
             }
         }

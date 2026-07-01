@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -18,7 +19,7 @@ data class MainActivityUiState(
 )
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(sessionManager: SessionManager) : ViewModel() {
+class MainActivityViewModel @Inject constructor(sessionManager: SessionManager, ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainActivityUiState())
     val uiState: StateFlow<MainActivityUiState> = _uiState.asStateFlow()
@@ -31,5 +32,10 @@ class MainActivityViewModel @Inject constructor(sessionManager: SessionManager) 
                 }
             }
             .launchIn(viewModelScope)
+
+        viewModelScope.launch {
+
+        }
+
     }
 }

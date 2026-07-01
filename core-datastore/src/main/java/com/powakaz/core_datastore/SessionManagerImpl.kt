@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class SessionManagerImpl @Inject constructor(private val tokenRepository: TokenRepository) :
     SessionManager {
 
-    override fun isLoggedIn(): Flow<Boolean> {
+    override fun isLoggedIn(): Flow<Boolean?> {
         return tokenRepository.getAccessToken().map {
             !it.isNullOrBlank()
         }

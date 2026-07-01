@@ -1,6 +1,7 @@
 package com.powakaz.feature_auth.presentation
 
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import com.powakaz.feature_auth.R
 import androidx.compose.foundation.Image
@@ -55,18 +56,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 // TODO:  Поднятие над клавиатурой
 
 
-sealed interface LoginScreenAction {
-    object SuccessfulLogin : LoginScreenAction
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
-    onScreenAction: (LoginScreenAction) -> Unit
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
+    Log.e("LOL", "screen")
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    LoginContent(uiState = state, onEvent = viewModel::onEvent, onScreenAction = onScreenAction)
+    LoginContent(uiState = state, onEvent = viewModel::onEvent)
 }
 
 
@@ -77,17 +75,15 @@ fun LoginScreenPreview() {
 
     LoginContent(
         uiState = uiState,
-        onEvent = {},
-        onScreenAction = {}
+        onEvent = {}
     )
 
 }
 
 
 @Composable
-fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit, onScreenAction: (LoginScreenAction) -> Unit) {
-
-    if (uiState.isNeedOpenNextScreen) onScreenAction(LoginScreenAction.SuccessfulLogin)
+fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
+    Log.e("LOL", uiState.currentState.toString())
 
     Scaffold { paddingValues ->
         Column(

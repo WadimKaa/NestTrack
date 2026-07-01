@@ -1,5 +1,6 @@
 package com.powakaz.nesttrack.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
@@ -16,27 +17,27 @@ fun AppNavHost(
     isLoggedIn: Boolean?
 ) {
 
+    if (isLoggedIn == null) return
+
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn == false) {
             navController.navigate(Screens.LoginScreen) {
+                Log.e("LOL", "nav")
+
                 popUpTo(0) { inclusive = true }
             }
         }
     }
 
-    if (isLoggedIn == null) return
+
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) Screens.HomeScreen else Screens.LoginScreen
+        startDestination = if (isLoggedIn!!) Screens.HomeScreen else Screens.LoginScreen
     ) {
         composable<Screens.LoginScreen> {
-            LoginScreen( onScreenAction = {
-                navController.navigate(Screens.HomeScreen){
-                    popUpTo<Screens.LoginScreen> { inclusive = true }
-                }
-            })
+            LoginScreen()
         }
 
         composable<Screens.HomeScreen> {
