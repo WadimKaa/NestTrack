@@ -6,7 +6,6 @@ package com.powakaz.nesttrack.feature_profile.presentation.mapper
 import androidx.compose.ui.graphics.Color
 import com.powakaz.nesttrack.feature_profile.R
 import com.powakaz.nesttrack.feature_profile.presentation.model.AvatarUi
-import com.powakaz.nesttrack.feature_profile.presentation.model.ProfileUiState
 
 fun getDefaultAvatar(id : Int): AvatarUi.Default {
 

@@ -2,18 +2,25 @@ package com.powakaz.nesttrack.feature_profile.presentation.screen
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.powakaz.nesttrack.feature_profile.presentation.model.ProfileUiState
+import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
+import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
+import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateAvatarUseCase
+import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateBirthDateUseCase
+import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateNameUseCase
 import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-
-class ProfileScreenViewModel @Inject constructor() : ViewModel() {
+class ProfileScreenViewModel @Inject constructor(
+    private val getProfileUseCase: GetProfileUseCase,
+    private val updateNameUseCase: UpdateNameUseCase,
+    private val updateBirthDateUseCase: UpdateBirthDateUseCase,
+    private val updateAvatarUseCase: UpdateAvatarUseCase
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
@@ -71,7 +78,7 @@ class ProfileScreenViewModel @Inject constructor() : ViewModel() {
             )
         }
     }
-    ///
+    /// ///////////////////////////date picker///////////////////////////////////
 
     fun showDatePicker() {
         _uiState.update {
@@ -140,9 +147,3 @@ data class ProfileUiState(
                 editedName != profile?.name
 }
 
-data class UserProfile(
-    val id: Int,
-    val name: String,
-    val birthDate: Long?,
-    val avatarUrl: String? = null
-)

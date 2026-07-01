@@ -131,50 +131,6 @@ fun ProfileScreen(
 
             ProfileDialog.None -> {}
         }
-
-        /*if (uiState.isEditNameDialogVisible) {
-            EditNameDialog(
-                currentName = uiState.profile?.name ?: "",
-                textNewName = uiState.editedName,
-                onTextNewNameChange = viewModel::onNameChanged,
-                onDismiss = viewModel::closeEditNameDialog,
-                onSave = viewModel::saveName,
-                onReadyToSave = uiState.isSaveEnabled
-            )
-        }
-
-        if (uiState.isEditBirthDialogVisible) {
-            EditBirthDialog(
-                onDismiss = viewModel::closeEditBirthDialog,
-                onChooseDateClick = viewModel::showDatePicker,
-                onSave = viewModel::saveBirth,
-                currentDate = uiState.profile?.birthDate,
-                selectedDate = uiState.editedBirthDate
-            )
-        }
-
-        if (uiState.isDatePickerVisible) {
-            BirthdayDatePicker(
-                selectedDateMillis = uiState.profile?.birthDate,
-                onDismiss = viewModel::closeDatePicker,
-                onDateSelected = viewModel::onBirthDateSelected
-            )
-        }
-
-        if (uiState.isEditAvatarDialogVisible) {
-            EditAvatarDialog(
-                onDismiss = viewModel::closeEditAvatarDialog,
-                onTakePhoto = {
-                    viewModel.closeEditAvatarDialog()
-                    openCamera()
-                },
-                onPickFromGallery = {
-                    viewModel.closeEditAvatarDialog()
-                    openGallery()
-                },
-                onDeletePhoto = {}
-            )
-        }*/
     }
 }
 
