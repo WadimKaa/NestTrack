@@ -1,16 +1,13 @@
 package com.powakaz.feature_auth.presentation
 
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import com.powakaz.feature_auth.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -39,8 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -50,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.powakaz.feature_auth.R
 
 
-// TODO:  Строки
 // TODO:  Поднятие над клавиатурой
 
 
@@ -66,10 +62,10 @@ fun LoginScreen(
 }
 
 
-@Preview(showBackground = true, device = "id:pixel_7")
+@Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    val uiState = LoginUiState(currentState = LoginState.TOKEN_CHECK, token = "retertert")
+    val uiState = LoginUiState(currentState = LoginState.TOKEN_CHECK, token = "")
 
     LoginContent(
         uiState = uiState,
@@ -118,12 +114,12 @@ fun HeadLogin(uiState: LoginUiState) {
         else painterResource(R.drawable.img_login_head)
 
     val headText =
-        if (uiState.currentState == LoginState.TOKEN_RIGHT) "Добро пожаловать!"
-        else "Вход по токену"
+        if (uiState.currentState == LoginState.TOKEN_RIGHT) stringResource(R.string.login_head)
+        else stringResource(R.string.login_head_not_success_state)
 
     val bodyText =
-        if (uiState.currentState == LoginState.TOKEN_RIGHT) "Вход выполнен успешно"
-        else "Введите ваш персональный токен для доступа к приложению"
+        if (uiState.currentState == LoginState.TOKEN_RIGHT) stringResource(R.string.login_body_token_right)
+        else stringResource(R.string.login_body_token_check)
 
 
 
@@ -133,15 +129,13 @@ fun HeadLogin(uiState: LoginUiState) {
         modifier = Modifier.padding(top = 86.dp),
         fontSize = 44.sp,
         fontWeight = FontWeight.Bold,
-        //fontFamily = AuthFontFamily,
         color = Color(0XFF05063d)
     )
     Text(
-        text = "Для учета времени и семейных финансов",
+        text = stringResource(R.string.login_top_body),
         modifier = Modifier.widthIn(max = 300.dp),
         textAlign = TextAlign.Center,
         color = Color(0XFF7a7c9c),
-        //fontFamily = AuthFontFamily,
         fontWeight = FontWeight.SemiBold,
         lineHeight = 18.sp
     )
@@ -153,7 +147,6 @@ fun HeadLogin(uiState: LoginUiState) {
         text = headText,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        //fontFamily = AuthFontFamily,
         color = Color(0XFF05063d)
     )
     Text(
@@ -162,7 +155,6 @@ fun HeadLogin(uiState: LoginUiState) {
         color = Color(0XFF7a7c9c),
         fontWeight = FontWeight.SemiBold,
         lineHeight = 18.sp,
-        //fontFamily = AuthFontFamily,
         modifier = Modifier
             .padding(top = 4.dp)
             .widthIn(max = 300.dp)
@@ -181,9 +173,9 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
         if (uiState.isTokenVisible) VisualTransformation.None else PasswordVisualTransformation()
 
     val errorText = when (uiState.currentState) {
-        LoginState.NETWORK_ERROR -> "Нет соединения с интернетом. Проверьте подключение и попробуйте снова"
-        LoginState.ERROR -> "Произошла ошибка"
-        LoginState.TOKEN_WRONG -> "Неверный токен. Проверьте и попробуйте снова"
+        LoginState.NETWORK_ERROR -> stringResource(R.string.login_error_internet_connection)
+        LoginState.ERROR -> stringResource(R.string.login_error)
+        LoginState.TOKEN_WRONG -> stringResource(R.string.login_error_token)
         else -> ""
     }
 
@@ -211,9 +203,8 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
                 isError = uiState.isNeedShowError,
                 placeholder = {
                     Text(
-                        text = "Введите токен",
+                        text = stringResource(R.string.login_input_token_label),
                         color = hintTextColor,
-                        //fontFamily = AuthFontFamily,
                         fontWeight = FontWeight.SemiBold
                     )
                 },
@@ -260,7 +251,6 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
                 Text(
                     text = errorText,
                     color = Color(0XFFEB5757),
-                    //fontFamily = AuthFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 6.dp)
@@ -273,19 +263,10 @@ fun InputTextLogin(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
 
 @Composable
 fun LoginButton(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
-    val isPreview = androidx.compose.ui.platform.LocalInspectionMode.current
-
-    val AuthFontFamily = if (isPreview) {
-        FontFamily.Default
-    } else {
-        FontFamily(
-            Font(R.font.nunito_regular, FontWeight.Normal),
-            Font(R.font.nunito_bold, FontWeight.Bold),
-            Font(R.font.nunito_semibold, FontWeight.SemiBold)
+    val buttonText =
+        if (uiState.currentState == LoginState.NORMAL) stringResource(R.string.login_button_text) else stringResource(
+            R.string.login_button_text_continue
         )
-    }
-
-    val buttonText = if (uiState.currentState == LoginState.NORMAL) "Войти" else "Продолжить"
 
     Button(
         onClick = {
@@ -306,8 +287,7 @@ fun LoginButton(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
             .padding(top = 12.dp, start = 24.dp, end = 24.dp)
     ) {
         Text(
-            text = buttonText, fontWeight = FontWeight.SemiBold,
-            fontFamily = AuthFontFamily,
+            text = buttonText, fontWeight = FontWeight.SemiBold
         )
     }
 }
@@ -322,9 +302,8 @@ fun LoadingCheckToken() {
             modifier = Modifier.size(30.dp)
         )
         Text(
-            text = "Проверяем токен...",
+            text = stringResource(R.string.login_label_check_token),
             color = Color(0XFF7a7c9c),
-            //fontFamily = AuthFontFamily,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .padding(start = 16.dp)
@@ -338,7 +317,7 @@ fun TokenRightMark() {
     Row(modifier = Modifier.padding(top = 24.dp)) {
         Image(painter = painterResource(R.drawable.ic_check), contentDescription = null)
         Text(
-            text = "Токен действителен",
+            text = stringResource(R.string.login_label_token_right),
             color = Color(0XFF50B36C),
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
@@ -351,18 +330,6 @@ fun TokenRightMark() {
 
 @Composable
 fun BottomLoginCard() {
-    val isPreview = androidx.compose.ui.platform.LocalInspectionMode.current
-
-    val AuthFontFamily = if (isPreview) {
-        FontFamily.Default
-    } else {
-        FontFamily(
-            Font(R.font.nunito_regular, FontWeight.Normal),
-            Font(R.font.nunito_bold, FontWeight.Bold),
-            Font(R.font.nunito_semibold, FontWeight.SemiBold)
-        )
-    }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -391,14 +358,12 @@ fun BottomLoginCard() {
                     .align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "Ваши данные защищены", fontWeight = FontWeight.SemiBold,
-                    //fontFamily = AuthFontFamily,
+                    text = stringResource(R.string.login_label_info_security), fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp
                 )
                 Text(
-                    text = "Доступ к приложению возможен только по вашему уникальному токену",
+                    text = stringResource(R.string.login_label_info_security_text),
                     fontWeight = FontWeight.Normal,
-                    //fontFamily = AuthFontFamily,
                     color = Color(0XFF7a7c9c),
                     fontSize = 12.sp,
                     lineHeight = 14.sp,

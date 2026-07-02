@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">feature-auth</string>
+    <string name="login_head">Добро пожаловать!</string>
+    <string name="login_head_not_success_state">Вход по токену</string>
+    <string name="login_body_token_right">Вход выполнен успешно</string>
+    <string name="login_body_token_check">Введите ваш персональный токен для доступа к приложению</string>
+    <string name="login_top_body">Для учета времени и семейных финансов</string>
+    <string name="login_error_internet_connection">Нет соединения с интернетом. Проверьте подключение и попробуйте снова</string>
+    <string name="login_error">Произошла ошибка</string>
+    <string name="login_error_token">Неверный токен. Проверьте и попробуйте снова</string>
+    <string name="login_input_token_label">Введите токен</string>
+    <string name="login_button_text">Войти</string>
+    <string name="login_button_text_continue">Продолжить</string>
+    <string name="login_label_check_token">Проверяем токен...</string>
+    <string name="login_label_token_right">Токен действителен</string>
+    <string name="login_label_info_security">Ваши данные защищены</string>
+    <string name="login_label_info_security_text">Доступ к приложению возможен только по вашему уникальному токену</string>
 </resources>
