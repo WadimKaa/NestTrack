@@ -15,4 +15,5 @@
     <string name="login_label_token_right">Токен действителен</string>
     <string name="login_label_info_security">Ваши данные защищены</string>
     <string name="login_label_info_security_text">Доступ к приложению возможен только по вашему уникальному токену</string>
+    <string name="login_app_name">Nest Tracker</string>
 </resources>

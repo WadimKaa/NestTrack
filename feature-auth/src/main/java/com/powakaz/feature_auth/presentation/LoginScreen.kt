@@ -125,7 +125,7 @@ fun HeadLogin(uiState: LoginUiState) {
 
 
     Text(
-        text = "Nest Tracker",
+        text = stringResource(R.string.login_app_name),
         modifier = Modifier.padding(top = 86.dp),
         fontSize = 44.sp,
         fontWeight = FontWeight.Bold,
