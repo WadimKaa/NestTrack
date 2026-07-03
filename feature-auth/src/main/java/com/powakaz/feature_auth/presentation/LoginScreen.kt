@@ -49,9 +49,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.feature_auth.R
 
 
-// TODO:  Поднятие над клавиатурой
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
@@ -86,7 +83,6 @@ fun LoginContent(uiState: LoginUiState, onEvent: (LoginUiEvent) -> Unit) {
                 .imePadding()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-
             ) {
             HeadLogin(uiState)
             if (uiState.isNeedShowInputText) InputTextLogin(uiState, onEvent)
@@ -358,7 +354,8 @@ fun BottomLoginCard() {
                     .align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = stringResource(R.string.login_label_info_security), fontWeight = FontWeight.SemiBold,
+                    text = stringResource(R.string.login_label_info_security),
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp
                 )
                 Text(

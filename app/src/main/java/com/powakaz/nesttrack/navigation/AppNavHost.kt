@@ -1,6 +1,5 @@
 package com.powakaz.nesttrack.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
@@ -8,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.powakaz.feature_auth.presentation.LoginScreen
-import com.powakaz.feature_auth.presentation.splash.SplashContent
 import com.powakaz.feature_home.HomeScreen
 import com.powakaz.navigation_api.Screens
 import com.powakaz.nesttrack.presentation.LoginState
