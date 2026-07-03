@@ -2,6 +2,8 @@ package com.powakaz.nesttrack.feature_profile.presentation.screen
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
 import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateAvatarUseCase
@@ -12,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +28,19 @@ class ProfileScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            getProfileUseCase().collect { profile ->
+                _uiState.update {
+                    it.copy(profile = profile)
+                }
+            }
+        }
+    }
+
+
+
+    ///////////////////////////dismiss all dialog///////////////////////////////////////
 
     fun dismissDialog() {
         _uiState.update { state ->
@@ -41,7 +57,6 @@ class ProfileScreenViewModel @Inject constructor(
         }
     }
 
-
     ///////////////////dialog avatar/////////////////////////////
 
     fun showEditAvatarDialog() {
@@ -53,10 +68,11 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun onAvatarSelected(uri: Uri) {
-        _uiState.update {
-            it.copy(
-                selectedAvatar = uri
-            )
+        viewModelScope.launch {
+            updateAvatarUseCase(uri)
+            _uiState.update {
+                it.copy(selectedAvatar = uri)
+            }
         }
     }
 
@@ -71,13 +87,20 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun saveBirth() {
-        _uiState.update {
-            it.copy(
-                activeDialog = ProfileDialog.None,
-                editedBirthDate = null,
-            )
+        val dateToSave = _uiState.value.editedBirthDate
+        if (dateToSave != null) {
+            viewModelScope.launch {
+                updateBirthDateUseCase(dateToSave)
+                _uiState.update {
+                    it.copy(
+                        activeDialog = ProfileDialog.None,
+                        editedBirthDate = null
+                    )
+                }
+            }
         }
     }
+
     /// ///////////////////////////date picker///////////////////////////////////
 
     fun showDatePicker() {
@@ -118,11 +141,14 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun saveName() {
-        _uiState.update {
-            it.copy(
-                editedName = "",
-                activeDialog = ProfileDialog.None
-            )
+        viewModelScope.launch {
+            updateNameUseCase(_uiState.value.editedName)
+            _uiState.update {
+                it.copy(
+                    editedName = "",
+                    activeDialog = ProfileDialog.None
+                )
+            }
         }
     }
 
