@@ -6,7 +6,11 @@
         <option name="selectionMode" value="DROPDOWN" />
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="EditNameDialogPreview">
+      <SelectionState runConfigName="core-datastore">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="core-common">
         <option name="selectionMode" value="DROPDOWN" />
         <DialogSelection />
       </SelectionState>

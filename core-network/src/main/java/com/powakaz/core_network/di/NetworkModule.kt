@@ -1,5 +1,8 @@
 package com.powakaz.core_network.di
 
+import com.powakaz.core_common.repository.TokenRepository
+import com.powakaz.core_datastore.TokenRepositoryImpl
+import com.powakaz.core_network.BuildConfig
 import com.powakaz.core_network.factory.OkHttpFactory
 import com.powakaz.core_network.factory.RetrofitFactory
 import com.powakaz.core_network.interceptor.AuthInterceptor
@@ -9,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
@@ -18,21 +22,48 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(): AuthInterceptor {
-        return AuthInterceptor("")
+    fun provideAuthInterceptor(tokenRepository: TokenRepository): AuthInterceptor {
+        return AuthInterceptor(tokenRepository)
     }
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    @PublicClient
+    fun providePublicOkHttpClient(): OkHttpClient {
+        return OkHttpFactory.createOkHttpClient()
+    }
+
+
+    @Provides
+    @Singleton
+    @AuthenticatedClient
+    fun provideAuthenticatedOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
         return OkHttpFactory.createOkHttpClient(authInterceptor)
+
+
     }
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return RetrofitFactory.createRetrofit("", okHttpClient)
+    @PublicClient
+    fun providePublicRetrofit(@PublicClient okHttpClient: OkHttpClient): Retrofit {
+        return RetrofitFactory.createRetrofit(BuildConfig.BASE_URL, okHttpClient)
     }
+
+    @Provides
+    @Singleton
+    @AuthenticatedClient
+    fun provideAuthenticatedRetrofit(@AuthenticatedClient okHttpClient: OkHttpClient): Retrofit {
+        return RetrofitFactory.createRetrofit(BuildConfig.BASE_URL, okHttpClient)
+    }
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class AuthenticatedClient
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class PublicClient
 
 
 }
