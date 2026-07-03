@@ -6,4 +6,8 @@ interface TokenRepository {
     fun getAccessToken() : Flow<String?>
     suspend fun saveToken(token: String)
     suspend fun clearToken()
+
+    fun getUserId(): Flow<Int?>
+
+    suspend fun saveUserId(userId: Int)
 }
