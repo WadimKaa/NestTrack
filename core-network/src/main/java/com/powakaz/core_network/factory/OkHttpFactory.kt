@@ -1,6 +1,7 @@
 package com.powakaz.core_network.factory
 
 import com.powakaz.core_network.interceptor.AuthInterceptor
+import com.powakaz.core_network.interceptor.SessionInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
@@ -8,7 +9,10 @@ import java.util.concurrent.TimeUnit
 object OkHttpFactory {
 
 
-    fun createOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    fun createOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        sessionInterceptor: SessionInterceptor
+    ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -19,6 +23,7 @@ object OkHttpFactory {
             .readTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
             .addInterceptor(authInterceptor)
+            .addInterceptor(sessionInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
     }

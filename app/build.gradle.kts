@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.powakaz.nesttrack"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.powakaz.nesttrack"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -39,6 +39,10 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature-auth"))
+    implementation(project(":feature-home"))
+    implementation(project(":core-common"))
+    implementation(project(":navigation-api"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -74,4 +78,6 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler.work)
+
+    implementation(libs.androidx.core.splashscreen)
 }

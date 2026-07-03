@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "com.powakaz.navigation_api"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
 
     defaultConfig {
