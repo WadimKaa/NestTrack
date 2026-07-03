@@ -1,11 +1,12 @@
 package com.powakaz.core_network.di
 
+import com.powakaz.core_common.manager.SessionManager
 import com.powakaz.core_common.repository.TokenRepository
-import com.powakaz.core_datastore.TokenRepositoryImpl
 import com.powakaz.core_network.BuildConfig
 import com.powakaz.core_network.factory.OkHttpFactory
 import com.powakaz.core_network.factory.RetrofitFactory
 import com.powakaz.core_network.interceptor.AuthInterceptor
+import com.powakaz.core_network.interceptor.SessionInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideSessionInterceptor(sessionManager: SessionManager): SessionInterceptor {
+        return SessionInterceptor(sessionManager)
+    }
+
+    @Provides
+    @Singleton
     @PublicClient
     fun providePublicOkHttpClient(): OkHttpClient {
         return OkHttpFactory.createOkHttpClient()
@@ -37,10 +44,11 @@ object NetworkModule {
     @Provides
     @Singleton
     @AuthenticatedClient
-    fun provideAuthenticatedOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
-        return OkHttpFactory.createOkHttpClient(authInterceptor)
-
-
+    fun provideAuthenticatedOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        sessionInterceptor: SessionInterceptor
+    ): OkHttpClient {
+        return OkHttpFactory.createOkHttpClient(authInterceptor, sessionInterceptor)
     }
 
     @Provides
