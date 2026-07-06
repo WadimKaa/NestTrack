@@ -10,7 +10,6 @@ fun UserProfileEntity.toDomain(): UserProfile {
         name = name,
         birthDate = birthDate,
         avatarUrl = avatarUrl,
-        createdAt = createdAt,
-        apiToken = apiToken
+        createdAt = createdAt
     )
 }

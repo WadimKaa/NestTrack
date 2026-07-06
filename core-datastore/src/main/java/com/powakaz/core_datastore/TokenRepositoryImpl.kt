@@ -18,7 +18,6 @@ class TokenRepositoryImpl @Inject constructor(private val dataStore : DataStore<
 
     companion object {
         private val TOKEN_KEY = stringPreferencesKey("auth_token")
-        private val USER_ID_KEY = intPreferencesKey("user_id")
     }
 
     override fun getAccessToken(): Flow<String?> {
@@ -39,18 +38,4 @@ class TokenRepositoryImpl @Inject constructor(private val dataStore : DataStore<
             preferences.remove(TOKEN_KEY)
         }
     }
-
-    override fun getUserId(): Flow<Int?> {
-        return dataStore.data.map { preferences ->
-            preferences[USER_ID_KEY]
-        }
-    }
-
-    override suspend fun saveUserId(userId: Int) {
-        dataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = userId
-        }
-    }
-
-
 }
