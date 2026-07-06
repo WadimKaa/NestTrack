@@ -7,8 +7,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.powakaz.core_common.manager.SessionManager
 import com.powakaz.core_common.repository.TokenRepository
+import com.powakaz.core_common.repository.UserIdRepository
 import com.powakaz.core_datastore.SessionManagerImpl
 import com.powakaz.core_datastore.TokenRepositoryImpl
+import com.powakaz.core_datastore.UserIdRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -31,8 +33,12 @@ abstract class DataStoreModule {
 
     @Binds
     @Singleton
-    abstract fun bindSessionManager(impl: SessionManagerImpl) : SessionManager
+    abstract fun bindUserIdRepository(impl: UserIdRepositoryImpl) : UserIdRepository
 
+
+    @Binds
+    @Singleton
+    abstract fun bindSessionManager(impl: SessionManagerImpl) : SessionManager
 
     companion object{
         @Provides
