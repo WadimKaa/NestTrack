@@ -1,10 +1,12 @@
 package com.powakaz.feature_auth.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.feature_auth.domain.usecase.CheckTokenUseCase
 import com.powakaz.feature_auth.domain.usecase.SaveTokenUseCase
+import com.powakaz.feature_auth.domain.usecase.SaveUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +44,8 @@ sealed interface LoginUiEvent {
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     val checkTokenUseCase: CheckTokenUseCase,
-    val saveTokenUseCase: SaveTokenUseCase
+    val saveTokenUseCase: SaveTokenUseCase,
+    val saveUserIdUseCase : SaveUserIdUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -77,6 +80,7 @@ class LoginViewModel @Inject constructor(
 
                         when (response) {
                             is NetworkResult.Success -> {
+                                saveUserIdUseCase(userId = response.data.id)
                                 _uiState.update {
                                     it.copy(currentState = LoginState.TOKEN_RIGHT)
                                 }
