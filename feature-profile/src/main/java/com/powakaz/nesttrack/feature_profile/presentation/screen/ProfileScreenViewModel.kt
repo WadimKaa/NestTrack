@@ -41,7 +41,7 @@ class ProfileScreenViewModel @Inject constructor(
                 is NetworkResult.Exception -> {
                     Log.e("LOL", result.e.message.toString())
                 }
-                is NetworkResult.Success<ProfileDto> -> {
+                is NetworkResult.Success<UserProfile> -> {
                     Log.e("LOL", result.toString())
                 }
             }

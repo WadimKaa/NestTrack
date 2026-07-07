@@ -27,19 +27,23 @@ class ProfileRepositoryImpl @Inject constructor(
     private val api: ProfileApi
 ) : ProfileRepository
 {
-    override suspend fun getProfile(): NetworkResult<ProfileDto> {
+    override suspend fun getProfile(): NetworkResult<UserProfile> {
 
         val result = safeApiCall {
             val profileList = api.getUsersProfile()
 
-            profileList.find {
+            val profile = profileList.find {
                 it.id == CURRENT_USER_ID
             } ?: throw Exception("User ID not found")
 
+            profile.toDomain()
         }
 
 
         return result
+    }
+    fun  test (): Any{
+        return ""
     }
 
     override suspend fun updateName(name: String) {

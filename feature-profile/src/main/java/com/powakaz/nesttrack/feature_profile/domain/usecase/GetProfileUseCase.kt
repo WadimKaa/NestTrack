@@ -10,5 +10,5 @@ import javax.inject.Inject
 class GetProfileUseCase @Inject constructor(
     private val profileRepository: ProfileRepository
 ){
-    suspend operator fun invoke(): NetworkResult<ProfileDto> = profileRepository.getProfile()
+    suspend operator fun invoke(): NetworkResult<UserProfile> = profileRepository.getProfile()
 }
