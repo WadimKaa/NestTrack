@@ -1,9 +1,12 @@
 package com.powakaz.nesttrack.feature_profile.presentation.screen
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileDto
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
 import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateAvatarUseCase
@@ -30,14 +33,21 @@ class ProfileScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getProfileUseCase().collect { profile ->
-                _uiState.update {
-                    it.copy(profile = profile)
+            val result = getProfileUseCase()
+            when(result) {
+                is NetworkResult.Error -> {
+                    Log.e("LOL", result.message.toString())
+                }
+                is NetworkResult.Exception -> {
+                    Log.e("LOL", result.e.message.toString())
+                }
+                is NetworkResult.Success<ProfileDto> -> {
+                    Log.e("LOL", result.toString())
                 }
             }
+
         }
     }
-
 
 
     ///////////////////////////dismiss all dialog///////////////////////////////////////

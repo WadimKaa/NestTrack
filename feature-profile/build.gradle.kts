@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -8,8 +9,9 @@ plugins {
 android {
     namespace = "com.powakaz.nesttrack.feature_profile"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
+    //compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -33,6 +35,7 @@ android {
 
 dependencies {
     implementation(project(":core-common"))
+    implementation(project(":core-network"))
 
 
     implementation(libs.androidx.appcompat)
@@ -66,5 +69,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    ////retrofit
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.serialization)
+    implementation(libs.okhttp)
 
 }

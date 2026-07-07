@@ -88,13 +88,14 @@ fun ProfileScreen(
         onEditNameClick = viewModel::showEditNameDialog,
         onEditBirthClick = viewModel::showEditBirthDialog,
         onEditAvatarClick = viewModel::showEditAvatarDialog,
-        avatar = uiState.selectedAvatar
+        avatar = uiState.selectedAvatar,
+        name = uiState.profile?.name ?: "lol",
 
     )
         when (uiState.activeDialog) {
 
             ProfileDialog.EditName -> EditNameDialog(
-                currentName = uiState.profile?.name ?: "",
+                currentName = uiState.profile?.name ?: "lol",
                 textNewName = uiState.editedName,
                 onTextNewNameChange = viewModel::onNameChanged,
                 onDismiss = viewModel::dismissDialog,
@@ -139,6 +140,7 @@ fun ProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenContent(
+    name: String,
     avatar: Uri?,
     onEditNameClick: () -> Unit,
     onEditBirthClick: () -> Unit,
@@ -172,7 +174,7 @@ fun ProfileScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            ShowGeneralCard(avatar = avatar, onEditNameClick = onEditNameClick)
+            ShowGeneralCard(name = name, avatar = avatar, onEditNameClick = onEditNameClick)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -410,7 +412,7 @@ fun EditAvatarCard(onEditAvatarClick: () -> Unit) {
 }
 
 @Composable
-fun ShowGeneralCard(avatar: Uri?, onEditNameClick: () -> Unit) {
+fun ShowGeneralCard(name: String, avatar: Uri?, onEditNameClick: () -> Unit) {
 
     Spacer(modifier = Modifier.height(10.dp))
 
@@ -446,7 +448,7 @@ fun ShowGeneralCard(avatar: Uri?, onEditNameClick: () -> Unit) {
         Spacer(modifier = Modifier.height(14.dp))
 
         Text(
-            text = "Полина",
+            text = name,
             modifier = Modifier
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
@@ -641,7 +643,8 @@ fun ProfileScreenPreview() {
         onEditNameClick = {},
         onEditBirthClick = {},
         onEditAvatarClick = {},
-        avatar = null
+        avatar = null,
+        name = ""
 
     )
 }

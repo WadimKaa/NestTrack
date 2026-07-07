@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <uses-feature
@@ -9,8 +10,9 @@
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:name=".NestTrackApp"
+        android:name=".App"
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -18,8 +20,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NestTrack">
+
+        <activity android:name=".presentation.MainActivity"/>
+
+
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".PolinaTest"
             android:exported="true"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize"

@@ -5,6 +5,6 @@ data class UserProfile(
     val name: String,
     val birthDate: Long?,
     val avatarUrl: String?,
-    val createdAt: Long?
+    val createdAt: String?
 
 )

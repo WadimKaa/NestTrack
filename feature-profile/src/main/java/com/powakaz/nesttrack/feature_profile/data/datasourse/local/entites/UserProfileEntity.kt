@@ -10,7 +10,7 @@ data class UserProfileEntity(
     val name: String,
     val birthDate: Long?,
     val avatarUrl: String?,
-    val createdAt: Long?,
+    val createdAt: String?,
     val apiToken: String?,
     val syncState: SyncState
 )
