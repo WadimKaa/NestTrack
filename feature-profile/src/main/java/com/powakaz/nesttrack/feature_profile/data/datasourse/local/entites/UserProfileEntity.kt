@@ -3,6 +3,7 @@ package com.powakaz.nesttrack.feature_profile.data.datasourse.local.entites
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.powakaz.nesttrack.feature_profile.data.datasourse.local.SyncState
+import java.time.LocalDate
 
 @Entity(tableName = "user_profile")
 data class UserProfileEntity(
@@ -10,7 +11,7 @@ data class UserProfileEntity(
     val name: String,
     val birthDate: Long?,
     val avatarUrl: String?,
-    val createdAt: String?,
+    val createdAt: LocalDate?,
     val apiToken: String?,
     val syncState: SyncState
 )

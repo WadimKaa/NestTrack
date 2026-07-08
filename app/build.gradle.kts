@@ -30,6 +30,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
 
@@ -85,4 +86,6 @@ dependencies {
     ksp(libs.androidx.hilt.compiler.work)
 
     implementation(libs.androidx.core.splashscreen)
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

@@ -1,7 +1,9 @@
 package com.powakaz.nesttrack.feature_profile.data.repository
 
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.copy
 import com.powakaz.core_common.repository.TokenRepository
 import com.powakaz.core_network.model.NetworkResult
@@ -27,6 +29,7 @@ class ProfileRepositoryImpl @Inject constructor(
     private val api: ProfileApi
 ) : ProfileRepository
 {
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getProfile(): NetworkResult<UserProfile> {
 
         val result = safeApiCall {
@@ -39,11 +42,7 @@ class ProfileRepositoryImpl @Inject constructor(
             profile.toDomain()
         }
 
-
         return result
-    }
-    fun  test (): Any{
-        return ""
     }
 
     override suspend fun updateName(name: String) {

@@ -1,7 +1,9 @@
 package com.powakaz.nesttrack.feature_profile.presentation.screen
 
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,11 +17,15 @@ import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateNameUseCase
 import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDate
+import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDateMountToText
 
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
@@ -29,22 +35,39 @@ class ProfileScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             val result = getProfileUseCase()
-            when(result) {
+            when (result) {
                 is NetworkResult.Error -> {
-                    Log.e("LOL", result.message.toString())
+                    NetworkResult.Error(result.code, result.message)
                 }
+
                 is NetworkResult.Exception -> {
-                    Log.e("LOL", result.e.message.toString())
+                    NetworkResult.Exception(result.e)
                 }
+
                 is NetworkResult.Success<UserProfile> -> {
-                    Log.e("LOL", result.toString())
+                    Log.e("LOl", result.toString())
+
+                    val profileData = result.data
+
+                    _uiState.update {
+                        it.copy(
+                            profile = profileData,
+                            formattedCreatedAt = profileData.createdAt?.let { date ->
+                                formatDateMountToText(date)
+                            } ?: "Дата не указана"
+
+                        )
+                    }
+
+                    NetworkResult.Success(Unit)
                 }
             }
+
 
         }
     }
@@ -166,6 +189,7 @@ class ProfileScreenViewModel @Inject constructor(
 
 data class ProfileUiState(
     val profile: UserProfile? = null,
+    val formattedCreatedAt: String = "",
     val activeDialog: ProfileDialog = ProfileDialog.None,
 
     val editedName: String = "",
