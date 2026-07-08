@@ -18,3 +18,10 @@ fun formatDateMountToText(date: LocalDate): String {
     val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("ru"))
     return date.format(formatter)
 }
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatDateMountNumber(date: LocalDate): String {
+    val formatter = DateTimeFormatter.ofPattern("dd MM yyyy", Locale("ru"))
+    return date.format(formatter)
+}

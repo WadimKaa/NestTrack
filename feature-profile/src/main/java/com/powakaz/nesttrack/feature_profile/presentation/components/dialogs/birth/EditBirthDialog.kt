@@ -1,5 +1,7 @@
 package com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,18 +37,21 @@ import com.powakaz.nesttrack.feature_profile.R
 import com.powakaz.nesttrack.feature_profile.presentation.components.buttons.CancelButton
 import com.powakaz.nesttrack.feature_profile.presentation.components.buttons.SaveButton
 import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDate
+import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDateMountNumber
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditBirthDialog(
     onDismiss: () -> Unit,
     onSave: () -> Unit,
     onChooseDateClick: () -> Unit,
-    currentDate: Long?,
-    selectedDate: Long?,
+    currentDate: LocalDate?,
+    selectedDate: LocalDate?,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -58,14 +63,18 @@ fun EditBirthDialog(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditBirthDialogContent(
-    onDismiss: () -> Unit, onChooseDateClick: () -> Unit, onSave: () -> Unit, currentDate: Long?,
-    selectedDate: Long?
+    onDismiss: () -> Unit,
+    onChooseDateClick: () -> Unit,
+    onSave: () -> Unit,
+    currentDate: LocalDate?,
+    selectedDate: LocalDate?
 ) {
 
-    val currentDateText = currentDate?.let(::formatDate).orEmpty()
-    val editedDateText = selectedDate?.let { formatDate(it) }
+    val currentDateText = currentDate?.let{formatDateMountNumber(it)}.orEmpty()
+    val editedDateText = selectedDate?.let { formatDateMountNumber(it) }
         ?: stringResource(id = R.string.choose_new_date)
 
     Card(
@@ -197,6 +206,6 @@ fun EditBirthDialogPreview() {
     EditBirthDialogContent(onDismiss = {},
         onChooseDateClick = {},
         onSave = {},
-        currentDate = 123456L,
-        selectedDate = 123456L)
+        currentDate = null,
+        selectedDate = null)
 }

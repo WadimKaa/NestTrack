@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -48,7 +49,7 @@ class ProfileRepositoryImpl @Inject constructor(
     override suspend fun updateName(name: String) {
     }
 
-    override suspend fun updateBirthDate(dateMillis: Long) {
+    override suspend fun updateBirthDate(date: LocalDate) {
     }
 
     override suspend fun updateAvatar(uri: Uri) {

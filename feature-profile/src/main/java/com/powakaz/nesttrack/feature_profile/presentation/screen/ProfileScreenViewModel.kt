@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDate
 import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDateMountToText
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
@@ -57,14 +58,15 @@ class ProfileScreenViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             profile = profileData,
-                            formattedCreatedAt = profileData.createdAt?.let { date ->
+                            /*formattedCreatedAt = profileData.createdAt?.let { date ->
                                 formatDateMountToText(date)
-                            } ?: "Дата не указана"
+                            } ?: "Дата не указана",
+                            formattedBirthDate = profileData.birthDate?.let { date ->
+                                formatDateMountToText(date)
+                            } ?: "Дата не указана"*/
 
                         )
                     }
-
-                    NetworkResult.Success(Unit)
                 }
             }
 
@@ -144,12 +146,12 @@ class ProfileScreenViewModel @Inject constructor(
         }
     }
 
-    fun onBirthDateSelected(dateMillis: Long) {
+    fun onBirthDateSelected(date: LocalDate) {
         _uiState.update {
             val dialog = it.activeDialog
             if (dialog is ProfileDialog.DatePicker) {
                 it.copy(
-                    editedBirthDate = dateMillis,
+                    editedBirthDate = date,
                     activeDialog = dialog.returnTo
                 )
             } else it
@@ -162,7 +164,7 @@ class ProfileScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 activeDialog = ProfileDialog.EditName,
-                editedName = it.profile?.name.orEmpty()
+                editedName = ""//it.profile?.name.orEmpty()
             )
         }
     }
@@ -189,7 +191,6 @@ class ProfileScreenViewModel @Inject constructor(
 
 data class ProfileUiState(
     val profile: UserProfile? = null,
-    val formattedCreatedAt: String = "",
     val activeDialog: ProfileDialog = ProfileDialog.None,
 
     val editedName: String = "",
@@ -197,10 +198,12 @@ data class ProfileUiState(
 
     val isEditBirthDialogVisible: Boolean = false,
     val isDatePickerVisible: Boolean = false,
-    val editedBirthDate: Long? = null,
+    val editedBirthDate: LocalDate? = null,
 
     val isEditAvatarDialogVisible: Boolean = false,
     val selectedAvatar: Uri? = null,
+
+    //val formattedCreatedAt: String = "",
 ) {
     val isSaveEnabled: Boolean
         get() = editedName.isNotBlank() &&

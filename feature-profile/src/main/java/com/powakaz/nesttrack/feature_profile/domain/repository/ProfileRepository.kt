@@ -5,6 +5,7 @@ import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileDto
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 interface ProfileRepository {
 
@@ -12,7 +13,7 @@ interface ProfileRepository {
 
     suspend fun updateName(name: String)
 
-    suspend fun updateBirthDate(dateMillis: Long)
+    suspend fun updateBirthDate(date: LocalDate)
 
     suspend fun updateAvatar(uri: Uri)
 }

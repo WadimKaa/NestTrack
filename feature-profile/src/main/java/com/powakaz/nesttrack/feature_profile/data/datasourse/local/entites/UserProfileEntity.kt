@@ -9,7 +9,7 @@ import java.time.LocalDate
 data class UserProfileEntity(
     @PrimaryKey val id: Int,
     val name: String,
-    val birthDate: Long?,
+    val birthDate: LocalDate?,
     val avatarUrl: String?,
     val createdAt: LocalDate?,
     val apiToken: String?,

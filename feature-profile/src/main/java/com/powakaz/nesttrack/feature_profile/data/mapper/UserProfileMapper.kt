@@ -25,28 +25,14 @@ fun UserProfileEntity.toDomain(): UserProfile {
 }
 
 
-private const val SERVER_DATE_FORMAT = "yyyy-MM-dd"
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun ProfileDto.toDomain(): UserProfile {
     return UserProfile(
         id = id,
         name = name,
-        birthDate = parseServerDate(birthDate),
+        birthDate = birthDate?.let { LocalDate.parse(it) },
         avatarUrl = avatarUrl,
         createdAt = OffsetDateTime.parse(createdAt).toLocalDate()
     )
-}
-
-
-@SuppressLint("SimpleDateFormat")
-private fun parseServerDate(dateStr: String?): Long? {
-    if (dateStr == null) return null
-
-    return try {
-        val formatter = SimpleDateFormat(SERVER_DATE_FORMAT)
-        formatter.parse(dateStr)?.time
-    } catch (e: Exception) {
-        null
-    }
 }

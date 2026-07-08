@@ -55,6 +55,7 @@ import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.Edi
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.BirthdayDatePicker
 import com.powakaz.nesttrack.feature_profile.presentation.components.image.ImagePicker
 import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
+import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDateMountToText
 import java.time.LocalDate
 
 
@@ -82,7 +83,9 @@ fun ProfileScreen(
         onEditAvatarClick = viewModel::showEditAvatarDialog,
         avatar = uiState.selectedAvatar,
         name = uiState.profile?.name ?: "",
-        formattedCreatedAt = uiState.formattedCreatedAt
+        createdAd = uiState.profile?.createdAt ?: LocalDate.now(),
+        birth = uiState.profile?.birthDate ?: LocalDate.now()
+
 
     )
         when (uiState.activeDialog) {
@@ -118,7 +121,7 @@ fun ProfileScreen(
             )
 
             is ProfileDialog.DatePicker -> BirthdayDatePicker(
-                selectedDateMillis = uiState.profile?.birthDate,
+                selectedDate = uiState.profile?.birthDate,
                 onDismiss = viewModel::dismissDialog,
                 onDateSelected = viewModel::onBirthDateSelected
             )
@@ -129,13 +132,15 @@ fun ProfileScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenContent(
     name: String,
     avatar: Uri?,
-    formattedCreatedAt: String,
+    birth: LocalDate,
+    createdAd: LocalDate,
     onEditNameClick: () -> Unit,
     onEditBirthClick: () -> Unit,
     onEditAvatarClick: () -> Unit
@@ -189,7 +194,7 @@ fun ProfileScreenContent(
             Row(
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                ShowDateOfBirthCard(onEditBirthClick = onEditBirthClick)
+                ShowDateOfBirthCard(onEditBirthClick = onEditBirthClick, birth = birth)
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -198,15 +203,16 @@ fun ProfileScreenContent(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            ShowFamilyMemberCard(formattedCreatedAt = formattedCreatedAt)
+            ShowFamilyMemberCard(createdAt = createdAd)
 
         }
     }
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ShowDateOfBirthCard(onEditBirthClick: () -> Unit) {
+fun ShowDateOfBirthCard(onEditBirthClick: () -> Unit, birth: LocalDate) {
     Column(
         modifier = Modifier
             .width(200.dp)
@@ -264,7 +270,7 @@ fun ShowDateOfBirthCard(onEditBirthClick: () -> Unit) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "15 марта 1995",
+            text = formatDateMountToText(birth),
             modifier = Modifier
                 .fillMaxWidth(),
             fontSize = 18.sp,
@@ -536,8 +542,9 @@ fun AvatarCard(
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ShowFamilyMemberCard(formattedCreatedAt: String,) {
+fun ShowFamilyMemberCard(createdAt: LocalDate) {
 
     Row(
         Modifier
@@ -603,7 +610,7 @@ fun ShowFamilyMemberCard(formattedCreatedAt: String,) {
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "c $formattedCreatedAt",
+                text = "c ${formatDateMountToText(createdAt)}",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
@@ -630,6 +637,7 @@ fun ShowFamilyMemberCard(formattedCreatedAt: String,) {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
@@ -639,7 +647,9 @@ fun ProfileScreenPreview() {
         onEditAvatarClick = {},
         avatar = null,
         name = "",
-        formattedCreatedAt = ""
+        createdAd = LocalDate.now(),
+        birth = LocalDate.now()
 
     )
 }
+//formattedCreatedAt = "",

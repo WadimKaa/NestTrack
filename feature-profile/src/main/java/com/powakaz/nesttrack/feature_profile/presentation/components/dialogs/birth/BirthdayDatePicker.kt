@@ -1,5 +1,7 @@
 package com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,10 +34,11 @@ import java.time.ZoneId
 import kotlin.time.Instant
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BirthdayDatePicker(
-    selectedDateMillis: Long?,
-    onDateSelected: (Long) -> Unit,
+    selectedDate: LocalDate?,
+    onDateSelected: (LocalDate) -> Unit,
     onDismiss: () -> Unit
 ) {
 
@@ -43,22 +46,25 @@ fun BirthdayDatePicker(
         onDismissRequest = onDismiss,
     ) {
         BirthdayDatePickerContent(
-            selectedDateMillis = selectedDateMillis,
+            selectedDate = selectedDate,
             onDismiss = onDismiss,
             onDateSelected = onDateSelected
         )
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BirthdayDatePickerContent(
-    selectedDateMillis: Long?,
+    selectedDate: LocalDate?,
     onDismiss: () -> Unit,
-    onDateSelected: (Long) -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
 ) {
 
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDateMillis)
+    val initialDateMillis = selectedDate?.atStartOfDay(ZoneId.systemDefault())
+        ?.toInstant()?.toEpochMilli()
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialDateMillis)
 
     Card {
         Column(modifier = Modifier.background(Color.White)) {
@@ -92,7 +98,13 @@ fun BirthdayDatePickerContent(
                 SaveButton(
                     text = "OK",
                     onClick = {
-                        datePickerState.selectedDateMillis?.let (onDateSelected)
+                        datePickerState.selectedDateMillis?.let {
+                            onDateSelected(
+                                java.time.Instant.ofEpochMilli(it)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                            )
+                        }
                     },
                     onEnabled = true,
                     modifier = Modifier.size(80.dp)
@@ -105,8 +117,9 @@ fun BirthdayDatePickerContent(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun BirthdayDatePickerPreview() {
-    BirthdayDatePickerContent(onDismiss = {}, onDateSelected = {}, selectedDateMillis = 1123456L)
+    BirthdayDatePickerContent(onDismiss = {}, onDateSelected = {}, selectedDate = null)
 }
