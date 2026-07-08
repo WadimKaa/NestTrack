@@ -1,0 +1,147 @@
+package com.powakaz.feature_finance.presentation
+
+import android.widget.ProgressBar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun FinanceMainScreenRoute() {
+
+}
+
+
+@Preview
+@Composable
+fun FinanceMainScreenPreview() {
+    FinanceMainScreen()
+}
+
+
+@Composable
+fun FinanceMainScreen() {
+    Scaffold { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxWidth()
+        ) {
+            TopBar()
+            Head()
+        }
+    }
+
+}
+
+@Composable
+fun TopBar() {
+    Text(
+        text = "Финансы",
+        color = Color(0XFF071145),
+        fontSize = 24.sp,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(start = 16.dp)
+    )
+    Text(
+        text = "Баланс, кошельки и операции",
+        color = Color(0XFF747a9f),
+        fontSize = 12.sp,
+        modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+    )
+}
+
+
+@Composable
+fun Head() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFFFFF)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        ),
+        shape = RoundedCornerShape(16.dp)
+
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(2.dp)
+                .clip(RoundedCornerShape(15.dp))
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            Color(0XFFf0f5fe),
+                            Color(0xFFfaeffd)
+                        )
+                    )
+                )
+        ) {
+            Column(modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 20.dp)) {
+                Text(
+                    text = "Общий баланс",
+                    color = Color(0XFF10173f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Br 2 000",
+                    color = Color(0XFF147afd),
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                HorizontalDivider(
+                    color = Color(0XFFe3eafc),
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                )
+                Text(
+                    text = "Недельный бюджет",
+                    color = Color(0XFF10173f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Row(modifier = Modifier.padding(top = 6.dp)) {
+                    Text(
+                        text = "Br 150",
+                        color = Color(0XFF147afd),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                    Text(
+                        text = "осталось",
+                        color = Color(0XFF69709b),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .padding(start = 4.dp, bottom = 1.dp)
+                            .align(Alignment.Bottom)
+                    )
+                }
+                LinearProgressIndicator(modifier = Modifier.padding(top = 6.dp))
+            }
+        }
+    }
+}

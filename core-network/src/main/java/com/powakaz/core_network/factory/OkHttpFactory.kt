@@ -1,5 +1,6 @@
 package com.powakaz.core_network.factory
 
+import com.powakaz.core_network.BuildConfig
 import com.powakaz.core_network.interceptor.AuthInterceptor
 import com.powakaz.core_network.interceptor.SessionInterceptor
 import okhttp3.OkHttpClient
@@ -14,8 +15,9 @@ object OkHttpFactory {
         sessionInterceptor: SessionInterceptor
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            HttpLoggingInterceptor.Level.BODY
         }
+
 
 
         return OkHttpClient.Builder()
