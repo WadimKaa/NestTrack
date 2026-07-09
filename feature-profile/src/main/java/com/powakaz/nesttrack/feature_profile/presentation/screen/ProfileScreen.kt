@@ -4,6 +4,7 @@ package com.powakaz.nesttrack.feature_profile.presentation.screen
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,6 +55,7 @@ import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.bir
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditNameDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.BirthdayDatePicker
 import com.powakaz.nesttrack.feature_profile.presentation.components.image.ImagePicker
+import com.powakaz.nesttrack.feature_profile.presentation.mapper.getDefaultAvatar
 import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
 import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDateMountToText
 import java.time.LocalDate
@@ -77,17 +79,18 @@ fun ProfileScreen(
     ) { openCamera, openGallery ->
 
 
-    ProfileScreenContent(
-        onEditNameClick = viewModel::showEditNameDialog,
-        onEditBirthClick = viewModel::showEditBirthDialog,
-        onEditAvatarClick = viewModel::showEditAvatarDialog,
-        avatar = uiState.selectedAvatar,
-        name = uiState.profile?.name ?: "",
-        createdAd = uiState.profile?.createdAt ?: LocalDate.now(),
-        birth = uiState.profile?.birthDate ?: LocalDate.now()
+        ProfileScreenContent(
+            onEditNameClick = viewModel::showEditNameDialog,
+            onEditBirthClick = viewModel::showEditBirthDialog,
+            onEditAvatarClick = viewModel::showEditAvatarDialog,
+            avatar = uiState.selectedAvatar ?: uiState.profile?.avatarUrl,
+            name = uiState.profile?.name ?: "",
+            createdAd = uiState.profile?.createdAt ?: LocalDate.now(),
+            birth = uiState.profile?.birthDate ?: LocalDate.now(),
+            id = uiState.profile!!.id
 
 
-    )
+        )
         when (uiState.activeDialog) {
 
             ProfileDialog.EditName -> EditNameDialog(
@@ -110,12 +113,12 @@ fun ProfileScreen(
             ProfileDialog.EditAvatar -> EditAvatarDialog(
                 onDismiss = viewModel::dismissDialog,
                 onTakePhoto = {
-                    viewModel.dismissDialog()
                     openCamera()
+                    viewModel.dismissDialog()
                 },
                 onPickFromGallery = {
-                    viewModel.dismissDialog()
                     openGallery()
+                    viewModel.dismissDialog()
                 },
                 onDeletePhoto = {}
             )
@@ -138,8 +141,9 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     name: String,
-    avatar: Uri?,
+    avatar: Any?,
     birth: LocalDate,
+    id: Int,
     createdAd: LocalDate,
     onEditNameClick: () -> Unit,
     onEditBirthClick: () -> Unit,
@@ -173,7 +177,12 @@ fun ProfileScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            ShowGeneralCard(name = name, avatar = avatar, onEditNameClick = onEditNameClick)
+            ShowGeneralCard(
+                name = name,
+                avatar = avatar,
+                id = id,
+                onEditNameClick = onEditNameClick
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -412,7 +421,7 @@ fun EditAvatarCard(onEditAvatarClick: () -> Unit) {
 }
 
 @Composable
-fun ShowGeneralCard(name: String, avatar: Uri?, onEditNameClick: () -> Unit) {
+fun ShowGeneralCard(name: String, avatar: Any?, id: Int, onEditNameClick: () -> Unit) {
 
     Spacer(modifier = Modifier.height(10.dp))
 
@@ -443,7 +452,7 @@ fun ShowGeneralCard(name: String, avatar: Uri?, onEditNameClick: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(10.dp))
 
-        AvatarCard(avatar)
+        AvatarCard(avatar, id)
 
         Spacer(modifier = Modifier.height(14.dp))
 
@@ -492,7 +501,8 @@ fun ShowGeneralCard(name: String, avatar: Uri?, onEditNameClick: () -> Unit) {
 
 @Composable
 fun AvatarCard(
-    avatar: Uri?,
+    avatar: Any?,
+    id: Int,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -502,20 +512,21 @@ fun AvatarCard(
     ) {
 
         if (avatar == null) {
+
+            val avatar = getDefaultAvatar(id)
+
             Image(
-                painter = painterResource(id = R.drawable.girl),
+                painter = painterResource(id = avatar.avatarRes),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = modifier
                     .fillMaxSize()
                     .clip(CircleShape)
-                /*.background(
-                brush = Brush.linearGradient(
-                    ///
-                )
-
-            )*/
-
+                    .background(
+                        brush = Brush.linearGradient(
+                            avatar.gradient
+                        )
+                    )
             )
         } else {
             AsyncImage(
@@ -524,7 +535,10 @@ fun AvatarCard(
                 contentScale = ContentScale.Crop,
                 modifier = modifier
                     .fillMaxSize()
-                    .clip(CircleShape)
+                    .clip(CircleShape),
+                onLoading = { Log.e("IMG", "loading") },
+                onSuccess = { Log.e("IMG", "success") },
+                onError = { Log.e("IMG", "error: ${it.result.throwable}") }
             )
         }
         Box(
@@ -645,11 +659,11 @@ fun ProfileScreenPreview() {
         onEditNameClick = {},
         onEditBirthClick = {},
         onEditAvatarClick = {},
-        avatar = null,
+        avatar = "",
         name = "",
         createdAd = LocalDate.now(),
-        birth = LocalDate.now()
+        birth = LocalDate.now(),
+        id = 0
 
     )
 }
-//formattedCreatedAt = "",

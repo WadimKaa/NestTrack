@@ -15,5 +15,5 @@ interface ProfileRepository {
 
     suspend fun updateBirthDate(date: LocalDate)
 
-    suspend fun updateAvatar(uri: Uri)
+    suspend fun updateAvatar(photo: Any)
 }

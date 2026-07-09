@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.text.intl.Locale
+import com.powakaz.nesttrack.feature_profile.BuildConfig
 import com.powakaz.nesttrack.feature_profile.data.datasourse.local.entites.UserProfileEntity
 import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileDto
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
@@ -32,7 +33,14 @@ fun ProfileDto.toDomain(): UserProfile {
         id = id,
         name = name,
         birthDate = birthDate?.let { LocalDate.parse(it) },
-        avatarUrl = avatarUrl,
+        avatarUrl = avatarUrl?.let { buildUrl(it) },
         createdAt = OffsetDateTime.parse(createdAt).toLocalDate()
     )
+}
+
+private fun buildUrl(path: String): String {
+    return when {
+        path.startsWith("http") -> path
+        else -> BuildConfig.BASE_URL_AVATAR + path
+    }
 }

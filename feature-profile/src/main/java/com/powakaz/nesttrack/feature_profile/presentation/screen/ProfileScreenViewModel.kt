@@ -57,14 +57,7 @@ class ProfileScreenViewModel @Inject constructor(
 
                     _uiState.update {
                         it.copy(
-                            profile = profileData,
-                            /*formattedCreatedAt = profileData.createdAt?.let { date ->
-                                formatDateMountToText(date)
-                            } ?: "Дата не указана",
-                            formattedBirthDate = profileData.birthDate?.let { date ->
-                                formatDateMountToText(date)
-                            } ?: "Дата не указана"*/
-
+                            profile = profileData
                         )
                     }
                 }
@@ -73,7 +66,6 @@ class ProfileScreenViewModel @Inject constructor(
 
         }
     }
-
 
     ///////////////////////////dismiss all dialog///////////////////////////////////////
 
@@ -102,11 +94,11 @@ class ProfileScreenViewModel @Inject constructor(
         }
     }
 
-    fun onAvatarSelected(uri: Uri) {
+    fun onAvatarSelected(photo: Any) {
         viewModelScope.launch {
-            updateAvatarUseCase(uri)
+            updateAvatarUseCase(photo)
             _uiState.update {
-                it.copy(selectedAvatar = uri)
+                it.copy(selectedAvatar = photo)
             }
         }
     }
@@ -201,9 +193,8 @@ data class ProfileUiState(
     val editedBirthDate: LocalDate? = null,
 
     val isEditAvatarDialogVisible: Boolean = false,
-    val selectedAvatar: Uri? = null,
+    val selectedAvatar: Any? = null,
 
-    //val formattedCreatedAt: String = "",
 ) {
     val isSaveEnabled: Boolean
         get() = editedName.isNotBlank() &&

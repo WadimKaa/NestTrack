@@ -52,7 +52,7 @@ class ProfileRepositoryImpl @Inject constructor(
     override suspend fun updateBirthDate(date: LocalDate) {
     }
 
-    override suspend fun updateAvatar(uri: Uri) {
+    override suspend fun updateAvatar(photo: Any) {
     }
 
     companion object {
