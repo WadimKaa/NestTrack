@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -22,6 +25,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,27 +70,21 @@ fun BirthdayDatePickerContent(
         ?.toInstant()?.toEpochMilli()
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialDateMillis)
 
-    Card {
-        Column(modifier = Modifier.background(Color.White)) {
-            DatePicker(
-                state = datePickerState,
-                colors = DatePickerDefaults.colors(
-                    selectedDayContainerColor = Color(0xFFF1749E),
-                    selectedDayContentColor = Color.White,
 
-                    selectedYearContainerColor = Color(0xFFA17CDE),
-                    selectedYearContentColor = Color.White,
-
-                    containerColor = Color.White
-                )
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
+    DatePickerDialog(
+        shape = RoundedCornerShape(14.dp),
+        colors = DatePickerDefaults.colors(
+            containerColor = Color.White
+        ),
+        onDismissRequest = onDismiss,
+        confirmButton = {
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                horizontalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxWidth()
             ) {
+
+                Spacer(modifier = Modifier.width(6.dp))
+
                 CancelButton(
                     text = "Отмена",
                     onClick = onDismiss,
@@ -110,11 +108,52 @@ fun BirthdayDatePickerContent(
                     modifier = Modifier.size(80.dp)
                 )
             }
+        }
+    ) {
+        Column(modifier = Modifier.background(Color.White)) {
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    selectedDayContainerColor = Color(0xFFF1749E),
+                    selectedDayContentColor = Color.White,
+
+                    selectedYearContainerColor = Color(0xFFA17CDE),
+                    selectedYearContentColor = Color.White,
+
+                    containerColor = Color.White
+                )
+            )
+
             Spacer(modifier = Modifier.height(10.dp))
+
+            /*Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+                //Spacer(modifier = Modifier.weight(1f))
+
+                SaveButton(
+                    text = "OK",
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let {
+                            onDateSelected(
+                                java.time.Instant.ofEpochMilli(it)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                            )
+                        }
+                    },
+                    onEnabled = true,
+                    modifier = Modifier.size(80.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))*/
         }
     }
-
 }
+
+
 
 
 @RequiresApi(Build.VERSION_CODES.O)
