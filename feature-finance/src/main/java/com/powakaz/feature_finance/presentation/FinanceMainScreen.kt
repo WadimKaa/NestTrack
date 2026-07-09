@@ -1,8 +1,8 @@
 package com.powakaz.feature_finance.presentation
 
-import android.widget.ProgressBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,6 +57,7 @@ fun FinanceMainScreen() {
             TopBar()
             Head()
             Wallets()
+            QuickActions()
         }
     }
 
@@ -191,13 +192,43 @@ fun FinanceHeadProgressBar(progress: Float) {
 
 @Composable
 fun Wallets() {
-    Text(
-        text = "Мои кошельки",
-        modifier = Modifier.padding(start = 16.dp),
-        color = Color(0XFF071145),
-        fontWeight = FontWeight.SemiBold
-    )
-    Row(modifier = Modifier.padding(top = 8.dp).fillMaxWidth()) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Мои кошельки",
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .align(Alignment.CenterVertically),
+            color = Color(0XFF071145),
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Row(
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(
+                text = "Все кошельки",
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .align(Alignment.CenterVertically),
+                color = Color(0XFF076ffe),
+                fontSize = 12.sp
+            )
+            Image(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color(0XFF076ffe)),
+                modifier = Modifier.size(14.dp)
+            )
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth()
+    ) {
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
@@ -323,6 +354,79 @@ fun Wallets() {
                 }
             }
 
+        }
+    }
+}
+
+
+@Composable
+fun QuickActions() {
+    Text(
+        text = "Быстрые действия",
+        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 8.dp),
+        color = Color(0XFF071145),
+        fontWeight = FontWeight.SemiBold
+    )
+    Row(modifier = Modifier
+        .padding(start = 16.dp, end = 16.dp)
+        .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        QuicAction(
+            "Расход",
+            Color(0xFFFC665B),
+            R.drawable.ic_arrow_down,
+            modifier = Modifier.weight(1f)
+        )
+        QuicAction("Доход",
+            Color(0XFF50ae68),
+            R.drawable.ic_plus,
+            modifier = Modifier.weight(1f))
+        QuicAction(
+            "Перевод",
+            Color(0XFF9650fc),
+            R.drawable.ic_double_arrows,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+fun QuicAction(text: String, color: Color, iconId: Int, modifier: Modifier) {
+    Card(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.5.dp
+        ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 24.dp, bottom = 24.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(shape = CircleShape, color = color)
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Image(
+                    painter = painterResource(iconId),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.White),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            Text(
+                text = text,
+                color = Color(0XFF071145),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 6.dp)
+            )
         }
     }
 }
