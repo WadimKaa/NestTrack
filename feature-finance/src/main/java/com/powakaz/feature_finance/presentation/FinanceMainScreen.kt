@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +56,7 @@ fun FinanceMainScreen() {
         ) {
             TopBar()
             Head()
+            Wallets()
         }
     }
 
@@ -183,4 +186,143 @@ fun FinanceHeadProgressBar(progress: Float) {
         )
     }
 
+}
+
+
+@Composable
+fun Wallets() {
+    Text(
+        text = "Мои кошельки",
+        modifier = Modifier.padding(start = 16.dp),
+        color = Color(0XFF071145),
+        fontWeight = FontWeight.SemiBold
+    )
+    Row(modifier = Modifier.padding(top = 8.dp).fillMaxWidth()) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .padding(start = 16.dp, end = 4.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 2.dp
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0XFFf1f8f1))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_cash),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth(0.4f)
+                            .align(Alignment.CenterVertically)
+                            .padding(start = 8.dp)
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 6.dp, top = 8.dp, bottom = 8.dp)
+                    ) {
+                        Text(
+                            text = "Наличные",
+                            color = Color(0XFF071145),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 11.sp
+                        )
+                        Row() {
+                            Text(
+                                text = "Br 200",
+                                modifier = Modifier
+                                    .padding(top = 4.dp, bottom = 4.dp),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            Image(
+                                painter = painterResource(R.drawable.ic_arrow_right),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(Color(0XFF85bf92))
+                            )
+                        }
+                        Text(text = "Кошелек", color = Color(0XFF69709b), fontSize = 11.sp)
+                    }
+                }
+            }
+
+        }
+
+
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp, start = 4.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 2.dp
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0XFFedf5fd))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_card),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth(0.4f)
+                            .align(Alignment.CenterVertically)
+                            .padding(start = 8.dp)
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 6.dp, top = 8.dp, bottom = 8.dp)
+                    ) {
+                        Text(
+                            text = "Безналичные",
+                            color = Color(0XFF071145),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 11.sp
+                        )
+                        Row() {
+                            Text(
+                                text = "Br 200",
+                                modifier = Modifier
+                                    .padding(top = 4.dp, bottom = 4.dp),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            Image(
+                                painter = painterResource(R.drawable.ic_arrow_right),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(Color(0XFF1072fe))
+                            )
+                        }
+                        Text(text = "Кошелек", color = Color(0XFF69709b), fontSize = 11.sp)
+                    }
+                }
+            }
+
+        }
+    }
 }
