@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -58,10 +59,12 @@ fun FinanceMainScreen() {
             Head()
             Wallets()
             QuickActions()
+            ListTransactions()
         }
     }
 
 }
+
 
 @Composable
 fun TopBar() {
@@ -123,7 +126,7 @@ fun Head() {
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "Br 2 000",
+                        text = "2 000 BYN",
                         color = Color(0XFF147afd),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -141,7 +144,7 @@ fun Head() {
                     )
                     Row(modifier = Modifier.padding(top = 6.dp, bottom = 10.dp)) {
                         Text(
-                            text = "Br 150",
+                            text = "150 BYN",
                             color = Color(0XFF147afd),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.SemiBold
@@ -272,7 +275,7 @@ fun Wallets() {
                         )
                         Row() {
                             Text(
-                                text = "Br 200",
+                                text = "200 BYN",
                                 modifier = Modifier
                                     .padding(top = 4.dp, bottom = 4.dp),
                                 fontSize = 14.sp,
@@ -336,7 +339,7 @@ fun Wallets() {
                         )
                         Row() {
                             Text(
-                                text = "Br 200",
+                                text = "200 BYN",
                                 modifier = Modifier
                                     .padding(top = 4.dp, bottom = 4.dp),
                                 fontSize = 14.sp,
@@ -367,20 +370,24 @@ fun QuickActions() {
         color = Color(0XFF071145),
         fontWeight = FontWeight.SemiBold
     )
-    Row(modifier = Modifier
-        .padding(start = 16.dp, end = 16.dp)
-        .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         QuicAction(
             "Расход",
             Color(0xFFFC665B),
             R.drawable.ic_arrow_down,
             modifier = Modifier.weight(1f)
         )
-        QuicAction("Доход",
+        QuicAction(
+            "Доход",
             Color(0XFF50ae68),
             R.drawable.ic_plus,
-            modifier = Modifier.weight(1f))
+            modifier = Modifier.weight(1f)
+        )
         QuicAction(
             "Перевод",
             Color(0XFF9650fc),
@@ -429,4 +436,160 @@ fun QuicAction(text: String, color: Color, iconId: Int, modifier: Modifier) {
             )
         }
     }
+}
+
+
+@Composable
+fun ListTransactions() {
+    Text(
+        text = "Операции по дням",
+        modifier = Modifier
+            .padding(start = 16.dp, top = 12.dp),
+        color = Color(0XFF071145),
+        fontWeight = FontWeight.SemiBold
+    )
+    OneDayCard()
+}
+
+@Composable
+fun OneDayCard() {
+    Card(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 1.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+            .fillMaxWidth()
+    ) {
+        Row() {
+            Image(
+                painter = painterResource(R.drawable.ic_calendar),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color(0XFF686e93)),
+                modifier = Modifier.padding(start = 6.dp, top = 6.dp, bottom = 6.dp)
+            )
+            Text(
+                text = "Сегодня, 6 июля",
+                modifier = Modifier
+                    .padding(start = 6.dp, top = 4.dp)
+                    .align(Alignment.CenterVertically),
+                fontSize = 13.sp,
+                color = Color(0XFF686e93)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "- 55 BYN",
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .align(Alignment.CenterVertically),
+                fontSize = 13.sp,
+                color = Color(0XFFf20302),
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = "+ 155 BYN",
+                modifier = Modifier
+                    .padding(start = 12.dp, top = 4.dp, end = 16.dp)
+                    .align(Alignment.CenterVertically),
+                fontSize = 13.sp,
+                color = Color(0XFF0bae31),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        HorizontalDivider(color = Color(0XFFf8f8fb))
+        Column() {
+            TransactionItem()
+            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp))
+            TransactionItem()
+        }
+    }
+}
+
+
+@Composable
+fun TransactionItem() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(start = 8.dp, top = 4.dp)
+                .background(shape = CircleShape, color = Color(0XFF659af1))
+                .padding(8.dp)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_gas),
+                contentDescription = null,
+                modifier = Modifier.size(26.dp)
+            )
+        }
+
+        Column(modifier = Modifier.padding(start = 12.dp)) {
+            Text(
+                text = "Умный дом",
+                color = Color(0XFF071145),
+                modifier = Modifier.padding(top = 6.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp
+            )
+            Box(
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .background(
+                        shape = RoundedCornerShape(4.dp),
+                        color = Color(0XFFedf3fe)
+                    )
+            ) {
+                Text(
+                    text = "Недельный бюджет",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0XFF5e7ad3),
+                    modifier = Modifier.padding(
+                        start = 8.dp,
+                        end = 8.dp,
+                        top = 2.dp,
+                        bottom = 2.dp
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Column(modifier = Modifier.padding(end = 16.dp)) {
+            Text(
+                text = "- 55 BYN",
+                fontSize = 13.sp,
+                color = Color(0XFFf20302),
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .align(Alignment.End)
+            )
+            Row() {
+                Text(
+                    text = "Наличные",
+                    fontSize = 10.sp,
+                    color = Color(0XFF686e93),
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_card),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .size(16.dp)
+                )
+            }
+        }
+    }
+
 }
