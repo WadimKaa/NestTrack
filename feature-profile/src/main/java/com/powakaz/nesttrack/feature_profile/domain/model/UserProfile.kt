@@ -8,6 +8,5 @@ data class UserProfile(
     val birthDate: LocalDate?,
     val avatarUrl: Any?,
     val createdAt: LocalDate?,
-   // val apiToken: String
 
 )

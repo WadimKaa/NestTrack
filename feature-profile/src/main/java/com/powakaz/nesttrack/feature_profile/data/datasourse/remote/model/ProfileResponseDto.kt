@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProfileDto(
+data class ProfileResponseDto(
     val id: Int,
     val name: String,
     @SerialName("avatar_url")
@@ -13,8 +13,6 @@ data class ProfileDto(
     val birthDate: String?,
     @SerialName("created_at")
     val createdAt: String?,
-    /*@SerialName("api_token")
-    val apiToken: String? = null*/
 )
 {
 }

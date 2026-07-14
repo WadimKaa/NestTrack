@@ -1,14 +1,10 @@
 package com.powakaz.nesttrack.feature_profile.presentation.screen
 
-import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.powakaz.core_network.model.NetworkResult
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileDto
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
 import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateAvatarUseCase
@@ -21,8 +17,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDate
-import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDateMountToText
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)

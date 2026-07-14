@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class AvatarDto(
+data class AvatarResponseDto(
+    val status: String,
     @SerialName("avatar_url")
     val avatarUrl: String
 ) {

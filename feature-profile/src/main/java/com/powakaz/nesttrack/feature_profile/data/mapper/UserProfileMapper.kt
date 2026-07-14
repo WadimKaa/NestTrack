@@ -1,18 +1,15 @@
 package com.powakaz.nesttrack.feature_profile.data.mapper
 
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.text.intl.Locale
 import com.powakaz.nesttrack.feature_profile.BuildConfig
 import com.powakaz.nesttrack.feature_profile.data.datasourse.local.entites.UserProfileEntity
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileDto
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileResponseDto
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateResponseDto
+import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.util.Date
 
 
 fun UserProfileEntity.toDomain(): UserProfile {
@@ -21,27 +18,31 @@ fun UserProfileEntity.toDomain(): UserProfile {
         name = name,
         birthDate = birthDate,
         avatarUrl = avatarUrl,
-        createdAt = createdAt,
-        //apiToken = apiToken
+        createdAt = createdAt
     )
 }
 
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun ProfileDto.toDomain(): UserProfile {
+fun ProfileResponseDto.toDomain(): UserProfile {
     return UserProfile(
         id = id,
         name = name,
         birthDate = birthDate?.let { LocalDate.parse(it) },
         avatarUrl = avatarUrl?.let { buildUrl(it) },
-        createdAt = OffsetDateTime.parse(createdAt).toLocalDate(),
-        //apiToken = apiToken
+        createdAt = OffsetDateTime.parse(createdAt).toLocalDate()
     )
 }
 
-fun UserProfile.toDto(): ProfileDto {
-    return ProfileDto(
+fun UpdateResponseDto.toDomain() : UpdateProfile {
+    return UpdateProfile(
+        status = status == "success"
+    )
+}
+
+fun UserProfile.toDto(): ProfileResponseDto {
+    return ProfileResponseDto(
         id = id,
         name = name,
         birthDate = birthDate?.toString(),
