@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProfileResponseDto(
+data class UserProfileResponseDto(
     val id: Int,
     val name: String,
     @SerialName("avatar_url")

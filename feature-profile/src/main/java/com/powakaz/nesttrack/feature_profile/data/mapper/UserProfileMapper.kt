@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.powakaz.nesttrack.feature_profile.BuildConfig
 import com.powakaz.nesttrack.feature_profile.data.datasourse.local.entites.UserProfileEntity
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileResponseDto
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateResponseDto
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UserProfileResponseDto
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateProfileResponseDto
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import java.time.LocalDate
@@ -26,7 +26,7 @@ fun UserProfileEntity.toDomain(): UserProfile {
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun ProfileResponseDto.toDomain(): UserProfile {
+fun UserProfileResponseDto.toDomain(): UserProfile {
     return UserProfile(
         id = id,
         name = name,
@@ -36,7 +36,7 @@ fun ProfileResponseDto.toDomain(): UserProfile {
     )
 }
 
-fun UpdateResponseDto.toDomain() : UpdateProfile {
+fun UpdateProfileResponseDto.toDomain() : UpdateProfile {
     Log.e("LOL", status)
     return UpdateProfile(
         status = status == "success"
@@ -44,8 +44,8 @@ fun UpdateResponseDto.toDomain() : UpdateProfile {
     )
 }
 
-fun UserProfile.toDto(): ProfileResponseDto {
-    return ProfileResponseDto(
+fun UserProfile.toDto(): UserProfileResponseDto {
+    return UserProfileResponseDto(
         id = id,
         name = name,
         birthDate = birthDate?.toString(),

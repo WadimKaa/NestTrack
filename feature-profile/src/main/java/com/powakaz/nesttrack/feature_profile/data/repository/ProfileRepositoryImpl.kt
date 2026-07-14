@@ -5,11 +5,11 @@ import androidx.annotation.RequiresApi
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.core_network.utils.safeApiCall
 import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.api.ProfileApi
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateResponseDto
 import com.powakaz.nesttrack.feature_profile.data.mapper.toDomain
 import com.powakaz.nesttrack.feature_profile.data.mapper.toDto
 import com.powakaz.nesttrack.feature_profile.di.PrivateProfileApi
 import com.powakaz.nesttrack.feature_profile.di.PublicProfileApi
+import com.powakaz.nesttrack.feature_profile.domain.model.UpdateAvatar
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.repository.ProfileRepository
@@ -52,9 +52,18 @@ class ProfileRepositoryImpl @Inject constructor(
         return result
     }
 
-    /*override suspend fun uploadAvatar(avatar: Any): NetworkResult<UserProfile> {
+    override suspend fun updateAvatar(avatar: Any): NetworkResult<UpdateAvatar> {
 
-    }*/
+        val result = safeApiCall {
+            val updateAvatar = privateApi.uploadAvatar(
+                id = CURRENT_USER_ID,
+                avatar = avatar
+            )
+        }
+
+        return result
+    }
+
 
     companion object {
         private const val CURRENT_USER_ID = 2

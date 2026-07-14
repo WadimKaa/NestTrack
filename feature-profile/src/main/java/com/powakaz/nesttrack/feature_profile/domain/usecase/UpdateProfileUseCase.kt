@@ -1,7 +1,6 @@
 package com.powakaz.nesttrack.feature_profile.domain.usecase
 
 import com.powakaz.core_network.model.NetworkResult
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateResponseDto
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.repository.ProfileRepository

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class AvatarResponseDto(
+data class UpdateAvatarResponseDto(
     val status: String,
     @SerialName("avatar_url")
     val avatarUrl: String

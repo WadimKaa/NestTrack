@@ -1,8 +1,8 @@
 package com.powakaz.nesttrack.feature_profile.data.datasourse.remote.api
 
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.AvatarResponseDto
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.ProfileResponseDto
-import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateResponseDto
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateAvatarResponseDto
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UserProfileResponseDto
+import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.UpdateProfileResponseDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -15,13 +15,13 @@ import retrofit2.http.Path
 interface ProfileApi {
 
     @GET("users")
-    suspend fun getUsersProfile(): List<ProfileResponseDto>
+    suspend fun getUsersProfile(): List<UserProfileResponseDto>
 
     @PUT("users/{id}")
     suspend fun updateProfile(
         @Path("id") id: Int,
-        @Body profile: ProfileResponseDto
-    ): UpdateResponseDto
+        @Body profile: UserProfileResponseDto
+    ): UpdateProfileResponseDto
 
 
     @Multipart
@@ -29,6 +29,6 @@ interface ProfileApi {
     suspend fun uploadAvatar(
         @Path("id") id: Int,
         @Part avatar: MultipartBody.Part
-    ): AvatarResponseDto
+    ): UpdateAvatarResponseDto
 
 }
