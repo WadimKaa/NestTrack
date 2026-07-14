@@ -11,9 +11,7 @@ interface ProfileRepository {
 
     suspend fun getProfile(): NetworkResult<UserProfile>
 
-    suspend fun updateName(name: String)
+    suspend fun updateProfile(profile: UserProfile): NetworkResult<Unit>
 
-    suspend fun updateBirthDate(date: LocalDate)
-
-    suspend fun updateAvatar(photo: Any)
+    //suspend fun uploadAvatar(avatar: Any): NetworkResult<UserProfile>
 }

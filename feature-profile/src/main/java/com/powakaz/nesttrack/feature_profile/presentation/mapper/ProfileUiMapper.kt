@@ -19,8 +19,6 @@ fun getDefaultAvatar(id: Int) : AvatarUi{
             )
         )
 
-
-
         else -> AvatarUi(
             avatarRes = R.drawable.girl,
             gradient = listOf(

@@ -12,7 +12,9 @@ data class ProfileDto(
     @SerialName("birth_date")
     val birthDate: String?,
     @SerialName("created_at")
-    val createdAt: String?
+    val createdAt: String?,
+    /*@SerialName("api_token")
+    val apiToken: String? = null*/
 )
 {
 }

@@ -18,15 +18,28 @@ object ProfileDataModule {
 
     @Provides
     @Singleton
-    fun provideProfileApi(@NetworkModule.PublicClient retrofit: Retrofit): ProfileApi {
+    @PublicProfileApi
+    fun provideProfileApiPublic(@NetworkModule.PublicClient retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
+    }
+
+
+
+    @Provides
+    @Singleton
+    @PrivateProfileApi
+    fun provideProfileApiPrivate(@NetworkModule.AuthenticatedClient retrofit: Retrofit): ProfileApi {
         return retrofit.create(ProfileApi::class.java)
     }
 
     @Provides
     @Singleton
     fun provideProfileRepository(
-        api: ProfileApi
+        @PublicProfileApi publicApi: ProfileApi,
+        @PrivateProfileApi privateApi: ProfileApi
     ): ProfileRepository {
-        return ProfileRepositoryImpl(api)
+        return ProfileRepositoryImpl(
+            publicApi = publicApi,
+            privateApi = privateApi)
     }
 }

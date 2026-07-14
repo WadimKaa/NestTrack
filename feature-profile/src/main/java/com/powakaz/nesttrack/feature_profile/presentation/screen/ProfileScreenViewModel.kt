@@ -12,8 +12,7 @@ import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.model.Profil
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
 import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateAvatarUseCase
-import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateBirthDateUseCase
-import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateNameUseCase
+import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateProfileUseCase
 import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,8 +29,7 @@ import java.time.LocalDate
 @HiltViewModel
 class ProfileScreenViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
-    private val updateNameUseCase: UpdateNameUseCase,
-    private val updateBirthDateUseCase: UpdateBirthDateUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase,
     private val updateAvatarUseCase: UpdateAvatarUseCase
 ) : ViewModel() {
 
@@ -51,7 +49,7 @@ class ProfileScreenViewModel @Inject constructor(
                 }
 
                 is NetworkResult.Success<UserProfile> -> {
-                    Log.e("LOl", result.toString())
+                    //Log.e("LOl", result.toString())
 
                     val profileData = result.data
 
@@ -95,10 +93,18 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun onAvatarSelected(photo: Any) {
+        val profile = _uiState.value.profile ?: return
+
         viewModelScope.launch {
-            updateAvatarUseCase(photo)
+            val avatarUrl = updateAvatarUseCase(photo)
+
             _uiState.update {
-                it.copy(selectedAvatar = photo)
+                it.copy(
+                    selectedAvatar = photo,
+                    profile = profile.copy(
+                        avatarUrl = avatarUrl
+                    )
+                )
             }
         }
     }
@@ -114,16 +120,22 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun saveBirth() {
-        val dateToSave = _uiState.value.editedBirthDate
-        if (dateToSave != null) {
-            viewModelScope.launch {
-                updateBirthDateUseCase(dateToSave)
-                _uiState.update {
-                    it.copy(
-                        activeDialog = ProfileDialog.None,
-                        editedBirthDate = null
-                    )
-                }
+        val profile = _uiState.value.profile ?: return
+        val birthDate = _uiState.value.editedBirthDate ?: return
+
+        viewModelScope.launch {
+            val updateProfile = profile.copy(
+                birthDate = birthDate
+            )
+
+            updateProfileUseCase(updateProfile)
+
+            _uiState.update {
+                it.copy(
+                    profile = profile,
+                    activeDialog = ProfileDialog.None,
+                    editedBirthDate = null
+                )
             }
         }
     }
@@ -168,17 +180,25 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun saveName() {
+
+        val profile = _uiState.value.profile ?: return
+
         viewModelScope.launch {
-            updateNameUseCase(_uiState.value.editedName)
+            val updatedProfile = profile.copy(
+                name = _uiState.value.editedName
+            )
+
+            updateProfileUseCase(updatedProfile)
+
             _uiState.update {
                 it.copy(
+                    profile = updatedProfile,
                     editedName = "",
                     activeDialog = ProfileDialog.None
                 )
             }
         }
     }
-
 }
 
 data class ProfileUiState(
@@ -195,7 +215,7 @@ data class ProfileUiState(
     val isEditAvatarDialogVisible: Boolean = false,
     val selectedAvatar: Any? = null,
 
-) {
+    ) {
     val isSaveEnabled: Boolean
         get() = editedName.isNotBlank() &&
                 editedName != profile?.name

@@ -87,7 +87,7 @@ fun ProfileScreen(
             name = uiState.profile?.name ?: "",
             createdAd = uiState.profile?.createdAt ?: LocalDate.now(),
             birth = uiState.profile?.birthDate ?: LocalDate.now(),
-            id = uiState.profile!!.id
+            id = uiState.profile?.id ?: 0
 
 
         )

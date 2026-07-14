@@ -7,7 +7,7 @@ import javax.inject.Inject
 class UpdateAvatarUseCase @Inject constructor(
     private val profileRepository: ProfileRepository
 ) {
-    suspend operator fun invoke(photo: Any) {
-        profileRepository.updateAvatar(photo)
+    suspend operator fun invoke(avatar: Any) {
+        //profileRepository.uploadAvatar(avatar)
     }
 }

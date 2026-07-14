@@ -21,7 +21,8 @@ fun UserProfileEntity.toDomain(): UserProfile {
         name = name,
         birthDate = birthDate,
         avatarUrl = avatarUrl,
-        createdAt = createdAt
+        createdAt = createdAt,
+        //apiToken = apiToken
     )
 }
 
@@ -34,7 +35,18 @@ fun ProfileDto.toDomain(): UserProfile {
         name = name,
         birthDate = birthDate?.let { LocalDate.parse(it) },
         avatarUrl = avatarUrl?.let { buildUrl(it) },
-        createdAt = OffsetDateTime.parse(createdAt).toLocalDate()
+        createdAt = OffsetDateTime.parse(createdAt).toLocalDate(),
+        //apiToken = apiToken
+    )
+}
+
+fun UserProfile.toDto(): ProfileDto {
+    return ProfileDto(
+        id = id,
+        name = name,
+        birthDate = birthDate?.toString(),
+        avatarUrl = avatarUrl?.toString(),
+        createdAt = createdAt?.toString()
     )
 }
 

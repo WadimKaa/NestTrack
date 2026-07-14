@@ -12,6 +12,6 @@ data class UserProfileEntity(
     val birthDate: LocalDate?,
     val avatarUrl: String?,
     val createdAt: LocalDate?,
-    val apiToken: String?,
+    val apiToken: String,
     val syncState: SyncState
 )
