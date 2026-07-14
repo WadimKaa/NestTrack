@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
 import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateAvatarUseCase
@@ -43,8 +44,6 @@ class ProfileScreenViewModel @Inject constructor(
                 }
 
                 is NetworkResult.Success<UserProfile> -> {
-                    //Log.e("LOl", result.toString())
-
                     val profileData = result.data
 
                     _uiState.update {
@@ -114,23 +113,15 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun saveBirth() {
-        val profile = _uiState.value.profile ?: return
-        val birthDate = _uiState.value.editedBirthDate ?: return
+        val profile = _uiState.value.profile ?: throw Exception("Profile not found")
+        val birthDate = _uiState.value.editedBirthDate ?: throw Exception("birth Date not found")
 
         viewModelScope.launch {
             val updateProfile = profile.copy(
                 birthDate = birthDate
             )
 
-            updateProfileUseCase(updateProfile)
-
-            _uiState.update {
-                it.copy(
-                    profile = profile,
-                    activeDialog = ProfileDialog.None,
-                    editedBirthDate = null
-                )
-            }
+            updateProfileInfo(updateProfile)
         }
     }
 
@@ -162,7 +153,7 @@ class ProfileScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 activeDialog = ProfileDialog.EditName,
-                editedName = ""//it.profile?.name.orEmpty()
+                editedName = ""
             )
         }
     }
@@ -174,22 +165,40 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun saveName() {
-
-        val profile = _uiState.value.profile ?: return
+        val profile = _uiState.value.profile ?: throw Exception("Profile not found") //IllegalStateException
 
         viewModelScope.launch {
-            val updatedProfile = profile.copy(
+            val updateProfile = profile.copy(
                 name = _uiState.value.editedName
             )
 
-            updateProfileUseCase(updatedProfile)
+            updateProfileInfo(updateProfile)
+        }
+    }
 
-            _uiState.update {
-                it.copy(
-                    profile = updatedProfile,
-                    editedName = "",
-                    activeDialog = ProfileDialog.None
-                )
+    suspend fun updateProfileInfo(updateProfile: UserProfile) {
+        val result = updateProfileUseCase(updateProfile)
+        when(result) {
+            is NetworkResult.Success<UpdateProfile> -> {
+                if (result.data.status) {
+                    _uiState.update {
+                        it.copy(
+                            profile = updateProfile,
+                            editedName = "",
+                            activeDialog = ProfileDialog.None
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(error = "Не удалось сохранить профиль")
+                    }
+                }
+            }
+            is NetworkResult.Error -> {
+                NetworkResult.Error(result.code, result.message)
+            }
+            is NetworkResult.Exception -> {
+                NetworkResult.Exception(result.e)
             }
         }
     }
@@ -208,6 +217,8 @@ data class ProfileUiState(
 
     val isEditAvatarDialogVisible: Boolean = false,
     val selectedAvatar: Any? = null,
+
+    val error: String? = null,
 
     ) {
     val isSaveEnabled: Boolean

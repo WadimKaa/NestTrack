@@ -1,6 +1,7 @@
 package com.powakaz.nesttrack.feature_profile.data.mapper
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.powakaz.nesttrack.feature_profile.BuildConfig
 import com.powakaz.nesttrack.feature_profile.data.datasourse.local.entites.UserProfileEntity
@@ -36,8 +37,10 @@ fun ProfileResponseDto.toDomain(): UserProfile {
 }
 
 fun UpdateResponseDto.toDomain() : UpdateProfile {
+    Log.e("LOL", status)
     return UpdateProfile(
         status = status == "success"
+
     )
 }
 
