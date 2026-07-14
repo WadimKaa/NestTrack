@@ -41,7 +41,9 @@ android {
 dependencies {
     implementation(project(":feature-auth"))
     implementation(project(":feature-home"))
+    implementation(project(":feature-finance"))
     implementation(project(":core-common"))
+    implementation(project(":core-network"))
     implementation(project(":navigation-api"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

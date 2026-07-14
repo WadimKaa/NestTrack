@@ -13,7 +13,7 @@ enum class Currency { BYN, USD }
 
 data class Wallet(
     val id: Int,
-    val userId: Int,
+    val userId: Int?,
     val name: String,
     val description: String,
     val currency: Currency,

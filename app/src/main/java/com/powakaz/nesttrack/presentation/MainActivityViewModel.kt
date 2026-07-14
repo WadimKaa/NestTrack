@@ -1,8 +1,11 @@
 package com.powakaz.nesttrack.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_common.manager.SessionManager
+import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.feature_finance.domain.usecase.GetFinancialDashboardUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,5 +44,7 @@ class MainActivityViewModel @Inject constructor(sessionManager: SessionManager) 
                 }
             }
             .launchIn(viewModelScope)
+
+
     }
 }

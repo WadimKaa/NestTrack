@@ -9,7 +9,7 @@ data class GetWalletsDto(
     @SerialName("id")
     val id : Int,
     @SerialName("user_id")
-    val userId : Int,
+    val userId : Int?,
     @SerialName("name")
     val name : String,
     @SerialName("description")
@@ -19,7 +19,7 @@ data class GetWalletsDto(
     @SerialName("type")
     val type : String,
     @SerialName("is_active")
-    val isActive : String,
+    val isActive : Boolean,
     @SerialName("balance")
     val balance : String
 )
