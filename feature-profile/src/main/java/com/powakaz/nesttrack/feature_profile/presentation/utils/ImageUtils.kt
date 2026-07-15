@@ -6,9 +6,12 @@ import androidx.core.content.FileProvider
 import java.io.File
 
 fun Context.createImageUri(): Uri {
+
+    val fileName = "temp_camera_${System.currentTimeMillis()}.jpg"
+
     val imageFile = File(
         filesDir,
-        "images/avatar.jpg" //_${System.currentTimeMillis()}
+        "images/$fileName"
     )
 
     imageFile.parentFile?.mkdirs()
@@ -18,4 +21,43 @@ fun Context.createImageUri(): Uri {
         "$packageName.fileprovider",
         imageFile
     )
+}
+
+fun Context.copyImageToAppStorage(uri: Uri): String {
+
+    deleteOldFiles()
+
+    val fileName = "avatar_${System.currentTimeMillis()}.jpg"
+
+    val imageFile = File(
+        filesDir,
+        "images/$fileName"
+    )
+
+    imageFile.parentFile?.mkdirs()
+
+    contentResolver.openInputStream(uri)?.use { input ->
+        imageFile.outputStream().use { output ->
+            input.copyTo(output)
+        }
+    } ?: error("Не удалось открыть изображение")
+
+    return imageFile.absolutePath
+}
+
+
+private fun Context.deleteOldFiles() {
+    val folder = File(
+        filesDir,
+        "images"
+    )
+
+    if (folder.exists()) {
+        folder.listFiles()?.forEach { file ->
+            if (file.name.startsWith("avatar_")) {
+                file.delete()
+            }
+        }
+    }
+
 }

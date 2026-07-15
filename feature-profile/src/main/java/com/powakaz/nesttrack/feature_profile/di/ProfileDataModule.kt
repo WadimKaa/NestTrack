@@ -3,6 +3,7 @@ package com.powakaz.nesttrack.feature_profile.di
 
 import com.powakaz.core_network.di.NetworkModule
 import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.api.ProfileApi
+import com.powakaz.nesttrack.feature_profile.data.mapper.AvatarMultipartMapper
 import com.powakaz.nesttrack.feature_profile.data.repository.ProfileRepositoryImpl
 import com.powakaz.nesttrack.feature_profile.domain.repository.ProfileRepository
 import dagger.Module
@@ -36,10 +37,12 @@ object ProfileDataModule {
     @Singleton
     fun provideProfileRepository(
         @PublicProfileApi publicApi: ProfileApi,
-        @PrivateProfileApi privateApi: ProfileApi
+        @PrivateProfileApi privateApi: ProfileApi,
+        avatarMultipartMapper: AvatarMultipartMapper
     ): ProfileRepository {
         return ProfileRepositoryImpl(
             publicApi = publicApi,
-            privateApi = privateApi)
+            privateApi = privateApi,
+            avatarMultipartMapper = avatarMultipartMapper)
     }
 }

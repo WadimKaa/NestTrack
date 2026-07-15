@@ -5,10 +5,12 @@ import androidx.annotation.RequiresApi
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.core_network.utils.safeApiCall
 import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.api.ProfileApi
+import com.powakaz.nesttrack.feature_profile.data.mapper.AvatarMultipartMapper
 import com.powakaz.nesttrack.feature_profile.data.mapper.toDomain
 import com.powakaz.nesttrack.feature_profile.data.mapper.toDto
 import com.powakaz.nesttrack.feature_profile.di.PrivateProfileApi
 import com.powakaz.nesttrack.feature_profile.di.PublicProfileApi
+import com.powakaz.nesttrack.feature_profile.domain.model.Avatar
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateAvatar
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
@@ -17,6 +19,7 @@ import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
     //private val dao: UserProfileDAO,
+    private val avatarMultipartMapper: AvatarMultipartMapper,
     @PublicProfileApi
     val publicApi: ProfileApi,
     @PrivateProfileApi
@@ -47,18 +50,19 @@ class ProfileRepositoryImpl @Inject constructor(
                 id = CURRENT_USER_ID,
                 profile = profile.toDto()
             )
-            updateResponse .toDomain()
+            updateResponse.toDomain()
         }
         return result
     }
 
-    override suspend fun updateAvatar(avatar: Any): NetworkResult<UpdateAvatar> {
+    override suspend fun updateAvatar(avatar: Avatar.Local): NetworkResult<UpdateAvatar> {
 
         val result = safeApiCall {
             val updateAvatar = privateApi.uploadAvatar(
                 id = CURRENT_USER_ID,
-                avatar = avatar
+                avatar = avatarMultipartMapper.map(avatar.path)
             )
+            updateAvatar.toDomain()
         }
 
         return result

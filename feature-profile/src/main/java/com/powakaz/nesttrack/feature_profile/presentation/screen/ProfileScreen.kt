@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -50,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.powakaz.nesttrack.feature_profile.R
+import com.powakaz.nesttrack.feature_profile.domain.model.Avatar
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditAvatarDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.birth.EditBirthDialog
 import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.EditNameDialog
@@ -57,6 +59,7 @@ import com.powakaz.nesttrack.feature_profile.presentation.components.dialogs.bir
 import com.powakaz.nesttrack.feature_profile.presentation.components.image.ImagePicker
 import com.powakaz.nesttrack.feature_profile.presentation.mapper.getDefaultAvatar
 import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
+import com.powakaz.nesttrack.feature_profile.presentation.utils.copyImageToAppStorage
 import com.powakaz.nesttrack.feature_profile.presentation.utils.formatDateMountToText
 import java.time.LocalDate
 
@@ -70,11 +73,13 @@ fun ProfileScreen(
     viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
 
     ImagePicker(
         onImagePicked = { uri ->
-            viewModel.onAvatarSelected(uri)
+            val path = context.copyImageToAppStorage(uri)
+            viewModel.onAvatarSelected(path)
         }
     ) { openCamera, openGallery ->
 
@@ -83,7 +88,7 @@ fun ProfileScreen(
             onEditNameClick = viewModel::showEditNameDialog,
             onEditBirthClick = viewModel::showEditBirthDialog,
             onEditAvatarClick = viewModel::showEditAvatarDialog,
-            avatar = uiState.selectedAvatar ?: uiState.profile?.avatarUrl,
+            avatar = uiState.profile?.avatarUrl ?: Avatar.Default,
             name = uiState.profile?.name ?: "",
             createdAd = uiState.profile?.createdAt ?: LocalDate.now(),
             birth = uiState.profile?.birthDate ?: LocalDate.now(),
@@ -141,7 +146,7 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     name: String,
-    avatar: Any?,
+    avatar: Avatar,
     birth: LocalDate,
     id: Int,
     createdAd: LocalDate,
@@ -421,7 +426,7 @@ fun EditAvatarCard(onEditAvatarClick: () -> Unit) {
 }
 
 @Composable
-fun ShowGeneralCard(name: String, avatar: Any?, id: Int, onEditNameClick: () -> Unit) {
+fun ShowGeneralCard(name: String, avatar: Avatar, id: Int, onEditNameClick: () -> Unit) {
 
     Spacer(modifier = Modifier.height(10.dp))
 
@@ -501,7 +506,7 @@ fun ShowGeneralCard(name: String, avatar: Any?, id: Int, onEditNameClick: () -> 
 
 @Composable
 fun AvatarCard(
-    avatar: Any?,
+    avatar: Avatar,
     id: Int,
     modifier: Modifier = Modifier
 ) {
@@ -511,49 +516,119 @@ fun AvatarCard(
         contentAlignment = Alignment.Center
     ) {
 
-        if (avatar == null) {
+        when (avatar) {
+            Avatar.Default -> {
+                val avatar = getDefaultAvatar(id)
 
-            val avatar = getDefaultAvatar(id)
+                Image(
+                    painter = painterResource(id = avatar.avatarRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.linearGradient(
+                                avatar.gradient
+                            )
+                        )
+                )
+            }
 
-            Image(
-                painter = painterResource(id = avatar.avatarRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
+            is Avatar.Local -> {
+                AsyncImage(
+                    model = avatar.path,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(CircleShape),
+                    onLoading = { Log.e("IMG", "loading") },
+                    onSuccess = { Log.e("IMG", "success") },
+                    onError = { Log.e("IMG", "error: ${it.result.throwable}") }
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .border(
+                            3.dp,
+                            Color.White,
+                            CircleShape
+                        )
+
+                )
+            }
+
+            is Avatar.Remote -> {
+                AsyncImage(
+                    model = avatar.url,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(CircleShape),
+                    onLoading = { Log.e("IMG", "loading") },
+                    onSuccess = { Log.e("IMG", "success") },
+                    onError = { Log.e("IMG", "error: ${it.result.throwable}") }
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .border(
+                            3.dp,
+                            Color.White,
+                            CircleShape
+                        )
+
+                )
+            }
+
+            /*if (avatar == null) {
+
+                val avatar = getDefaultAvatar(id)
+
+                Image(
+                    painter = painterResource(id = avatar.avatarRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.linearGradient(
+                                avatar.gradient
+                            )
+                        )
+                )
+            } else {
+                AsyncImage(
+                    model = avatar,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .clip(CircleShape),
+                    onLoading = { Log.e("IMG", "loading") },
+                    onSuccess = { Log.e("IMG", "success") },
+                    onError = { Log.e("IMG", "error: ${it.result.throwable}") }
+                )
+            }
+             Box(
+                modifier = Modifier
                     .fillMaxSize()
                     .clip(CircleShape)
-                    .background(
-                        brush = Brush.linearGradient(
-                            avatar.gradient
-                        )
+                    .border(
+                        3.dp,
+                        Color.White,
+                        CircleShape
                     )
-            )
-        } else {
-            AsyncImage(
-                model = avatar,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = modifier
-                    .fillMaxSize()
-                    .clip(CircleShape),
-                onLoading = { Log.e("IMG", "loading") },
-                onSuccess = { Log.e("IMG", "success") },
-                onError = { Log.e("IMG", "error: ${it.result.throwable}") }
-            )
+
+            )*/
+
         }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(CircleShape)
-                .border(
-                    3.dp,
-                    Color.White,
-                    CircleShape
-                )
-
-        )
     }
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -659,7 +734,7 @@ fun ProfileScreenPreview() {
         onEditNameClick = {},
         onEditBirthClick = {},
         onEditAvatarClick = {},
-        avatar = "",
+        avatar = Avatar.Default,
         name = "",
         createdAd = LocalDate.now(),
         birth = LocalDate.now(),

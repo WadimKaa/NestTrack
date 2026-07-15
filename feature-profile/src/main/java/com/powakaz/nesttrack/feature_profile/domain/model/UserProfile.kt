@@ -6,7 +6,7 @@ data class UserProfile(
     val id: Int,
     val name: String,
     val birthDate: LocalDate?,
-    val avatarUrl: Any?,
+    val avatarUrl: Avatar,
     val createdAt: LocalDate?,
 
 )

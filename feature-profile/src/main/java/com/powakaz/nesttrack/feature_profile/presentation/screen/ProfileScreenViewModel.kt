@@ -1,10 +1,13 @@
 package com.powakaz.nesttrack.feature_profile.presentation.screen
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.nesttrack.feature_profile.domain.model.Avatar
+import com.powakaz.nesttrack.feature_profile.domain.model.UpdateAvatar
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
@@ -85,19 +88,49 @@ class ProfileScreenViewModel @Inject constructor(
         }
     }
 
-    fun onAvatarSelected(photo: Any) {
-        val profile = _uiState.value.profile ?: return
+    fun onAvatarSelected(photo: String) {
+        val profile = _uiState.value.profile ?: throw Exception("Profile not found")
 
         viewModelScope.launch {
-            val avatarUrl = updateAvatarUseCase(photo)
+            val avatar = Avatar.Local(photo)
 
             _uiState.update {
                 it.copy(
-                    selectedAvatar = photo,
+                    //selectedAvatar = photo,
                     profile = profile.copy(
-                        avatarUrl = avatarUrl
+                        avatarUrl = avatar
                     )
                 )
+            }
+
+            val result = updateAvatarUseCase(avatar)
+
+            when(result) {
+                is NetworkResult.Success<UpdateAvatar> -> {
+                    if (result.data.status) {
+                        /*_uiState.update {
+                            it.copy(
+                                profile = profile.copy(
+                                    avatarUrl = Avatar.Remote(result.data.avatarUrl)
+                                )
+                            )
+                        }*/
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                profile = profile.copy(
+                                    avatarUrl = Avatar.Default
+                                ),
+                                error = "Не удалось сохранить профиль")
+                        }
+                    }
+                }
+                is NetworkResult.Error -> {
+                    NetworkResult.Error(result.code, result.message)
+                }
+                is NetworkResult.Exception -> {
+                    NetworkResult.Exception(result.e)
+                }
             }
         }
     }
