@@ -125,7 +125,10 @@ fun ProfileScreen(
                     openGallery()
                     viewModel.dismissDialog()
                 },
-                onDeletePhoto = {}
+                onDeletePhoto = {
+                    viewModel.onAvatarDelete()
+                    viewModel.dismissDialog()
+                }
             )
 
             is ProfileDialog.DatePicker -> BirthdayDatePicker(

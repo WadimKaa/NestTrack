@@ -1,6 +1,5 @@
 package com.powakaz.nesttrack.feature_profile.presentation.screen
 
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
@@ -10,8 +9,9 @@ import com.powakaz.nesttrack.feature_profile.domain.model.Avatar
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateAvatar
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
+import com.powakaz.nesttrack.feature_profile.domain.usecase.DeleteAvatarUseCase
 import com.powakaz.nesttrack.feature_profile.domain.usecase.GetProfileUseCase
-import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateAvatarUseCase
+import com.powakaz.nesttrack.feature_profile.domain.usecase.UploadAvatarUseCase
 import com.powakaz.nesttrack.feature_profile.domain.usecase.UpdateProfileUseCase
 import com.powakaz.nesttrack.feature_profile.presentation.state.ProfileDialog
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,8 @@ import java.time.LocalDate
 class ProfileScreenViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
-    private val updateAvatarUseCase: UpdateAvatarUseCase
+    private val updateAvatarUseCase: UploadAvatarUseCase,
+    private val deleteAvatarUseCase: DeleteAvatarUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -96,7 +97,6 @@ class ProfileScreenViewModel @Inject constructor(
 
             _uiState.update {
                 it.copy(
-                    //selectedAvatar = photo,
                     profile = profile.copy(
                         avatarUrl = avatar
                     )
@@ -105,7 +105,7 @@ class ProfileScreenViewModel @Inject constructor(
 
             val result = updateAvatarUseCase(avatar)
 
-            when(result) {
+            when (result) {
                 is NetworkResult.Success<UpdateAvatar> -> {
                     if (result.data.status) {
                         /*_uiState.update {
@@ -121,17 +121,36 @@ class ProfileScreenViewModel @Inject constructor(
                                 profile = profile.copy(
                                     avatarUrl = Avatar.Default
                                 ),
-                                error = "Не удалось сохранить профиль")
+                                error = "Не удалось сохранить профиль"
+                            )
                         }
                     }
                 }
+
                 is NetworkResult.Error -> {
                     NetworkResult.Error(result.code, result.message)
                 }
+
                 is NetworkResult.Exception -> {
                     NetworkResult.Exception(result.e)
                 }
             }
+        }
+    }
+
+    fun onAvatarDelete() {
+        val profile = _uiState.value.profile ?: throw Exception("Profile not found")
+
+        viewModelScope.launch {
+            val updatedProfile = profile.copy(
+                avatarUrl = Avatar.Default
+            )
+
+            _uiState.update {
+                it.copy(profile = updatedProfile)
+            }
+
+            deleteAvatarUseCase(updatedProfile)
         }
     }
 
@@ -198,7 +217,8 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     fun saveName() {
-        val profile = _uiState.value.profile ?: throw Exception("Profile not found") //IllegalStateException
+        val profile =
+            _uiState.value.profile ?: throw Exception("Profile not found") //IllegalStateException
 
         viewModelScope.launch {
             val updateProfile = profile.copy(
@@ -211,7 +231,7 @@ class ProfileScreenViewModel @Inject constructor(
 
     suspend fun updateProfileInfo(updateProfile: UserProfile) {
         val result = updateProfileUseCase(updateProfile)
-        when(result) {
+        when (result) {
             is NetworkResult.Success<UpdateProfile> -> {
                 if (result.data.status) {
                     _uiState.update {
@@ -227,9 +247,11 @@ class ProfileScreenViewModel @Inject constructor(
                     }
                 }
             }
+
             is NetworkResult.Error -> {
                 NetworkResult.Error(result.code, result.message)
             }
+
             is NetworkResult.Exception -> {
                 NetworkResult.Exception(result.e)
             }
@@ -249,7 +271,7 @@ data class ProfileUiState(
     val editedBirthDate: LocalDate? = null,
 
     val isEditAvatarDialogVisible: Boolean = false,
-    val selectedAvatar: Any? = null,
+    //val selectedAvatar: Any? = null,
 
     val error: String? = null,
 

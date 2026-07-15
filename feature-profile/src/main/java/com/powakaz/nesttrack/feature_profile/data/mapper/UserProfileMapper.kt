@@ -72,6 +72,7 @@ fun UserProfile.toDto(): UserProfileResponseDto {
     )
 }
 
+
 private fun buildUrl(path: String): String {
     return when {
         path.startsWith("http") -> path

@@ -28,7 +28,7 @@ interface ProfileApi {
     @POST("users/{id}/avatar")
     suspend fun uploadAvatar(
         @Path("id") id: Int,
-        @Part avatar: MultipartBody.Part
+        @Part avatar: MultipartBody.Part?
     ): UpdateAvatarResponseDto
 
 }

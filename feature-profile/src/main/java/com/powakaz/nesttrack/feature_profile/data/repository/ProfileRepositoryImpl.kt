@@ -68,6 +68,17 @@ class ProfileRepositoryImpl @Inject constructor(
         return result
     }
 
+    override suspend fun deleteAvatar(profile: UserProfile): NetworkResult<UpdateProfile> {
+        val result = safeApiCall {
+            val updateResponse  = privateApi.updateProfile(
+                id = CURRENT_USER_ID,
+                profile = profile.toDto()
+            )
+            updateResponse.toDomain()
+        }
+        return result
+    }
+
 
     companion object {
         private const val CURRENT_USER_ID = 2

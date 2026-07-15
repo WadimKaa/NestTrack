@@ -13,4 +13,6 @@ interface ProfileRepository {
     suspend fun updateProfile(profile: UserProfile): NetworkResult<UpdateProfile>
 
     suspend fun updateAvatar(avatar: Avatar.Local): NetworkResult<UpdateAvatar>
+
+    suspend fun deleteAvatar(profile: UserProfile): NetworkResult<UpdateProfile>
 }
