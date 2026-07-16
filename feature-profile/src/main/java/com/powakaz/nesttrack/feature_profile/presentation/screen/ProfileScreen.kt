@@ -159,70 +159,62 @@ fun ProfileScreenContent(
     onEditBirthClick: () -> Unit,
     onEditAvatarClick: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
 
-                    Text(
-                        text = stringResource(id = R.string.profile_title),
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black,
-                        fontFamily = FontFamily.SansSerif
-                    )
-                }
-            )
-        }
-    ) { paddingValues ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        //.padding(paddingValues),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Column(
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = stringResource(id = R.string.profile_title),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black,
+            fontFamily = FontFamily.SansSerif
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        ShowGeneralCard(
+            name = name,
+            avatar = avatar,
+            id = id,
+            onEditNameClick = onEditNameClick
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = stringResource(id = R.string.your_details),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .padding(start = 24.dp),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.DarkGray,
+            fontFamily = FontFamily.SansSerif
+        )
+
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
         ) {
-
-            ShowGeneralCard(
-                name = name,
-                avatar = avatar,
-                id = id,
-                onEditNameClick = onEditNameClick
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text = stringResource(id = R.string.your_details),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 24.dp),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.DarkGray,
-                fontFamily = FontFamily.SansSerif
-            )
+            ShowDateOfBirthCard(onEditBirthClick = onEditBirthClick, birth = birth)
 
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                ShowDateOfBirthCard(onEditBirthClick = onEditBirthClick, birth = birth)
-
-
-                EditAvatarCard(onEditAvatarClick = onEditAvatarClick)
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            ShowFamilyMemberCard(createdAt = createdAd)
-
+            EditAvatarCard(onEditAvatarClick = onEditAvatarClick)
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        ShowFamilyMemberCard(createdAt = createdAd)
+
     }
 
 }
@@ -233,7 +225,7 @@ fun RowScope.ShowDateOfBirthCard(onEditBirthClick: () -> Unit, birth: LocalDate)
     Column(
         modifier = Modifier
             .weight(1f)
-            .height(220.dp)
+            .height(210.dp)
             .padding(horizontal = 16.dp)
             .shadow(
                 elevation = 8.dp,
@@ -340,7 +332,7 @@ fun RowScope.EditAvatarCard(onEditAvatarClick: () -> Unit) {
     Column(
         modifier = Modifier
             .weight(1f)
-            .height(220.dp)
+            .height(210.dp)
             .padding(horizontal = 16.dp)
             .shadow(
                 elevation = 8.dp,
@@ -430,8 +422,6 @@ fun RowScope.EditAvatarCard(onEditAvatarClick: () -> Unit) {
 
 @Composable
 fun ShowGeneralCard(name: String, avatar: Avatar, id: Int, onEditNameClick: () -> Unit) {
-
-    Spacer(modifier = Modifier.height(10.dp))
 
     Column(
         modifier = Modifier
