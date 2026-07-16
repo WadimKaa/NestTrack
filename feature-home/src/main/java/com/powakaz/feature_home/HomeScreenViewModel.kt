@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 
 data class HomeScreenUiState(
-    val selectedItem: Int = 0
+    val selectedItem: Int = 2 ///!!!0
 ) {
 
 }

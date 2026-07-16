@@ -15,6 +15,8 @@ import com.powakaz.nesttrack.feature_profile.domain.model.UpdateAvatar
 import com.powakaz.nesttrack.feature_profile.domain.model.UpdateProfile
 import com.powakaz.nesttrack.feature_profile.domain.model.UserProfile
 import com.powakaz.nesttrack.feature_profile.domain.repository.ProfileRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -27,13 +29,13 @@ class ProfileRepositoryImpl @Inject constructor(
 ) : ProfileRepository
 {
     @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun getProfile(): NetworkResult<UserProfile> {
-
+    override suspend fun getProfile(userId: Int): NetworkResult<UserProfile> {
         val result = safeApiCall {
+
             val profileList = publicApi.getUsersProfile()
 
             val profile = profileList.find {
-                it.id == CURRENT_USER_ID
+                it.id == userId
             } ?: throw Exception("User ID not found")
 
             profile.toDomain()
@@ -47,7 +49,7 @@ class ProfileRepositoryImpl @Inject constructor(
 
         val result = safeApiCall {
             val updateResponse  = privateApi.updateProfile(
-                id = CURRENT_USER_ID,
+                id = profile.id,
                 profile = profile.toDto()
             )
             updateResponse.toDomain()
