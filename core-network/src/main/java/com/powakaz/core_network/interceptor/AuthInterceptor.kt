@@ -15,11 +15,10 @@ class AuthInterceptor @Inject constructor(private val tokenRepository: TokenRepo
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
-        /*val token = runBlocking {
+        val token = runBlocking {
             tokenRepository.getAccessToken().first()
-        }*/
+        }
 
-        val token = "token_polina_456"
 
         if (token.isNullOrBlank()) {
             throw NoTokenException()
