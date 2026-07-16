@@ -12,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -159,14 +161,13 @@ fun ProfileScreenContent(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
 
                     Text(
                         text = stringResource(id = R.string.profile_title),
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 20.dp),
+                            .fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
@@ -213,7 +214,6 @@ fun ProfileScreenContent(
             ) {
                 ShowDateOfBirthCard(onEditBirthClick = onEditBirthClick, birth = birth)
 
-                Spacer(modifier = Modifier.weight(1f))
 
                 EditAvatarCard(onEditAvatarClick = onEditAvatarClick)
             }
@@ -229,10 +229,10 @@ fun ProfileScreenContent(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ShowDateOfBirthCard(onEditBirthClick: () -> Unit, birth: LocalDate) {
+fun RowScope.ShowDateOfBirthCard(onEditBirthClick: () -> Unit, birth: LocalDate) {
     Column(
         modifier = Modifier
-            .width(200.dp)
+            .weight(1f)
             .height(220.dp)
             .padding(horizontal = 16.dp)
             .shadow(
@@ -336,10 +336,10 @@ fun ShowDateOfBirthCard(onEditBirthClick: () -> Unit, birth: LocalDate) {
 }
 
 @Composable
-fun EditAvatarCard(onEditAvatarClick: () -> Unit) {
+fun RowScope.EditAvatarCard(onEditAvatarClick: () -> Unit) {
     Column(
         modifier = Modifier
-            .width(200.dp)
+            .weight(1f)
             .height(220.dp)
             .padding(horizontal = 16.dp)
             .shadow(
@@ -738,7 +738,7 @@ fun ProfileScreenPreview() {
         onEditBirthClick = {},
         onEditAvatarClick = {},
         avatar = Avatar.Default,
-        name = "",
+        name = "полина",
         createdAd = LocalDate.now(),
         birth = LocalDate.now(),
         id = 0
