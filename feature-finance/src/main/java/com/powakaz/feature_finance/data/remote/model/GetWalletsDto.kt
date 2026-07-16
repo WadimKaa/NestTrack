@@ -21,5 +21,5 @@ data class GetWalletsDto(
     @SerialName("is_active")
     val isActive : Boolean,
     @SerialName("balance")
-    val balance : String
+    val balance : Float
 )

@@ -16,4 +16,7 @@ abstract class FinanceModule {
     @Binds
     @Singleton
     abstract fun bindFinanceRepository(financeRepositoryImpl: FinanceRepositoryImpl): FinanceRepository
+
+
+
 }

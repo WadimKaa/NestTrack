@@ -1,9 +1,12 @@
 package com.powakaz.feature_finance.domain.model
 
+import java.time.Instant
+import java.time.LocalDate
+
 data class FinanceDashboard(
-    val totalBalance: Int,
-    val weekBalance: Int,
-    val walletDtoList: List<Wallet>,
+    val totalBalance: Float,
+    val weekBalance: Float,
+    val userWalletList: List<Wallet>,
     val financeDays: List<FinanceDay>
 )
 
@@ -18,24 +21,29 @@ data class Wallet(
     val description: String,
     val currency: Currency,
     val type: WalletType,
-    val balance: String,
+    val balance: Float,
     val iconId: Int,
 )
 
 
 data class FinanceDay(
     val title: String,
-    val income: Int,
-    val outgo: Int,
-    val operations: List<Operation>
+    val transactionDate : LocalDate,
+    val income: Float,
+    val outgo: Float,
+    val transactions: List<Transaction>
 )
 
+enum class ICON {GIFT, WEEK}
 
-data class Operation(
+
+data class Transaction(
     val name: String,
     val description: String,
-    val iconId: Int,
+    val categoryName: String,
+    val iconId: ICON,
     val iconCircleColor: String,
-    val balance: Int,
-    val type: WalletType
+    val amount: Float,
+    val type: WalletType,
+    val transactionDate : Instant
 )

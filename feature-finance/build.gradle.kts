@@ -19,6 +19,8 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -26,6 +28,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk)
+
     implementation(project(":core-network"))
     implementation(project(":core-datastore"))
     implementation(project(":core-common"))
@@ -37,6 +41,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.coroutines.core)
 
 
     implementation(libs.androidx.appcompat)

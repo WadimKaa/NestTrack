@@ -2,22 +2,63 @@ package com.powakaz.feature_finance.data.repository
 
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.core_network.utils.safeApiCall
-import com.powakaz.feature_finance.data.mapper.toDomain
+import com.powakaz.feature_finance.data.mapper.FinanceDashboardMapper
 import com.powakaz.feature_finance.data.remote.NetworkFinanceApi
+import com.powakaz.feature_finance.data.remote.model.GetCategoriesDto
+import com.powakaz.feature_finance.data.remote.model.GetTransactionsPageDto
+import com.powakaz.feature_finance.data.remote.model.GetWalletsDto
 import com.powakaz.feature_finance.di.NetworkModule
-import com.powakaz.feature_finance.domain.model.Wallet
+import com.powakaz.feature_finance.domain.model.FinanceDashboard
 import com.powakaz.feature_finance.domain.repository.FinanceRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 
 class FinanceRepositoryImpl @Inject constructor(
     @NetworkModule.AuthenticatedNetworkFinanceApi private val authNetworkFinanceApi: NetworkFinanceApi,
-    @NetworkModule.PublicNetworkFinanceApi private val publicNetworkFinanceApi: NetworkFinanceApi
+    @NetworkModule.PublicNetworkFinanceApi private val publicNetworkFinanceApi: NetworkFinanceApi,
+    private val financeDashboardMapper: FinanceDashboardMapper
 ) : FinanceRepository {
 
-    override suspend fun getAllWallets(): NetworkResult<List<Wallet>> {
+    private suspend fun getAllWallets(): NetworkResult<List<GetWalletsDto>> {
         return safeApiCall {
-            publicNetworkFinanceApi.getAllWallets().map { it.toDomain() }
+            publicNetworkFinanceApi.getAllWallets()
         }
     }
+
+    private suspend fun getAllCategories(): NetworkResult<List<GetCategoriesDto>> {
+        return safeApiCall {
+            publicNetworkFinanceApi.getAllCategories()
+        }
+    }
+
+    private suspend fun getStartTransactionsPage(): NetworkResult<GetTransactionsPageDto> {
+        return safeApiCall {
+            publicNetworkFinanceApi.getStartTransactionsPage()
+        }
+    }
+
+
+    override suspend fun getFinanceDashboard(currentUserId: Int, weeklyWalletId: Int): NetworkResult<FinanceDashboard> {
+        return coroutineScope {
+            val walletsReq = async { getAllWallets() }
+            val transactionsReq = async { getStartTransactionsPage() }
+
+            val wallets = when(val result = walletsReq.await()){
+                is NetworkResult.Success<List<GetWalletsDto>> -> result.data
+                is NetworkResult.Error -> return@coroutineScope result
+                is NetworkResult.Exception -> return@coroutineScope result
+            }
+
+            val transactions = when(val result = transactionsReq.await()){
+                is NetworkResult.Success<GetTransactionsPageDto> -> result.data
+                is NetworkResult.Error -> return@coroutineScope result
+                is NetworkResult.Exception -> return@coroutineScope result
+            }
+
+            NetworkResult.Success(financeDashboardMapper.map(wallets, transactions, currentUserId, weeklyWalletId))
+        }
+    }
+
 }

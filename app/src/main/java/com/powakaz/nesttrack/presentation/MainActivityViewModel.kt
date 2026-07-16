@@ -25,7 +25,7 @@ data class MainActivityUiState(
 )
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(sessionManager: SessionManager) : ViewModel() {
+class MainActivityViewModel @Inject constructor(sessionManager: SessionManager, getFinancialDashboardUseCase: GetFinancialDashboardUseCase) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainActivityUiState())
     val uiState: StateFlow<MainActivityUiState> = _uiState.asStateFlow()
@@ -45,6 +45,11 @@ class MainActivityViewModel @Inject constructor(sessionManager: SessionManager) 
             }
             .launchIn(viewModelScope)
 
+
+        viewModelScope.launch {
+            var finDashboard = getFinancialDashboardUseCase(1)
+            Log.e("LOL", finDashboard.toString())
+        }
 
     }
 }
