@@ -34,14 +34,14 @@ data class FinanceDay(
     val transactions: List<Transaction>
 )
 
-enum class ICON {GIFT, WEEK}
 
 
 data class Transaction(
+    val id : Int,
     val name: String,
     val description: String,
     val categoryName: String,
-    val iconId: ICON,
+    val iconId: String,
     val iconCircleColor: String,
     val amount: Float,
     val type: WalletType,

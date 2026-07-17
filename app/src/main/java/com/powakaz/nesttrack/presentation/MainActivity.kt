@@ -8,6 +8,8 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.powakaz.feature_finance.presentation.FinanceDashboardScreen
+import com.powakaz.feature_finance.presentation.FinanceDashboardScreenRoute
 import com.powakaz.nesttrack.navigation.AppNavHost
 import com.powakaz.nesttrack.ui.theme.NestTrackTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,10 +31,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             NestTrackTheme {
-                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                /*val state by viewModel.uiState.collectAsStateWithLifecycle()
                 if (state.loginState != LoginState.INITIAL) {
                     AppNavHost(loginState = state.loginState)
-                }
+                }*/
+
+                FinanceDashboardScreenRoute()
             }
         }
     }

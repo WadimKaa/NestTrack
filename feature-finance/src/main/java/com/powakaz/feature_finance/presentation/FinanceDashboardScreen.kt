@@ -12,54 +12,82 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.feature_finance.R
+import com.powakaz.feature_finance.domain.model.FinanceDay
+import com.powakaz.feature_finance.domain.model.Transaction
+import com.powakaz.feature_finance.domain.model.WalletType
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun FinanceMainScreenRoute() {
+fun FinanceDashboardScreenRoute(viewModel: FinanceDashboardViewModel = hiltViewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    FinanceDashboardScreen(state)
 
 }
 
 
 @Preview
 @Composable
-fun FinanceMainScreenPreview() {
-    FinanceMainScreen()
+fun FinanceDashboardScreenPreview() {
+    FinanceDashboardScreen(FinDashboardUiState())
 }
 
 
 @Composable
-fun FinanceMainScreen() {
+fun FinanceDashboardScreen(uiState: FinDashboardUiState) {
     Scaffold { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxWidth()
-        ) {
-            TopBar()
-            Head()
-            Wallets()
-            QuickActions()
-            ListTransactions()
+        LazyColumn(modifier = Modifier.padding(paddingValues)) {
+            item {
+                TopBar()
+            }
+            item {
+                Head(uiState.userBalance, uiState.weekBalance, uiState.progressWeekBalance)
+            }
+            item {
+                Wallets(uiState.cashBalance, uiState.cardBalance)
+            }
+            item {
+                QuickActions()
+            }
+            item {
+                Text(
+                    text = "Операции по дням",
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 12.dp),
+                    color = Color(0XFF071145),
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            items(items = uiState.listDays, key = { it.transactions[0].id }) {
+                OneDayCard(it)
+            }
         }
     }
 
@@ -85,7 +113,7 @@ fun TopBar() {
 
 
 @Composable
-fun Head() {
+fun Head(userTotalBalance: String, weekBalance: String, weekProgress: Float) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -126,7 +154,7 @@ fun Head() {
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "2 000 BYN",
+                        text = "$userTotalBalance BYN",
                         color = Color(0XFF147afd),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -144,7 +172,7 @@ fun Head() {
                     )
                     Row(modifier = Modifier.padding(top = 6.dp, bottom = 10.dp)) {
                         Text(
-                            text = "150 BYN",
+                            text = "$weekBalance BYN",
                             color = Color(0XFF147afd),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.SemiBold
@@ -159,7 +187,7 @@ fun Head() {
                                 .align(Alignment.Bottom)
                         )
                     }
-                    FinanceHeadProgressBar(0.3f)
+                    FinanceHeadProgressBar(weekProgress)
                 }
                 Image(
                     painter = painterResource(R.drawable.img_wallet),
@@ -194,7 +222,7 @@ fun FinanceHeadProgressBar(progress: Float) {
 
 
 @Composable
-fun Wallets() {
+fun Wallets(cashBalance: String, cardBalance: String) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Мои кошельки",
@@ -222,7 +250,7 @@ fun Wallets() {
                 painter = painterResource(R.drawable.ic_arrow_right),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(Color(0XFF076ffe)),
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(14.dp).align(Alignment.CenterVertically)
             )
         }
     }
@@ -232,132 +260,103 @@ fun Wallets() {
             .padding(top = 8.dp)
             .fillMaxWidth()
     ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(start = 16.dp, end = 4.dp),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 2.dp
-            )
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(2.dp)
-                    .clip(RoundedCornerShape(15.dp))
-                    .background(Color(0XFFf1f8f1))
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_cash),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth(0.4f)
-                            .align(Alignment.CenterVertically)
-                            .padding(start = 8.dp)
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 6.dp, top = 8.dp, bottom = 8.dp)
-                    ) {
-                        Text(
-                            text = "Наличные",
-                            color = Color(0XFF071145),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 11.sp
-                        )
-                        Row() {
-                            Text(
-                                text = "200 BYN",
-                                modifier = Modifier
-                                    .padding(top = 4.dp, bottom = 4.dp),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            Image(
-                                painter = painterResource(R.drawable.ic_arrow_right),
-                                contentDescription = null,
-                                colorFilter = ColorFilter.tint(Color(0XFF85bf92))
-                            )
-                        }
-                        Text(text = "Кошелек", color = Color(0XFF69709b), fontSize = 11.sp)
-                    }
-                }
-            }
+        WalletCard(
+            cashBalance,
+            "Наличные",
+            R.drawable.ic_cash,
+            Color(0XFF67b667),
+            Modifier.fillMaxWidth(0.5f)
+        )
+        WalletCard(
+            cardBalance,
+            "Безналичные",
+            R.drawable.ic_card,
+            Color(0XFF2d80ff),
+            Modifier.fillMaxWidth(1f)
+        )
+    }
+}
 
+@Composable
+fun WalletCard(
+    cardBalance: String,
+    cardName: String,
+    iconId: Int,
+    accentColor: Color,
+    modifier: Modifier
+) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        modifier = modifier
+            .padding(start = 16.dp, end = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(2.dp)
+                .clip(RoundedCornerShape(15.dp))
+                .background(accentColor.copy(alpha = 0.08f))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+            ) {
+                Image(
+                    painter = painterResource(iconId),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 8.dp)
+                )
+                Column(
+                    modifier = Modifier
+                        .padding(start = 6.dp, top = 8.dp, bottom = 8.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Text(
+                        text = cardName,
+                        color = Color(0XFF071145),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        lineHeight = 12.sp
+                    )
+
+                    Text(
+                        text = "$cardBalance BYN",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        lineHeight = 16.sp,
+                        modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
+                        color = Color(0XFF1d1b20)
+
+                    )
+                    Text(
+                        text = "Кошелек",
+                        color = Color(0XFF7477a2),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 11.sp,
+                        lineHeight = 11.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+                Image(
+                    painter = painterResource(R.drawable.ic_arrow_right),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(accentColor),
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+
+            }
         }
 
-
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 16.dp, start = 4.dp),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 2.dp
-            )
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(2.dp)
-                    .clip(RoundedCornerShape(15.dp))
-                    .background(Color(0XFFedf5fd))
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_card),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth(0.4f)
-                            .align(Alignment.CenterVertically)
-                            .padding(start = 8.dp)
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 6.dp, top = 8.dp, bottom = 8.dp)
-                    ) {
-                        Text(
-                            text = "Безналичные",
-                            color = Color(0XFF071145),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 11.sp
-                        )
-                        Row() {
-                            Text(
-                                text = "200 BYN",
-                                modifier = Modifier
-                                    .padding(top = 4.dp, bottom = 4.dp),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            Image(
-                                painter = painterResource(R.drawable.ic_arrow_right),
-                                contentDescription = null,
-                                colorFilter = ColorFilter.tint(Color(0XFF1072fe))
-                            )
-                        }
-                        Text(text = "Кошелек", color = Color(0XFF69709b), fontSize = 11.sp)
-                    }
-                }
-            }
-
-        }
     }
 }
 
@@ -438,21 +437,8 @@ fun QuicAction(text: String, color: Color, iconId: Int, modifier: Modifier) {
     }
 }
 
-
 @Composable
-fun ListTransactions() {
-    Text(
-        text = "Операции по дням",
-        modifier = Modifier
-            .padding(start = 16.dp, top = 12.dp),
-        color = Color(0XFF071145),
-        fontWeight = FontWeight.SemiBold
-    )
-    OneDayCard()
-}
-
-@Composable
-fun OneDayCard() {
+fun OneDayCard(day: FinanceDay) {
     Card(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 1.dp
@@ -473,7 +459,7 @@ fun OneDayCard() {
                 modifier = Modifier.padding(start = 6.dp, top = 6.dp, bottom = 6.dp)
             )
             Text(
-                text = "Сегодня, 6 июля",
+                text = day.transactionDate.format(DateTimeFormatter.ofPattern("dd.MM.yy")),
                 modifier = Modifier
                     .padding(start = 6.dp, top = 4.dp)
                     .align(Alignment.CenterVertically),
@@ -482,7 +468,7 @@ fun OneDayCard() {
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "- 55 BYN",
+                text = "-${day.outgo} BYN",
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .align(Alignment.CenterVertically),
@@ -491,7 +477,7 @@ fun OneDayCard() {
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "+ 155 BYN",
+                text = "+${day.income} BYN",
                 modifier = Modifier
                     .padding(start = 12.dp, top = 4.dp, end = 16.dp)
                     .align(Alignment.CenterVertically),
@@ -502,16 +488,36 @@ fun OneDayCard() {
         }
         HorizontalDivider(color = Color(0XFFf8f8fb))
         Column() {
-            TransactionItem()
-            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp))
-            TransactionItem()
+            day.transactions.forEach {
+                TransactionItem(it)
+            }
+
+            /*HorizontalDivider(
+                color = Color(0XFFf8f8fb),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, end = 12.dp)
+            )*/
+
         }
     }
 }
 
 
 @Composable
-fun TransactionItem() {
+fun TransactionItem(transaction: Transaction) {
+    val amountText =
+        if (transaction.amount < 0) "-${transaction.amount.toInt()}" else "+${transaction.amount.toInt()}"
+    val amountColor = if (transaction.amount < 0) Color(0XFFf20302) else Color(0XFF0bae31)
+    val transactionTypeText = if (transaction.type == WalletType.CASH) "Наличные" else "Безналичные"
+    val transactionTypeIcon =
+        if (transaction.type == WalletType.CASH) R.drawable.ic_cash else R.drawable.ic_card
+    val iconIdentifier = LocalContext.current.resources.getIdentifier(
+        "ic_${transaction.iconId}_category",
+        "drawable",
+        LocalContext.current.packageName
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -520,19 +526,23 @@ fun TransactionItem() {
         Box(
             modifier = Modifier
                 .padding(start = 8.dp, top = 4.dp)
-                .background(shape = CircleShape, color = Color(0XFF659af1))
+                .background(
+                    shape = CircleShape,
+                    color = Color(transaction.iconCircleColor.toColorInt())
+                )
                 .padding(8.dp)
         ) {
             Image(
-                painter = painterResource(R.drawable.ic_gas),
+                painter = painterResource(iconIdentifier),
                 contentDescription = null,
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(26.dp),
+                colorFilter = ColorFilter.tint(Color.White)
             )
         }
 
         Column(modifier = Modifier.padding(start = 12.dp)) {
             Text(
-                text = "Умный дом",
+                text = transaction.name,
                 color = Color(0XFF071145),
                 modifier = Modifier.padding(top = 6.dp),
                 fontWeight = FontWeight.SemiBold,
@@ -543,14 +553,14 @@ fun TransactionItem() {
                     .padding(top = 2.dp)
                     .background(
                         shape = RoundedCornerShape(4.dp),
-                        color = Color(0XFFedf3fe)
+                        color = Color(transaction.iconCircleColor.toColorInt()).copy(alpha = 0.12f)
                     )
             ) {
                 Text(
-                    text = "Недельный бюджет",
+                    text = transaction.categoryName,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0XFF5e7ad3),
+                    color = Color(transaction.iconCircleColor.toColorInt()),
                     modifier = Modifier.padding(
                         start = 8.dp,
                         end = 8.dp,
@@ -565,9 +575,9 @@ fun TransactionItem() {
 
         Column(modifier = Modifier.padding(end = 16.dp)) {
             Text(
-                text = "- 55 BYN",
+                text = "$amountText BYN",
                 fontSize = 13.sp,
-                color = Color(0XFFf20302),
+                color = amountColor,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .padding(top = 6.dp)
@@ -575,14 +585,14 @@ fun TransactionItem() {
             )
             Row() {
                 Text(
-                    text = "Наличные",
+                    text = transactionTypeText,
                     fontSize = 10.sp,
                     color = Color(0XFF686e93),
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
                 Image(
-                    painter = painterResource(R.drawable.ic_card),
+                    painter = painterResource(transactionTypeIcon),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(start = 4.dp)
