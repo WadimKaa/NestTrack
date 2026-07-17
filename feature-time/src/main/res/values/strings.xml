@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="time_title">Учет времени</string>
+    <string name="you_balance">Твой баланс</string>
+    <string name="_you_owe_time">Тебе должны время</string>
+    <string name="you_owe_time">Ты должен время</string>
+    <string name="target">Цель: равновесие</string>
+    <string name="btn_add_concession">+ Новая уступка</string>
+</resources>
