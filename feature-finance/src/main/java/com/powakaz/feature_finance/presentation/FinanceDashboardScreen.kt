@@ -250,7 +250,9 @@ fun Wallets(cashBalance: String, cardBalance: String) {
                 painter = painterResource(R.drawable.ic_arrow_right),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(Color(0XFF076ffe)),
-                modifier = Modifier.size(14.dp).align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .size(14.dp)
+                    .align(Alignment.CenterVertically)
             )
         }
     }
@@ -439,6 +441,8 @@ fun QuicAction(text: String, color: Color, iconId: Int, modifier: Modifier) {
 
 @Composable
 fun OneDayCard(day: FinanceDay) {
+    val outGoText = if (day.outgo.toInt() == 0) "-${day.outgo.toInt()} BYN" else "${day.outgo.toInt()} BYN"
+
     Card(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 1.dp
@@ -469,7 +473,7 @@ fun OneDayCard(day: FinanceDay) {
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "-${day.outgo} BYN",
+                text = outGoText,
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .align(Alignment.CenterVertically),
@@ -478,7 +482,7 @@ fun OneDayCard(day: FinanceDay) {
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "+${day.income} BYN",
+                text = "+${day.income.toInt()} BYN",
                 modifier = Modifier
                     .padding(start = 12.dp, top = 4.dp, end = 16.dp)
                     .align(Alignment.CenterVertically),
@@ -491,15 +495,15 @@ fun OneDayCard(day: FinanceDay) {
         Column() {
             day.transactions.forEach {
                 TransactionItem(it)
+                if (it != day.transactions.last()) {
+                    HorizontalDivider(
+                        color = Color(0XFFf8f8fb),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 12.dp, end = 12.dp)
+                    )
+                }
             }
-
-            /*HorizontalDivider(
-                color = Color(0XFFf8f8fb),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 12.dp, end = 12.dp)
-            )*/
-
         }
     }
 }
@@ -508,7 +512,7 @@ fun OneDayCard(day: FinanceDay) {
 @Composable
 fun TransactionItem(transaction: Transaction) {
     val amountText =
-        if (transaction.amount < 0) "-${transaction.amount.toInt()}" else "+${transaction.amount.toInt()}"
+        if (transaction.amount < 0) "${transaction.amount.toInt()}" else "+${transaction.amount.toInt()}"
     val amountColor = if (transaction.amount < 0) Color(0XFFf20302) else Color(0XFF0bae31)
     val transactionTypeText = if (transaction.type == WalletType.CASH) "Наличные" else "Безналичные"
     val transactionTypeIcon =
@@ -522,7 +526,7 @@ fun TransactionItem(transaction: Transaction) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp, bottom = 8.dp)
+            .padding(top = 4.dp, bottom = 8.dp, start = 4.dp)
     ) {
         Box(
             modifier = Modifier

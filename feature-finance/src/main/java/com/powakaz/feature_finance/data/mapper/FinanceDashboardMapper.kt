@@ -2,6 +2,7 @@ package com.powakaz.feature_finance.data.mapper
 
 import com.powakaz.feature_finance.data.remote.model.GetTransactionsPageDto
 import com.powakaz.feature_finance.data.remote.model.GetWalletsDto
+import com.powakaz.feature_finance.data.remote.model.TransactionDto
 import com.powakaz.feature_finance.domain.model.FinanceDashboard
 import com.powakaz.feature_finance.domain.model.FinanceDay
 import com.powakaz.feature_finance.domain.model.Transaction
@@ -23,15 +24,18 @@ class FinanceDashboardMapper @Inject constructor(private val transactionMapper: 
             totalBalance = calculateTotalBalance(walletsDto, currentUserId),
             weekBalance = calculateWeekBalance(walletsDto, weeklyWalletId),
             userWalletList = walletsDto.filter { it.userId == currentUserId }.map { it.toDomain() },
-            financeDays = bindFinanceDays(transactionsDto, walletsDto)
+            financeDays = bindFinanceDays(transactionsDto, walletsDto, currentUserId)
         )
     }
 
     private fun bindFinanceDays(
         transactionsDto: GetTransactionsPageDto,
-        walletsDto: List<GetWalletsDto>
+        walletsDto: List<GetWalletsDto>,
+        currentUserId: Int
     ): List<FinanceDay> {
-        val transactions = transactionsDto.data.map { transactionMapper.map(it, walletsDto) }
+        val filteredTransactions = filterByCurrentUser(transactionsDto, walletsDto, currentUserId)
+        val transactions =
+            filteredTransactions.map { transactionMapper.map(it, walletsDto, currentUserId) }
         val transactionsGroups = transactions.groupBy {
             it.transactionDate.atZone(ZoneId.systemDefault()).toLocalDate()
         }
@@ -44,6 +48,21 @@ class FinanceDashboardMapper @Inject constructor(private val transactionMapper: 
 
         return financeDays
     }
+
+    private fun filterByCurrentUser(
+        transactionsDto: GetTransactionsPageDto,
+        walletsDto: List<GetWalletsDto>,
+        currentUserId: Int
+    ): List<TransactionDto> {
+
+        val walletUserIds = walletsDto.associate { it.name to it.userId }
+
+        return transactionsDto.data.filter { dto ->
+            walletUserIds[dto.fromWalletName] == currentUserId ||
+                    walletUserIds[dto.toWalletName] == currentUserId
+        }
+    }
+
 
     private fun mapTransactionToFinanceDay(
         transactionsGroup: List<Transaction>,

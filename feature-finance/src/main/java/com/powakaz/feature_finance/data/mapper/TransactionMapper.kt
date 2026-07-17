@@ -10,7 +10,7 @@ import javax.inject.Inject
 class TransactionMapper @Inject constructor() {
 
 
-    fun map(transactionDto: TransactionDto, wallets: List<GetWalletsDto>): Transaction {
+    fun map(transactionDto: TransactionDto, wallets: List<GetWalletsDto>, currentUserId: Int): Transaction {
         return Transaction(
             id = transactionDto.id,
             name = transactionDto.name,
@@ -18,10 +18,25 @@ class TransactionMapper @Inject constructor() {
             categoryName = transactionDto.categoryName,
             iconId = transactionDto.categoryIcon,
             iconCircleColor = transactionDto.categoryColor,
-            amount = transactionDto.amount,
+            amount = calculateAmount(currentUserId, transactionDto, wallets),
             type = getType(wallets, transactionDto),
             transactionDate = Instant.parse(transactionDto.transactionDate)
         )
+    }
+
+    private fun calculateAmount(
+        currentUserId: Int,
+        transactionDto: TransactionDto,
+        wallets: List<GetWalletsDto>
+    ): Float {
+        val toWalletId = wallets.find { it.name == transactionDto.toWalletName }?.id
+        var amount = transactionDto.amount
+
+        return if (toWalletId == null || wallets.find { it.id == toWalletId && it.userId != currentUserId} != null){
+            0 - amount
+        }else{
+            amount
+        }
     }
 
     private fun getType(
