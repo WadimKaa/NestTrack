@@ -3,6 +3,7 @@ package com.powakaz.core_datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.powakaz.core_common.repository.TokenRepository
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +38,4 @@ class TokenRepositoryImpl @Inject constructor(private val dataStore : DataStore<
             preferences.remove(TOKEN_KEY)
         }
     }
-
-
-
 }

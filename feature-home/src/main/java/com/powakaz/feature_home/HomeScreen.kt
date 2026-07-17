@@ -1,5 +1,8 @@
 package com.powakaz.feature_home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,8 +25,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.powakaz.nesttrack.feature_profile.presentation.screen.ProfileScreen
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()){
@@ -32,6 +37,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()){
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewHomeScreen(){
@@ -52,6 +58,7 @@ val navItems = listOf(
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreenContent(homeScreenUiState: HomeScreenUiState, onEvent: (HomeScreenUiEvent) -> Unit){
     Scaffold(
@@ -87,6 +94,12 @@ fun HomeScreenContent(homeScreenUiState: HomeScreenUiState, onEvent: (HomeScreen
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
+
+            when(homeScreenUiState.selectedItem) {
+                0 -> {}
+                1 -> {}
+                2 -> ProfileScreen()
+            }
 
         }
     }

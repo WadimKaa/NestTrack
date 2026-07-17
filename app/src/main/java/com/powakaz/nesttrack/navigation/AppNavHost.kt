@@ -1,5 +1,7 @@
 package com.powakaz.nesttrack.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
@@ -9,8 +11,10 @@ import androidx.navigation.compose.rememberNavController
 import com.powakaz.feature_auth.presentation.LoginScreen
 import com.powakaz.feature_home.HomeScreen
 import com.powakaz.navigation_api.Screens
+import com.powakaz.nesttrack.feature_profile.presentation.screen.ProfileScreen
 import com.powakaz.nesttrack.presentation.LoginState
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberNavController(),
@@ -42,7 +46,7 @@ fun AppNavHost(
     ) {
 
         composable<Screens.LoginScreen> {
-            LoginScreen()
+           LoginScreen()
         }
 
         composable<Screens.HomeScreen> {

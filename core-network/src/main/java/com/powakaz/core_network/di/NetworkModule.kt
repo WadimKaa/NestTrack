@@ -21,7 +21,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    @Provides
+   @Provides
     @Singleton
     fun provideAuthInterceptor(tokenRepository: TokenRepository): AuthInterceptor {
         return AuthInterceptor(tokenRepository)
@@ -32,6 +32,8 @@ object NetworkModule {
     fun provideSessionInterceptor(sessionManager: SessionManager): SessionInterceptor {
         return SessionInterceptor(sessionManager)
     }
+
+
 
     @Provides
     @Singleton

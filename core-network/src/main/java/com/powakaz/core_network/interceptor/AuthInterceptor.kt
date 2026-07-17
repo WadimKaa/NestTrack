@@ -19,6 +19,7 @@ class AuthInterceptor @Inject constructor(private val tokenRepository: TokenRepo
             tokenRepository.getAccessToken().first()
         }
 
+
         if (token.isNullOrBlank()) {
             throw NoTokenException()
         }

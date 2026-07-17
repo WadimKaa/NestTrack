@@ -26,6 +26,7 @@ rootProject.name = "Nest Track"
 include(":app")
 include(":navigation-api")
 include(":core-network")
+include(":feature-profile")
 include(":core-datastore")
 include(":core-common")
 include(":feature-auth")
