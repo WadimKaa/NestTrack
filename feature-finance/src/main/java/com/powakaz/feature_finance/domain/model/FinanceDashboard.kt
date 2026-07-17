@@ -7,7 +7,8 @@ data class FinanceDashboard(
     val totalBalance: Float,
     val weekBalance: Float,
     val userWalletList: List<Wallet>,
-    val financeDays: List<FinanceDay>
+    val financeDays: List<FinanceDay>,
+    val currentUserId : Int
 )
 
 

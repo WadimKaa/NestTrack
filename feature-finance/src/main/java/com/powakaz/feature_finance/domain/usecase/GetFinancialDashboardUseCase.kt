@@ -8,6 +8,8 @@ import com.powakaz.feature_finance.domain.repository.FinanceRepository
 import javax.inject.Inject
 
 class GetFinancialDashboardUseCase @Inject constructor(private val financeRepository: FinanceRepository) {
-    suspend operator fun invoke(currentUserId : Int): NetworkResult<FinanceDashboard> = financeRepository.getFinanceDashboard(currentUserId,
-        FinanceConstants.WEEKLY_WALLET_ID)
+    suspend operator fun invoke(): NetworkResult<FinanceDashboard> =
+        financeRepository.getFinanceDashboard(
+            FinanceConstants.WEEKLY_WALLET_ID
+        )
 }

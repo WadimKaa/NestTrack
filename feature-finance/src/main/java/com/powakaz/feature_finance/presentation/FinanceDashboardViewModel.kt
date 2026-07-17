@@ -20,9 +20,9 @@ data class FinDashboardUiState(
     val userBalance: String = "",
     val weekBalance: String = "",
     val progressWeekBalance: Float = 0f,
-    val cashBalance : String = "",
-    val cardBalance : String = "",
-    val listDays : List<FinanceDay> = listOf()
+    val cashBalance: String = "",
+    val cardBalance: String = "",
+    val listDays: List<FinanceDay> = listOf()
 )
 
 @HiltViewModel
@@ -35,15 +35,17 @@ class FinanceDashboardViewModel @Inject constructor(getFinancialDashboardUseCase
 
     init {
         viewModelScope.launch {
-            when (val finDashboardData = getFinancialDashboardUseCase(1)) {
+            when (val finDashboardData = getFinancialDashboardUseCase()) {
                 is NetworkResult.Success<FinanceDashboard> -> {
                     _uiState.update {
                         FinDashboardUiState(
                             userBalance = finDashboardData.data.totalBalance.toInt().toString(),
                             weekBalance = finDashboardData.data.weekBalance.toInt().toString(),
                             progressWeekBalance = finDashboardData.data.weekBalance / FinanceConstants.WEEKLY_MAX_BUDGET,
-                            cardBalance = finDashboardData.data.userWalletList.find { it.userId == 1 && it.type == WalletType.CARD }!!.balance.toInt().toString(),
-                            cashBalance = finDashboardData.data.userWalletList.find { it.userId == 1 && it.type == WalletType.CASH }!!.balance.toInt().toString(),
+                            cardBalance = finDashboardData.data.userWalletList.find { it.userId == finDashboardData.data.currentUserId && it.type == WalletType.CARD }!!.balance.toInt()
+                                .toString(),
+                            cashBalance = finDashboardData.data.userWalletList.find { it.userId == finDashboardData.data.currentUserId && it.type == WalletType.CASH }!!.balance.toInt()
+                                .toString(),
                             listDays = finDashboardData.data.financeDays
                         )
                     }
@@ -52,6 +54,7 @@ class FinanceDashboardViewModel @Inject constructor(getFinancialDashboardUseCase
                 is NetworkResult.Error -> {
 
                 }
+
                 is NetworkResult.Exception -> {
 
                 }

@@ -24,7 +24,8 @@ class FinanceDashboardMapper @Inject constructor(private val transactionMapper: 
             totalBalance = calculateTotalBalance(walletsDto, currentUserId),
             weekBalance = calculateWeekBalance(walletsDto, weeklyWalletId),
             userWalletList = walletsDto.filter { it.userId == currentUserId }.map { it.toDomain() },
-            financeDays = bindFinanceDays(transactionsDto, walletsDto, currentUserId)
+            financeDays = bindFinanceDays(transactionsDto, walletsDto, currentUserId),
+            currentUserId = currentUserId
         )
     }
 
