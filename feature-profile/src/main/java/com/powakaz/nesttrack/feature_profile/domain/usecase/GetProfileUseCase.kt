@@ -8,13 +8,7 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class GetProfileUseCase @Inject constructor(
-    private val profileRepository: ProfileRepository,
-    private val userIdRepository: UserIdRepository
+    private val profileRepository: ProfileRepository
 ){
-    suspend operator fun invoke(): NetworkResult<UserProfile> {
-
-        val id = userIdRepository.getUserId().first()
-
-        return profileRepository.getProfile(id)
-    }
+    suspend operator fun invoke(): NetworkResult<UserProfile> = profileRepository.getProfile()
 }

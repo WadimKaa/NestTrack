@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
-    suspend fun getProfile(userId: Int): NetworkResult<UserProfile>
+    suspend fun getProfile(): NetworkResult<UserProfile>
 
     suspend fun updateProfile(profile: UserProfile): NetworkResult<UpdateProfile>
 

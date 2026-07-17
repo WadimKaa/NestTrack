@@ -2,6 +2,7 @@ package com.powakaz.nesttrack.feature_profile.data.repository
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.powakaz.core_common.repository.UserIdRepository
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.core_network.utils.safeApiCall
 import com.powakaz.nesttrack.feature_profile.data.datasourse.remote.api.ProfileApi
@@ -21,6 +22,7 @@ import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
     //private val dao: UserProfileDAO,
+    private val userIdRepository: UserIdRepository,
     private val avatarMultipartMapper: AvatarMultipartMapper,
     @PublicProfileApi
     val publicApi: ProfileApi,
@@ -29,13 +31,13 @@ class ProfileRepositoryImpl @Inject constructor(
 ) : ProfileRepository
 {
     @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun getProfile(userId: Int): NetworkResult<UserProfile> {
+    override suspend fun getProfile(): NetworkResult<UserProfile> {
         val result = safeApiCall {
 
             val profileList = publicApi.getUsersProfile()
 
             val profile = profileList.find {
-                it.id == userId
+                it.id == userIdRepository.getUserId().first()
             } ?: throw Exception("User ID not found")
 
             profile.toDomain()
@@ -61,7 +63,7 @@ class ProfileRepositoryImpl @Inject constructor(
 
         val result = safeApiCall {
             val updateAvatar = privateApi.uploadAvatar(
-                id = CURRENT_USER_ID,
+                id = userIdRepository.getUserId().first(),
                 avatar = avatarMultipartMapper.map(avatar.path)
             )
             updateAvatar.toDomain()
@@ -73,17 +75,11 @@ class ProfileRepositoryImpl @Inject constructor(
     override suspend fun deleteAvatar(profile: UserProfile): NetworkResult<UpdateProfile> {
         val result = safeApiCall {
             val updateResponse  = privateApi.updateProfile(
-                id = CURRENT_USER_ID,
+                id = userIdRepository.getUserId().first(),
                 profile = profile.toDto()
             )
             updateResponse.toDomain()
         }
         return result
     }
-
-
-    companion object {
-        private const val CURRENT_USER_ID = 2
-    }
-
 }
