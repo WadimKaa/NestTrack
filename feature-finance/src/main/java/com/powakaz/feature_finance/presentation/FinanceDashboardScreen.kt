@@ -464,7 +464,8 @@ fun OneDayCard(day: FinanceDay) {
                     .padding(start = 6.dp, top = 4.dp)
                     .align(Alignment.CenterVertically),
                 fontSize = 13.sp,
-                color = Color(0XFF686e93)
+                color = Color(0XFF686e93),
+                fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -531,6 +532,7 @@ fun TransactionItem(transaction: Transaction) {
                     color = Color(transaction.iconCircleColor.toColorInt())
                 )
                 .padding(8.dp)
+                .align(Alignment.CenterVertically)
         ) {
             Image(
                 painter = painterResource(iconIdentifier),
@@ -552,7 +554,7 @@ fun TransactionItem(transaction: Transaction) {
                 modifier = Modifier
                     .padding(top = 2.dp)
                     .background(
-                        shape = RoundedCornerShape(4.dp),
+                        shape = RoundedCornerShape(6.dp),
                         color = Color(transaction.iconCircleColor.toColorInt()).copy(alpha = 0.12f)
                     )
             ) {
@@ -563,9 +565,7 @@ fun TransactionItem(transaction: Transaction) {
                     color = Color(transaction.iconCircleColor.toColorInt()),
                     modifier = Modifier.padding(
                         start = 8.dp,
-                        end = 8.dp,
-                        top = 2.dp,
-                        bottom = 2.dp
+                        end = 8.dp
                     )
                 )
             }
@@ -576,7 +576,7 @@ fun TransactionItem(transaction: Transaction) {
         Column(modifier = Modifier.padding(end = 16.dp)) {
             Text(
                 text = "$amountText BYN",
-                fontSize = 13.sp,
+                fontSize = 14.sp,
                 color = amountColor,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -597,6 +597,7 @@ fun TransactionItem(transaction: Transaction) {
                     modifier = Modifier
                         .padding(start = 4.dp)
                         .size(16.dp)
+                        .align(Alignment.CenterVertically)
                 )
             }
         }
