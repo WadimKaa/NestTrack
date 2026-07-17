@@ -17,15 +17,19 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 
 
-/*fun UserProfileEntity.toDomain(): UserProfile {
+fun UserProfileEntity.toDomain(): UserProfile {
     return UserProfile(
         id = id,
         name = name,
         birthDate = birthDate,
-        avatarUrl = avatarUrl,
+        avatarUrl = if (avatarUrl == null) {
+            Avatar.Default
+        } else {
+            Avatar.Remote(buildUrl(avatarUrl))
+        },
         createdAt = createdAt
     )
-}*/
+}
 
 
 
