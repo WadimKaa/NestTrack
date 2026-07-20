@@ -44,6 +44,7 @@ data class Transaction(
     val categoryName: String,
     val iconId: String,
     val iconCircleColor: String,
+    val iconResourceId : Int,
     val amount: Float,
     val type: WalletType,
     val transactionDate : Instant

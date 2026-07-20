@@ -47,7 +47,7 @@ class FinanceRepositoryImpl @Inject constructor(
         return coroutineScope {
             val walletsReq = async { getAllWallets() }
             val transactionsReq = async { getStartTransactionsPage() }
-            val currentUserId = userIdRepository.getUserId().first()
+            //val currentUserId = userIdRepository.getUserId().first()
 
             val wallets = when(val result = walletsReq.await()){
                 is NetworkResult.Success<List<GetWalletsDto>> -> result.data
@@ -61,7 +61,7 @@ class FinanceRepositoryImpl @Inject constructor(
                 is NetworkResult.Exception -> return@coroutineScope result
             }
 
-            NetworkResult.Success(financeDashboardMapper.map(wallets, transactions, currentUserId, weeklyWalletId))
+            NetworkResult.Success(financeDashboardMapper.map(wallets, transactions, 1, weeklyWalletId))
         }
     }
 

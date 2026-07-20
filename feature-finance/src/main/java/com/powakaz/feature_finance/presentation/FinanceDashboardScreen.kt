@@ -42,14 +42,14 @@ import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.domain.model.FinanceDay
 import com.powakaz.feature_finance.domain.model.Transaction
 import com.powakaz.feature_finance.domain.model.WalletType
+import com.powakaz.feature_finance.presentation.model.FinanceDayUiState
+import com.powakaz.feature_finance.presentation.model.TransactionUiState
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun FinanceDashboardScreenRoute(viewModel: FinanceDashboardViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-
     FinanceDashboardScreen(state)
-
 }
 
 
@@ -58,6 +58,8 @@ fun FinanceDashboardScreenRoute(viewModel: FinanceDashboardViewModel = hiltViewM
 fun FinanceDashboardScreenPreview() {
     FinanceDashboardScreen(FinDashboardUiState())
 }
+
+
 
 
 @Composable
@@ -85,7 +87,7 @@ fun FinanceDashboardScreen(uiState: FinDashboardUiState) {
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            items(items = uiState.listDays, key = { it.transactions[0].id }) {
+            items(items = uiState.listDays, key = { it.id}) {
                 OneDayCard(it)
             }
             item { Spacer(modifier = Modifier.height(4.dp)) }
@@ -440,9 +442,7 @@ fun QuicAction(text: String, color: Color, iconId: Int, modifier: Modifier) {
 }
 
 @Composable
-fun OneDayCard(day: FinanceDay) {
-    val outGoText = if (day.outgo.toInt() == 0) "-${day.outgo.toInt()} BYN" else "${day.outgo.toInt()} BYN"
-
+fun OneDayCard(day: FinanceDayUiState) {
     Card(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 1.dp
@@ -463,7 +463,7 @@ fun OneDayCard(day: FinanceDay) {
                 modifier = Modifier.padding(start = 6.dp, top = 6.dp, bottom = 6.dp)
             )
             Text(
-                text = day.transactionDate.format(DateTimeFormatter.ofPattern("dd.MM.yy")),
+                text = day.transactionDate,
                 modifier = Modifier
                     .padding(start = 6.dp, top = 4.dp)
                     .align(Alignment.CenterVertically),
@@ -473,7 +473,7 @@ fun OneDayCard(day: FinanceDay) {
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = outGoText,
+                text = day.outgo,
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .align(Alignment.CenterVertically),
@@ -482,7 +482,7 @@ fun OneDayCard(day: FinanceDay) {
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "+${day.income.toInt()} BYN",
+                text = day.income,
                 modifier = Modifier
                     .padding(start = 12.dp, top = 4.dp, end = 16.dp)
                     .align(Alignment.CenterVertically),
@@ -510,18 +510,10 @@ fun OneDayCard(day: FinanceDay) {
 
 
 @Composable
-fun TransactionItem(transaction: Transaction) {
-    val amountText =
-        if (transaction.amount < 0) "${transaction.amount.toInt()}" else "+${transaction.amount.toInt()}"
-    val amountColor = if (transaction.amount < 0) Color(0XFFf20302) else Color(0XFF0bae31)
+fun TransactionItem(transaction: TransactionUiState) {
     val transactionTypeText = if (transaction.type == WalletType.CASH) "Наличные" else "Безналичные"
     val transactionTypeIcon =
         if (transaction.type == WalletType.CASH) R.drawable.ic_cash else R.drawable.ic_card
-    val iconIdentifier = LocalContext.current.resources.getIdentifier(
-        "ic_${transaction.iconId}_category",
-        "drawable",
-        LocalContext.current.packageName
-    )
 
     Row(
         modifier = Modifier
@@ -533,13 +525,13 @@ fun TransactionItem(transaction: Transaction) {
                 .padding(start = 8.dp, top = 4.dp)
                 .background(
                     shape = CircleShape,
-                    color = Color(transaction.iconCircleColor.toColorInt())
+                    color = transaction.iconCircleColor
                 )
                 .padding(8.dp)
                 .align(Alignment.CenterVertically)
         ) {
             Image(
-                painter = painterResource(iconIdentifier),
+                painter = painterResource(transaction.iconResourceId),
                 contentDescription = null,
                 modifier = Modifier.size(26.dp),
                 colorFilter = ColorFilter.tint(Color.White)
@@ -559,14 +551,14 @@ fun TransactionItem(transaction: Transaction) {
                     .padding(top = 2.dp)
                     .background(
                         shape = RoundedCornerShape(6.dp),
-                        color = Color(transaction.iconCircleColor.toColorInt()).copy(alpha = 0.12f)
+                        color = transaction.iconCircleColor.copy(alpha = 0.12f)
                     )
             ) {
                 Text(
                     text = transaction.categoryName,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(transaction.iconCircleColor.toColorInt()),
+                    color = transaction.iconCircleColor,
                     modifier = Modifier.padding(
                         start = 8.dp,
                         end = 8.dp
@@ -579,9 +571,9 @@ fun TransactionItem(transaction: Transaction) {
 
         Column(modifier = Modifier.padding(end = 16.dp)) {
             Text(
-                text = "$amountText BYN",
+                text = transaction.amount,
                 fontSize = 14.sp,
-                color = amountColor,
+                color = transaction.amountColor,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .padding(top = 6.dp)

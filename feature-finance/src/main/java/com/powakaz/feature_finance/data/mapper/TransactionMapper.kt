@@ -17,6 +17,7 @@ class TransactionMapper @Inject constructor() {
             description = transactionDto.description,
             categoryName = transactionDto.categoryName,
             iconId = transactionDto.categoryIcon,
+            iconResourceId = -1,
             iconCircleColor = transactionDto.categoryColor,
             amount = calculateAmount(currentUserId, transactionDto, wallets),
             type = getType(wallets, transactionDto),

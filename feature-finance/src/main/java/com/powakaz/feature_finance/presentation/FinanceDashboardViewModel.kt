@@ -1,5 +1,6 @@
 package com.powakaz.feature_finance.presentation
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
@@ -8,7 +9,10 @@ import com.powakaz.feature_finance.domain.model.FinanceDashboard
 import com.powakaz.feature_finance.domain.model.FinanceDay
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.domain.usecase.GetFinancialDashboardUseCase
+import com.powakaz.feature_finance.presentation.mapper.FinanceDayUiStateMapper
+import com.powakaz.feature_finance.presentation.model.FinanceDayUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,11 +26,14 @@ data class FinDashboardUiState(
     val progressWeekBalance: Float = 0f,
     val cashBalance: String = "",
     val cardBalance: String = "",
-    val listDays: List<FinanceDay> = listOf()
+    val listDays: List<FinanceDayUiState> = listOf()
 )
 
 @HiltViewModel
-class FinanceDashboardViewModel @Inject constructor(getFinancialDashboardUseCase: GetFinancialDashboardUseCase) :
+class FinanceDashboardViewModel @Inject constructor(
+    getFinancialDashboardUseCase: GetFinancialDashboardUseCase,
+    financeDayUiStateMapper: FinanceDayUiStateMapper
+) :
     ViewModel() {
 
     private val _uiState = MutableStateFlow(FinDashboardUiState())
@@ -46,7 +53,7 @@ class FinanceDashboardViewModel @Inject constructor(getFinancialDashboardUseCase
                                 .toString(),
                             cashBalance = finDashboardData.data.userWalletList.find { it.userId == finDashboardData.data.currentUserId && it.type == WalletType.CASH }!!.balance.toInt()
                                 .toString(),
-                            listDays = finDashboardData.data.financeDays
+                            listDays = finDashboardData.data.financeDays.map { financeDayUiStateMapper.map(it) }
                         )
                     }
                 }
