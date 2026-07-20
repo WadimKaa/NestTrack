@@ -36,6 +36,7 @@ android {
 
 dependencies {
     implementation(project(":feature-profile"))
+    implementation(project(":feature-time"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

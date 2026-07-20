@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_profile.presentation.screen.ProfileScreen
+import com.powakaz.nesttrack.feature_time.pres.TimeTrackingScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -97,7 +98,7 @@ fun HomeScreenContent(homeScreenUiState: HomeScreenUiState, onEvent: (HomeScreen
 
             when(homeScreenUiState.selectedItem) {
                 0 -> {}
-                1 -> {}
+                1 -> TimeTrackingScreen()
                 2 -> ProfileScreen()
             }
 

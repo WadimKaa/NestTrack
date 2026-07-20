@@ -6,5 +6,9 @@
     <string name="_you_owe_time">Тебе должны время</string>
     <string name="you_owe_time">Ты должен время</string>
     <string name="target">Цель: равновесие</string>
-    <string name="btn_add_concession">+ Новая уступка</string>
+    <string name="btn_add_concession">Новая уступка</string>
+    <string name="your_activities">Ваши активности</string>
+    <string name="control">Управление</string>
+    <string name="add">Добавить</string>
+    <string name="your_concession">Ваши уступки</string>
 </resources>
