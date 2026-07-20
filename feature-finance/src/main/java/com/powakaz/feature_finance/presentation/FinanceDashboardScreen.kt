@@ -88,6 +88,7 @@ fun FinanceDashboardScreen(uiState: FinDashboardUiState) {
             items(items = uiState.listDays, key = { it.transactions[0].id }) {
                 OneDayCard(it)
             }
+            item { Spacer(modifier = Modifier.height(4.dp)) }
         }
     }
 
@@ -267,14 +268,14 @@ fun Wallets(cashBalance: String, cardBalance: String) {
             "Наличные",
             R.drawable.ic_cash,
             Color(0XFF67b667),
-            Modifier.fillMaxWidth(0.5f)
+            Modifier.fillMaxWidth(0.5f).padding(start = 16.dp, end = 8.dp)
         )
         WalletCard(
             cardBalance,
             "Безналичные",
             R.drawable.ic_card,
             Color(0XFF2d80ff),
-            Modifier.fillMaxWidth(1f)
+            Modifier.fillMaxWidth(1f).padding(end = 16.dp, start = 8.dp)
         )
     }
 }
@@ -291,8 +292,7 @@ fun WalletCard(
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
-        modifier = modifier
-            .padding(start = 16.dp, end = 4.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
