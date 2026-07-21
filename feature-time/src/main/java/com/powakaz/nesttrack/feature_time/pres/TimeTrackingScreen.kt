@@ -400,7 +400,7 @@ fun ShowTimeBalance() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(180.dp)
             .padding(horizontal = 16.dp)
             .shadow(
                 elevation = 4.dp,
@@ -459,7 +459,7 @@ fun ShowTimeBalance() {
 
         Column(
             modifier = Modifier
-                .padding(start = 16.dp, top = 20.dp)
+                .padding(start = 16.dp, top = 30.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.you_balance),
