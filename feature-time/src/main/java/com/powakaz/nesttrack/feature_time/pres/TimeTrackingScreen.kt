@@ -7,6 +7,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -20,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -44,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -140,10 +145,13 @@ fun TimeTrackingScreenContent() {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            ShowListConcession()
-
-
         }
+
+        val items = listOf("One", "Two", "Two", "Two", "Two", "Two", "Two")
+        items(items) { item ->
+            ShowListConcession()
+        }
+
 
 
     }
@@ -177,12 +185,14 @@ fun ShowListConcession() {
             shape = CircleShape
         )
 
+        Spacer(modifier = Modifier.width(10.dp))
+
         Column(
             modifier = Modifier.widthIn(max = 90.dp)
         ) {
             Text(
                 text = "Велосипед",
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
                 fontFamily = FontFamily.SansSerif
@@ -224,12 +234,13 @@ fun ShowListConcession() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Покатались по лесу", // добавить многоточие если больше символов
+                text = "Покатались по лесу",
                 fontSize = 9.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.Gray,
                 fontFamily = FontFamily.SansSerif,
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -275,11 +286,13 @@ fun ShowListConcession() {
         Spacer(modifier = Modifier.width(2.dp))
 
     }
-//8E8E8E
+
+    Spacer(modifier = Modifier.height(4.dp))
+
 }
 
 @Composable
-fun ShowActivities() {   //// листаем вбок
+fun ShowActivities() {
 
     Column(
         modifier = Modifier
@@ -322,42 +335,31 @@ fun ShowActivities() {   //// листаем вбок
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp)
+
+        val items = listOf("One", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two")
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp)
         ) {
-            ActivitiesItem(
-                text = "Велосипед",
-                modifier = Modifier.width(50.dp),
-                icon = painterResource(id = R.drawable.bus),
-                backgroundColor = Color(0xFFC5FFCA),
-                shape = RoundedCornerShape(16.dp)
-            )
 
-            ActivitiesItem(
-                text = "Прогулка",
-                modifier = Modifier.width(50.dp),
-                icon = painterResource(id = R.drawable.childr),
-                backgroundColor = Color(0xFFD2FCD5),
-                shape = RoundedCornerShape(16.dp)
-            )
+            item {
+                AddNewActivity()
+            }
 
-            ActivitiesItem(
-                text = "Кафе",
-                modifier = Modifier.width(50.dp),
-                icon = painterResource(id = R.drawable.cafe),
-                backgroundColor = Color(0xFFFCC2DD),
-                shape = RoundedCornerShape(16.dp)
-            )
-
-
-            ///
-
-            AddNewActivity()
+            items(items) { item ->
+                ActivitiesItem(
+                    text = "Велосипед",
+                    modifier = Modifier.width(50.dp),
+                    icon = painterResource(id = R.drawable.bus),
+                    backgroundColor = Color(0xFFC5FFCA),
+                    shape = RoundedCornerShape(16.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(14.dp))
+
     }
 }
 

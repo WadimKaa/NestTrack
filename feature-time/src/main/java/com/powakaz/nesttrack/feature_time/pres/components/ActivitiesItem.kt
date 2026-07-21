@@ -55,7 +55,7 @@ fun ActivitiesItemContent(text: String? = null, modifier: Modifier, icon: Painte
         Icon(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp)
+                .size(40.dp)
                 .clip(shape)
                 .background(backgroundColor)
                 .padding(6.dp),
@@ -78,7 +78,7 @@ fun ActivitiesItemContent(text: String? = null, modifier: Modifier, icon: Painte
         }
     }
 
-    Spacer(modifier = Modifier.width(10.dp))
+    //Spacer(modifier = Modifier.width(10.dp))
 
 
 }
