@@ -29,22 +29,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.feature_finance.R
-import com.powakaz.feature_finance.domain.model.FinanceDay
-import com.powakaz.feature_finance.domain.model.Transaction
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.presentation.model.FinanceDayUiState
 import com.powakaz.feature_finance.presentation.model.TransactionUiState
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun FinanceDashboardScreenRoute(viewModel: FinanceDashboardViewModel = hiltViewModel()) {
