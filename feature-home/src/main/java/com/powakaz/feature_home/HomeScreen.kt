@@ -2,7 +2,6 @@ package com.powakaz.feature_home
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_profile.presentation.screen.ProfileScreen
-import com.powakaz.nesttrack.feature_time.pres.TimeTrackingScreen
+import com.powakaz.nesttrack.feature_time.pres.screen.TimeTrackingScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)

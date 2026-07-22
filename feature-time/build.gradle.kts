@@ -1,3 +1,7 @@
+import java.io.FileInputStream
+import java.util.Properties
+import kotlin.apply
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
@@ -6,7 +10,17 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(FileInputStream(localPropertiesFile))
+    }
+}
+
 android {
+    val haBaseUrlAvatar: String = localProperties.getProperty("BASE_URL_AVATAR") as String? ?: ""
+
+
     namespace = "com.powakaz.nesttrack.feature_time"
     compileSdk {
         version = release(36)
@@ -14,6 +28,8 @@ android {
 
     defaultConfig {
         minSdk = 24
+
+        buildConfigField("String", "BASE_URL_AVATAR", "\"${haBaseUrlAvatar}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -31,6 +47,11 @@ android {
 }
 
 dependencies {
+
+    implementation(project(":core-common"))
+    implementation(project(":core-network"))
+
+
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
@@ -53,4 +74,10 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    ////retrofit
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.serialization)
+    implementation(libs.okhttp)
 }

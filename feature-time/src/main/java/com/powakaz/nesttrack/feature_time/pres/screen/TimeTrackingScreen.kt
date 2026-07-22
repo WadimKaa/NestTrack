@@ -1,17 +1,15 @@
-package com.powakaz.nesttrack.feature_time.pres
+package com.powakaz.nesttrack.feature_time.pres.screen
 
-import android.R.attr.contentDescription
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,23 +24,20 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -52,6 +47,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_time.R
 import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.UserAvatar
@@ -60,13 +57,18 @@ private val shape20 = RoundedCornerShape(20.dp)
 
 
 @Composable
-fun TimeTrackingScreen() {
-    TimeTrackingScreenContent()
+fun TimeTrackingScreen(
+    viewModel: TimeTrackingScreenViewModel = hiltViewModel()
+) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    TimeTrackingScreenContent(uiState)
 }
 
 
 @Composable
-fun TimeTrackingScreenContent() {
+fun TimeTrackingScreenContent(uiState: TimeTrackingUiState) {
 
     LazyColumn(
         modifier = Modifier
@@ -88,7 +90,7 @@ fun TimeTrackingScreenContent() {
 
         item {
             Spacer(modifier = Modifier.height(20.dp))
-            ShowTimeBalance()
+            ShowTimeBalance(uiState)
         }
 
         item {
@@ -395,7 +397,7 @@ fun AddNewActivity() {
 }
 
 @Composable
-fun ShowTimeBalance() {
+fun ShowTimeBalance(uiState: TimeTrackingUiState) {
 
     Box(
         modifier = Modifier
@@ -472,13 +474,14 @@ fun ShowTimeBalance() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "+ 300 ч 25 мин",
+                text = uiState.timeBalance,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2156FE),
                 fontFamily = FontFamily.Default,
                 maxLines = 1
             )
+            //Log.e("LOL", uiState.timeBalance)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -508,5 +511,5 @@ fun ShowTimeBalance() {
 @Preview(showBackground = true)
 @Composable
 fun TimeTrackingScreenPreview() {
-    TimeTrackingScreenContent()
+    TimeTrackingScreenContent(uiState = TimeTrackingUiState())
 }
