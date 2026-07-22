@@ -9,8 +9,14 @@ import javax.inject.Inject
 
 
 data class CreateTransactionUiState(
-    val name : String = ""
+    val name : String = "",
+    val selectedCategoryIndex : Int = 0
 )
+
+
+sealed interface onEvent{
+
+}
 
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor() : ViewModel(){
