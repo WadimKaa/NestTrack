@@ -11,6 +11,6 @@ data class TimeBalanceResponseDto(
     @SerialName("with_user_name")
     val userNameWith: String,
     @SerialName("balance_hours")
-    val balanceHours: Float
+    val balanceHours: Double
 ) {
 }

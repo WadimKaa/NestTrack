@@ -127,7 +127,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState) {
         item {
             Spacer(modifier = Modifier.height(20.dp))
 
-            ShowActivities()
+            ShowActivities(uiState)
         }
 
         item {
@@ -294,7 +294,7 @@ fun ShowListConcession() {
 }
 
 @Composable
-fun ShowActivities() {
+fun ShowActivities(uiState: TimeTrackingUiState) {
 
     Column(
         modifier = Modifier
@@ -349,9 +349,9 @@ fun ShowActivities() {
                 AddNewActivity()
             }
 
-            items(items) { item ->
+            items(uiState.activitiesList) { item ->
                 ActivitiesItem(
-                    text = "Велосипед",
+                    text = item.name,
                     modifier = Modifier.width(50.dp),
                     icon = painterResource(id = R.drawable.bus),
                     backgroundColor = Color(0xFFC5FFCA),
@@ -481,7 +481,6 @@ fun ShowTimeBalance(uiState: TimeTrackingUiState) {
                 fontFamily = FontFamily.Default,
                 maxLines = 1
             )
-            //Log.e("LOL", uiState.timeBalance)
 
             Spacer(modifier = Modifier.height(16.dp))
 

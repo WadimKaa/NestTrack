@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.nesttrack.feature_time.domain.model.Activities
+import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
-import com.powakaz.nesttrack.feature_time.domain.usecase.GetTimeBalanceUseCase
+import com.powakaz.nesttrack.feature_time.domain.model.TimeData
+import com.powakaz.nesttrack.feature_time.domain.usecase.LoadTimeTrackingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimeTrackingScreenViewModel @Inject constructor(
-    val getTimeBalanceUseCase: GetTimeBalanceUseCase
+    val loadTimeTrackingUseCase: LoadTimeTrackingUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TimeTrackingUiState())
 
@@ -25,34 +28,42 @@ class TimeTrackingScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val result = getTimeBalanceUseCase()
+
+            val result = loadTimeTrackingUseCase()
+
             when(result) {
                 is NetworkResult.Error -> {
                     NetworkResult.Error(result.code, result.message)
+                    Log.e("LOL", "error")
                 }
 
                 is NetworkResult.Exception -> {
                     NetworkResult.Exception(result.e)
+                    Log.e("LOL", result.e.toString())
                 }
 
-                is NetworkResult.Success<List<TimeBalance>> -> {
+                is NetworkResult.Success<TimeData> -> {
 
-                    val timeBalanceData = result.data.first().balanceHours
+                    val timeBalance  = result.data.timeBalance.first().balanceHours
+                    val activitiesList = result.data.activities
 
                     _uiState.update {
                         it.copy(
-                            timeBalance = timeBalanceData
+                            timeBalance = timeBalance,
+                            activitiesList = activitiesList
                         )
                     }
+
                 }
             }
         }
-
     }
 }
 
 data class TimeTrackingUiState(
     val timeBalance: String = "",
+    val activitiesList: List<Activities> = emptyList(),
+    val concessionList: List<Concession> = emptyList()
 ) {
 
 }
