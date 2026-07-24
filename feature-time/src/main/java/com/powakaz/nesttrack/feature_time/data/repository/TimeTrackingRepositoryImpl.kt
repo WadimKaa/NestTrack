@@ -48,6 +48,7 @@ class TimeTrackingRepositoryImpl @Inject constructor(
                 }
 
 
+
                 TimeData(
                     timeBalance = timeBalanceDeferred.await(),
                     activities = activitiesDeferred.await(),

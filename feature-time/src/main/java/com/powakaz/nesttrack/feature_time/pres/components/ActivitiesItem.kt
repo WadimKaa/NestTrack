@@ -40,13 +40,19 @@ fun ActivitiesItem(
     modifier: Modifier = Modifier,
     icon: Painter,
     backgroundColor: Color,
-    shape: Shape
+    shape: Shape,
+    tint: Color
 ) {
-    ActivitiesItemContent(text, modifier, icon, backgroundColor, shape)
+    ActivitiesItemContent(text, modifier, icon, backgroundColor, shape, tint)
 }
 
 @Composable
-fun ActivitiesItemContent(text: String? = null, modifier: Modifier, icon: Painter, backgroundColor: Color, shape: Shape)
+fun ActivitiesItemContent(text: String? = null,
+                          modifier: Modifier,
+                          icon: Painter,
+                          backgroundColor: Color,
+                          shape: Shape,
+                          tint: Color)
 {
     Column(
         modifier = modifier,
@@ -61,7 +67,7 @@ fun ActivitiesItemContent(text: String? = null, modifier: Modifier, icon: Painte
                 .padding(6.dp),
             contentDescription = null,
             painter = icon,
-            tint = Color.Unspecified,
+            tint = tint,
         )
 
         text?.let {
@@ -91,6 +97,7 @@ fun ActivitiesItemPreview() {
         modifier = Modifier.width(60.dp),
         icon = painterResource(id = R.drawable.bus),
         Color(0xFFC5FFCA),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
+        tint = Color(0xFF1F6725),
     )
 }

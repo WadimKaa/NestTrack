@@ -13,7 +13,7 @@ fun TimeBalanceResponseDto.toDomain(): TimeBalance {
     return TimeBalance(
         userIdWith = userIdWith,
         userNameWith = userNameWith,
-        balanceHours = balanceHours.toString() //-4.0
+        balanceHours = balanceHours
     )
 }
 

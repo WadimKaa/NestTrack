@@ -9,6 +9,7 @@ import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.domain.model.TimeData
 import com.powakaz.nesttrack.feature_time.domain.usecase.LoadTimeTrackingUseCase
+import com.powakaz.nesttrack.feature_time.pres.utils.formatter.DateFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+private const val balanceCountdownStart = 0.0
 @HiltViewModel
 class TimeTrackingScreenViewModel @Inject constructor(
     val loadTimeTrackingUseCase: LoadTimeTrackingUseCase
@@ -47,12 +48,23 @@ class TimeTrackingScreenViewModel @Inject constructor(
                     val timeBalance  = result.data.timeBalance.first().balanceHours
                     val activitiesList = result.data.activities
 
+                    val currentBalanceState = if (timeBalance > balanceCountdownStart) {
+                        BalanceState.OWE_ME
+                    } else if (timeBalance < balanceCountdownStart) {
+                        BalanceState.I_OWE
+                    } else {
+                        BalanceState.BALANCE
+                    }
+
                     _uiState.update {
                         it.copy(
-                            timeBalance = timeBalance,
-                            activitiesList = activitiesList
+                            timeBalance = DateFormatter.formatDurationHours(timeBalance),
+                            activitiesList = activitiesList,
+                            currentBalanceState = currentBalanceState
                         )
                     }
+                    Log.e("LOL", activitiesList.toString())
+
 
                 }
             }
@@ -62,8 +74,11 @@ class TimeTrackingScreenViewModel @Inject constructor(
 
 data class TimeTrackingUiState(
     val timeBalance: String = "",
+    val currentBalanceState: BalanceState = BalanceState.BALANCE,
     val activitiesList: List<Activities> = emptyList(),
     val concessionList: List<Concession> = emptyList()
 ) {
 
 }
+
+enum class BalanceState { I_OWE, OWE_ME, BALANCE }

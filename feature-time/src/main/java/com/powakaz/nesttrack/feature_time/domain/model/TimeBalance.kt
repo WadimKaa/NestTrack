@@ -5,5 +5,5 @@ import kotlinx.serialization.SerialName
 data class TimeBalance(
     val userIdWith: Int,
     val userNameWith: String,
-    val balanceHours: String
+    val balanceHours: Double
 )

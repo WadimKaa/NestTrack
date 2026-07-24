@@ -50,8 +50,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_time.R
+import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.UserAvatar
+import com.powakaz.nesttrack.feature_time.pres.utils.mapper.toComposeColorOrDefault
 
 private val shape20 = RoundedCornerShape(20.dp)
 
@@ -90,7 +92,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState) {
 
         item {
             Spacer(modifier = Modifier.height(20.dp))
-            ShowTimeBalance(uiState)
+            ShowTimeBalance(uiState.timeBalance, uiState.currentBalanceState)
         }
 
         item {
@@ -103,7 +105,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState) {
                     .padding(horizontal = 16.dp)
                     .height(60.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2156FE))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF835EFF))
 
             ) {
                 Icon(
@@ -184,7 +186,8 @@ fun ShowListConcession() {
                 .height(36.dp),
             icon = painterResource(id = R.drawable.bus),
             backgroundColor = Color(0xFFD2FCD5),
-            shape = CircleShape
+            shape = CircleShape,
+            tint = Color.Unspecified ////!!!!!
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -327,7 +330,7 @@ fun ShowActivities(uiState: TimeTrackingUiState) {
                 text = stringResource(id = R.string.control),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF2156FE),
+                color = Color(0xFF835EFF),
                 fontFamily = FontFamily.SansSerif,
                 modifier = Modifier
                     .align(alignment = Alignment.TopEnd)
@@ -337,8 +340,6 @@ fun ShowActivities(uiState: TimeTrackingUiState) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-
-        val items = listOf("One", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two", "Two")
 
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -350,12 +351,14 @@ fun ShowActivities(uiState: TimeTrackingUiState) {
             }
 
             items(uiState.activitiesList) { item ->
+
                 ActivitiesItem(
                     text = item.name,
                     modifier = Modifier.width(50.dp),
                     icon = painterResource(id = R.drawable.bus),
-                    backgroundColor = Color(0xFFC5FFCA),
-                    shape = RoundedCornerShape(16.dp)
+                    backgroundColor = item.iconColor.toComposeColorOrDefault(alpha = 0.2f),
+                    shape = RoundedCornerShape(16.dp),
+                    tint = item.iconColor.toComposeColorOrDefault(),
                 )
             }
         }
@@ -397,7 +400,13 @@ fun AddNewActivity() {
 }
 
 @Composable
-fun ShowTimeBalance(uiState: TimeTrackingUiState) {
+fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState) {
+
+    val (textRes, textColor) = when (currentBalanceState) {
+        BalanceState.I_OWE -> R.string.you_owe_time to Color(0xFFFB3662)
+        BalanceState.BALANCE -> R.string.you_have_balance to Color.DarkGray
+        BalanceState.OWE_ME -> R.string._you_owe_time to Color(0xFF9A7BFD)
+    }
 
     Box(
         modifier = Modifier
@@ -465,7 +474,7 @@ fun ShowTimeBalance(uiState: TimeTrackingUiState) {
         ) {
             Text(
                 text = stringResource(id = R.string.you_balance),
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
                 fontFamily = FontFamily.SansSerif
@@ -474,21 +483,21 @@ fun ShowTimeBalance(uiState: TimeTrackingUiState) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = uiState.timeBalance,
-                fontSize = 24.sp,
+                text = timeBalance,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2156FE),
+                color = textColor,
                 fontFamily = FontFamily.Default,
                 maxLines = 1
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = stringResource(id = R.string.you_owe_time), // R.string._you_owe_time
-                fontSize = 12.sp,
+                text = stringResource(textRes),
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.DarkGray,
+                color = textColor,
                 fontFamily = FontFamily.SansSerif
             )
 
@@ -496,7 +505,7 @@ fun ShowTimeBalance(uiState: TimeTrackingUiState) {
 
             Text(
                 text = stringResource(id = R.string.target),
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF8F95B2),
                 fontFamily = FontFamily.SansSerif
