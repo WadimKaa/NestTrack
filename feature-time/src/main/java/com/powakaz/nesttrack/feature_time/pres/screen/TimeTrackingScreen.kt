@@ -328,16 +328,18 @@ fun ShowActivities(uiState: TimeTrackingUiState, context: Context) {
                 modifier = Modifier.offset(14.dp)
             )
 
-            Text(
-                text = stringResource(id = R.string.control),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF835EFF),
-                fontFamily = FontFamily.SansSerif,
-                modifier = Modifier
-                    .align(alignment = Alignment.TopEnd)
-                    .offset((-14).dp)
-            )
+            if (uiState.activitiesList.isNotEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.control),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF835EFF),
+                    fontFamily = FontFamily.SansSerif,
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopEnd)
+                        .offset((-14).dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -406,7 +408,7 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState) {
 
     val (textRes, textColor) = when (currentBalanceState) {
         BalanceState.I_OWE -> R.string.you_owe_time to Color(0xFFFB3662)
-        BalanceState.BALANCE -> R.string.you_have_balance to Color.DarkGray
+        BalanceState.BALANCE -> R.string.you_have_balance to Color(0xFF00C121)
         BalanceState.OWE_ME -> R.string._you_owe_time to Color(0xFF9A7BFD)
     }
 
@@ -476,7 +478,7 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState) {
         ) {
             Text(
                 text = stringResource(id = R.string.you_balance),
-                fontSize = 14.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
                 fontFamily = FontFamily.SansSerif

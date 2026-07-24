@@ -44,7 +44,7 @@ class TimeTrackingRepositoryImpl @Inject constructor(
                 }
 
                 val concessionsDeferred = async {
-                    publicApi.getListConcession(page = 1).toDomain()
+                    publicApi.getListConcession().toDomain() //page = 1
                 }
 
 

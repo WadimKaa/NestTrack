@@ -21,6 +21,6 @@ interface TimeTrackingApi {
 
     @GET("time/logs")
     suspend fun getListConcession(
-        @Query("page") page: Int
+       // @Query("page") page: Int
     ): ConcessionListResponseDto
 }
