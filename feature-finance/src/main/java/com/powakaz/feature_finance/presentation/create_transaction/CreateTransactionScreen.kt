@@ -1,8 +1,10 @@
 package com.powakaz.feature_finance.presentation.create_transaction
 
+import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +25,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -31,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -41,8 +46,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kizitonwose.calendar.compose.HorizontalCalendar
+import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.core.DayPosition
 import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.Wallet
@@ -53,7 +62,7 @@ import com.powakaz.feature_finance.domain.model.WalletType
 @Preview
 fun CreateTransactionScreenRoute(viewModel: CreateTransactionViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    CreateTransactionScreen(uiState)
+    CreateTransactionScreen(uiState, viewModel::onEvent)
 }
 
 
@@ -63,13 +72,17 @@ fun CreateTransactionScreenPreview() {
     CreateTransactionScreen(
         CreateTransactionUiState(
             name = "Kekek"
-        )
+        ),
+        {}
     )
 }
 
 
 @Composable
-fun CreateTransactionScreen(uiState: CreateTransactionUiState) {
+fun CreateTransactionScreen(
+    uiState: CreateTransactionUiState,
+    onEvent: (CreateTransactionEvent) -> Unit
+) {
     Scaffold() { paddingValues ->
         Column(
             modifier = Modifier
@@ -77,7 +90,7 @@ fun CreateTransactionScreen(uiState: CreateTransactionUiState) {
                 .verticalScroll(rememberScrollState())
         ) {
             CreateTransactionTopBar()
-            NameTransactionCard(uiState.name)
+            NameTransactionCard(uiState.name, onEvent)
             Label("Кошелек")
             WalletsCard()
             Label("Сумма")
@@ -89,6 +102,269 @@ fun CreateTransactionScreen(uiState: CreateTransactionUiState) {
             ButtonSaveTransaction()
 
         }
+    }
+
+    if (false) {
+        ChoiceWalletDialog()
+    }
+
+
+    if (false) {
+        ChoiceCategoryDialog()
+    }
+
+
+    if (false) {
+        DataBottomSheet()
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DataBottomSheet() {
+    ModalBottomSheet(onDismissRequest = {}, dragHandle = {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(width = 30.dp, height = 4.dp)
+                    .background(color = Color(0XFFcdccdb), shape = RoundedCornerShape(32.dp))
+            )
+        }
+    }) {
+        Text(
+            text = "Выберите дату",
+            color = Color(0XFF042154),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
+        HorizontalCalendar(state = rememberCalendarState(), dayContent = { day ->
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (false)
+                            androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        else
+                            androidx.compose.ui.graphics.Color.Transparent
+                    )
+                    .clickable(
+                        enabled = day.position == DayPosition.MonthDate,
+                        onClick = {}
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = day.date.dayOfMonth.toString()
+                )
+            }
+        })
+    }
+}
+
+@Composable
+fun ChoiceCategoryDialog() {
+    Dialog(onDismissRequest = {}) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0XFFfafafa)
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp)
+        ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Image(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 16.dp, end = 16.dp)
+                )
+                Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
+                    Text(
+                        text = "Категория",
+                        color = Color(0XFF042154),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    Text(
+                        text = "Выберите категорию перевода",
+                        color = Color(0XFF7a8198),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    CategoryItem()
+                    CategoryItem()
+                    CategoryItem()
+                    CategoryItem()
+                    Spacer(modifier = Modifier.height(16.dp))
+
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoryItem() {
+    Row(
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .background(
+                color = Color(0XFFfefefe),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = Color(0XFFe5e5ec),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .fillMaxWidth()
+    ) {
+        Image(
+            painter = painterResource(R.drawable.ic_calendar),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(Color(0XFFfd4e93)),
+            modifier = Modifier
+                .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
+                .size(36.dp)
+        )
+
+        Text(
+            text = "Умный дом",
+            fontSize = 14.sp,
+            color = Color(0XFF14274e),
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 16.sp,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(start = 8.dp)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(R.drawable.ic_radiobutton_selected),
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp)
+        )
+    }
+}
+
+@Composable
+fun ChoiceWalletDialog() {
+    Dialog(onDismissRequest = {}) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0XFFfafafa)
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp)
+        ) {
+            Box() {
+                Image(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 16.dp, end = 16.dp)
+                )
+                Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
+                    Text(
+                        text = "Откуда",
+                        color = Color(0XFF042154),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    Text(
+                        text = "Выберите кошелек",
+                        color = Color(0XFF7a8198),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    WalletItem()
+                    WalletItem()
+                    WalletItem()
+                    WalletItem()
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WalletItem() {
+    Row(
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .background(
+                color = Color(0XFFfefefe),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = Color(0XFFe5e5ec),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .fillMaxWidth()
+    ) {
+        Image(
+            painter = painterResource(R.drawable.ic_cash),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
+                .size(42.dp)
+        )
+        Column(
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(
+                text = "Наличные",
+                color = Color(0XFF042154),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 12.sp
+            )
+            Text(
+                text = "870 BYN",
+                fontSize = 16.sp,
+                color = Color(0XFF9599ae),
+                lineHeight = 16.sp
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(R.drawable.ic_radiobutton_selected),
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp)
+        )
     }
 }
 
@@ -129,7 +405,7 @@ fun CreateTransactionTopBar() {
 }
 
 @Composable
-fun NameTransactionCard(name: String) {
+fun NameTransactionCard(name: String, onEvent: (CreateTransactionEvent) -> Unit) {
     Card(
         modifier = Modifier
             .padding(top = 12.dp, start = 16.dp, end = 16.dp)
@@ -160,10 +436,11 @@ fun NameTransactionCard(name: String) {
                 )
                 OutlinedTextField(
                     value = name,
-                    onValueChange = {},
+                    onValueChange = { onEvent(CreateTransactionEvent.NameChange(it)) },
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color(0XFFe2e3e7)
+                        unfocusedBorderColor = Color(0XFFe2e3e7),
+                        focusedTextColor = Color(0XFF6750a4)
                     ),
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
@@ -294,12 +571,14 @@ fun Wallet(destination: String, wallet: Wallet, modifier: Modifier) {
                     text = "Наличные",
                     color = Color(0XFF042154),
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 12.sp
                 )
                 Text(
                     text = "870 BYN",
                     fontSize = 16.sp,
-                    color = Color(0XFF9599ae)
+                    color = Color(0XFF9599ae),
+                    lineHeight = 16.sp
                 )
             }
             Image(
@@ -323,7 +602,11 @@ fun InputSum() {
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 .background(color = Color.White, shape = RoundedCornerShape(12.dp))
-                .border(width = 1.dp, color = Color(0XFFe5e5ec), shape = RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.dp,
+                    color = Color(0XFFe5e5ec),
+                    shape = RoundedCornerShape(12.dp)
+                )
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_coins),
@@ -372,7 +655,11 @@ fun SumCard(sum: String, modifier: Modifier) {
         modifier = modifier
             .padding(start = 4.dp, end = 4.dp)
             .background(color = Color.White, shape = RoundedCornerShape(12.dp))
-            .border(width = 1.dp, color = Color(0XFFe5e5ec), shape = RoundedCornerShape(12.dp))
+            .border(
+                width = 1.dp,
+                color = Color(0XFFe5e5ec),
+                shape = RoundedCornerShape(12.dp)
+            )
     ) {
         Text(
             text = sum,
@@ -453,7 +740,11 @@ fun SelectDate() {
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp)
             .background(color = Color.White, shape = RoundedCornerShape(12.dp))
-            .border(width = 1.dp, color = Color(0XFFe5e5ec), shape = RoundedCornerShape(12.dp))
+            .border(
+                width = 1.dp,
+                color = Color(0XFFe5e5ec),
+                shape = RoundedCornerShape(12.dp)
+            )
     ) {
         Image(
             painter = painterResource(R.drawable.ic_calendar),

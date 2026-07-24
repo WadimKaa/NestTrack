@@ -48,7 +48,7 @@ fun FinanceDashboardScreenRoute(viewModel: FinanceDashboardViewModel = hiltViewM
 }
 
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun FinanceDashboardScreenPreview() {
     FinanceDashboardScreen(FinDashboardUiState())
@@ -59,8 +59,7 @@ fun FinanceDashboardScreenPreview() {
 
 @Composable
 fun FinanceDashboardScreen(uiState: FinDashboardUiState) {
-    Scaffold { paddingValues ->
-        LazyColumn(modifier = Modifier.padding(paddingValues)) {
+        LazyColumn() {
             item {
                 TopBar()
             }
@@ -87,8 +86,6 @@ fun FinanceDashboardScreen(uiState: FinDashboardUiState) {
             }
             item { Spacer(modifier = Modifier.height(4.dp)) }
         }
-    }
-
 }
 
 

@@ -27,6 +27,16 @@ data class Wallet(
 )
 
 
+data class Category(
+    val id: Int,
+    val userId: Int?,
+    val name: String,
+    val iconName: String,
+    val colorHex: String,
+    val isIncome: Boolean,
+)
+
+
 data class FinanceDay(
     val title: String,
     val transactionDate : LocalDate,

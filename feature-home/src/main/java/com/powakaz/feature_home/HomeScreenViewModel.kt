@@ -15,7 +15,6 @@ data class HomeScreenUiState(
 
 }
 
-
 sealed interface HomeScreenUiEvent {
     data class SelectItem(val itemId: Int) : HomeScreenUiEvent
 }

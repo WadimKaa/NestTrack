@@ -26,6 +26,7 @@ datastore = "1.1.1"
 datastoreCore = "1.2.1"
 core-splashscreen = "1.0.1"
 desugar = "2.1.5"
+kizitonwoseCalendar = "2.6.0"
 
 
 
@@ -78,6 +79,7 @@ androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core
 
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
 desugar-jdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
+kizitonwose-calendar-compose = {module = "com.kizitonwose.calendar:compose",version.ref = "kizitonwoseCalendar"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
