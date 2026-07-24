@@ -31,7 +31,9 @@ fun ConcessionListResponseDto.toDomain(): ConcessionList {
         page = page,
         totalRecords = totalRecords,
         hasMorePage = hasMorePage,
-        dataConcession = dataConcession
+        dataConcession = dataConcession.map {
+            it.toDomain()
+        }
     )
 }
 fun ConcessionDto.toDomain(): Concession {

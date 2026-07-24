@@ -6,5 +6,5 @@ data class ConcessionList(
     val page: Int,
     val totalRecords: Int?,
     val hasMorePage: Boolean,
-    val dataConcession: List<ConcessionDto>
+    val dataConcession: List<Concession>
 )

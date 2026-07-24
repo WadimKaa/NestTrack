@@ -488,7 +488,7 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState) {
 
             Text(
                 text = timeBalance,
-                fontSize = 28.sp,
+                fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = textColor,
                 fontFamily = FontFamily.Default,

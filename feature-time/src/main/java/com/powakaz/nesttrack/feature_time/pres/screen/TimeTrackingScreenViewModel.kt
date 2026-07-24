@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.nesttrack.feature_time.data.mapper.toDomain
 import com.powakaz.nesttrack.feature_time.domain.model.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
@@ -47,6 +48,8 @@ class TimeTrackingScreenViewModel @Inject constructor(
 
                     val timeBalance  = result.data.timeBalance.first().balanceHours
                     val activitiesList = result.data.activities
+                    val concessionList = result.data.concessions.dataConcession
+
 
                     val currentBalanceState = if (timeBalance > balanceCountdownStart) {
                         BalanceState.OWE_ME
@@ -60,10 +63,11 @@ class TimeTrackingScreenViewModel @Inject constructor(
                         it.copy(
                             timeBalance = DateFormatter.formatDurationHours(timeBalance),
                             activitiesList = activitiesList,
-                            currentBalanceState = currentBalanceState
+                            currentBalanceState = currentBalanceState,
+                            concessionList = concessionList
                         )
                     }
-                    Log.e("LOL", activitiesList.toString())
+                    Log.e("LOL", concessionList.toString())
 
 
                 }
