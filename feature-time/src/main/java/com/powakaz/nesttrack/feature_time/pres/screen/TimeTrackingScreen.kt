@@ -1,6 +1,6 @@
 package com.powakaz.nesttrack.feature_time.pres.screen
 
-import android.util.Log
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -50,10 +51,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_time.R
-import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.UserAvatar
-import com.powakaz.nesttrack.feature_time.pres.utils.mapper.toComposeColorOrDefault
+import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesColorToUi
+import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconToUi
 
 private val shape20 = RoundedCornerShape(20.dp)
 
@@ -64,13 +65,14 @@ fun TimeTrackingScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    TimeTrackingScreenContent(uiState)
+    TimeTrackingScreenContent(uiState, context)
 }
 
 
 @Composable
-fun TimeTrackingScreenContent(uiState: TimeTrackingUiState) {
+fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
 
     LazyColumn(
         modifier = Modifier
@@ -129,7 +131,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState) {
         item {
             Spacer(modifier = Modifier.height(20.dp))
 
-            ShowActivities(uiState)
+            ShowActivities(uiState, context)
         }
 
         item {
@@ -297,7 +299,7 @@ fun ShowListConcession() {
 }
 
 @Composable
-fun ShowActivities(uiState: TimeTrackingUiState) {
+fun ShowActivities(uiState: TimeTrackingUiState, context: Context) {
 
     Column(
         modifier = Modifier
@@ -355,10 +357,10 @@ fun ShowActivities(uiState: TimeTrackingUiState) {
                 ActivitiesItem(
                     text = item.name,
                     modifier = Modifier.width(50.dp),
-                    icon = painterResource(id = R.drawable.bus),
-                    backgroundColor = item.iconColor.toComposeColorOrDefault(alpha = 0.2f),
+                    icon = painterResource(context.findActivitiesIconToUi(item.iconName)),
+                    backgroundColor = item.iconColor.findActivitiesColorToUi(alpha = 0.2f),
                     shape = RoundedCornerShape(16.dp),
-                    tint = item.iconColor.toComposeColorOrDefault(),
+                    tint = item.iconColor.findActivitiesColorToUi(),
                 )
             }
         }
@@ -519,5 +521,8 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState) {
 @Preview(showBackground = true)
 @Composable
 fun TimeTrackingScreenPreview() {
-    TimeTrackingScreenContent(uiState = TimeTrackingUiState())
+    TimeTrackingScreenContent(
+        uiState = TimeTrackingUiState(),
+        context = LocalContext.current
+    )
 }

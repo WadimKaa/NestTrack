@@ -3,9 +3,10 @@ package com.powakaz.nesttrack.feature_time.pres.utils.mapper
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 
-fun String.toComposeColorOrDefault(
-default: Color = Color.Gray,
-alpha: Float = 1f
+
+fun String.findActivitiesColorToUi(
+    default: Color = Color.Gray,
+    alpha: Float = 1f
 ): Color {
     return try {
         Color(this.toColorInt())
@@ -14,3 +15,4 @@ alpha: Float = 1f
         default.copy(alpha = alpha)
     }
 }
+
