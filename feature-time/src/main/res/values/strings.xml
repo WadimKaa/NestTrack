@@ -12,4 +12,14 @@
     <string name="control">Управление</string>
     <string name="add">Добавить</string>
     <string name="your_concession">Ваши уступки</string>
+
+
+    <string name="new_activities">Новая активность</string>
+    <string name="activities_name">Название активности</string>
+    <string name="entered_activities_name">Введите название</string>
+    <string name="choose_icon_activities">Выберите иконку</string>
+    <string name="choose_color_icon_activities">Выберите цвет</string>
+    <string name="preview">Предпросмотр</string>
+    <string name="create">Создать</string>
+    <string name="cancel">Отмена</string>
 </resources>

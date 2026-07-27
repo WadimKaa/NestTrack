@@ -1,6 +1,8 @@
 package com.powakaz.nesttrack.feature_time.pres.screen
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
@@ -23,6 +25,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val balanceCountdownStart = 0.0
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class TimeTrackingScreenViewModel @Inject constructor(
     val loadTimeTrackingUseCase: LoadTimeTrackingUseCase

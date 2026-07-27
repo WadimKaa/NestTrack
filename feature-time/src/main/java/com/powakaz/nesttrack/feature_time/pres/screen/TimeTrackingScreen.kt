@@ -1,6 +1,8 @@
 package com.powakaz.nesttrack.feature_time.pres.screen
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -61,6 +63,7 @@ import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconTo
 private val shape20 = RoundedCornerShape(20.dp)
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimeTrackingScreen(
     viewModel: TimeTrackingScreenViewModel = hiltViewModel()
@@ -147,7 +150,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
                 fontFamily = FontFamily.SansSerif,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset(28.dp),
+                    .offset(22.dp),
                 textAlign = TextAlign.Start
             )
 
