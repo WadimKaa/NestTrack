@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -140,7 +142,11 @@ fun DateBottomSheet(selectedDate: LocalDate) {
         firstDayOfWeek = firstDayOfWeekFromLocale()
     )
 
-    ModalBottomSheet(onDismissRequest = {}, dragHandle = {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    ModalBottomSheet(sheetState = sheetState, onDismissRequest = {}, dragHandle = {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -154,26 +160,127 @@ fun DateBottomSheet(selectedDate: LocalDate) {
             )
         }
     }) {
-        Text(
-            text = "Выберите дату",
-            color = Color(0XFF042154),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .align(Alignment.CenterHorizontally)
-        )
+        Column {
+            Text(
+                text = "Выберите дату",
+                color = Color(0XFF042154),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
 
-        HorizontalCalendar(
-            state = state,
-            dayContent = { day ->
-                DayCell(day, selectedDate)
-            },
-            monthHeader = { month ->
-                MonthHeader(month)
-            },
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+            HorizontalCalendar(
+                state = state,
+                dayContent = { day ->
+                    DayCell(day, selectedDate)
+                },
+                monthHeader = { month ->
+                    MonthHeader(month)
+                },
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+            )
+
+            QuickDateSelect()
+
+            Button(
+                onClick = {}, colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0XFF6f46f6)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(text = "Выбрать дату", color = Color.White, fontWeight = FontWeight.SemiBold)
+            }
+
+            Text(
+                text = "Отмена",
+                color = Color(0XFF7047f8),
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 16.dp, bottom = 16.dp)
+            )
+
+        }
+    }
+}
+
+@Composable
+fun QuickDateSelect() {
+    Text(
+        text = "Быстрый выбор",
+        color = Color(0XFF575e7d),
+        modifier = Modifier.padding(top = 24.dp, start = 16.dp)
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+    ) {
+        QuickDateSelectItem(
+            Modifier
+                .padding(start = 8.dp, end = 8.dp)
+                .weight(1f), true
         )
+        QuickDateSelectItem(
+            Modifier
+                .padding(start = 8.dp, end = 8.dp)
+                .weight(1f), false
+        )
+        QuickDateSelectItem(
+            Modifier
+                .padding(start = 8.dp, end = 8.dp)
+                .weight(1f), false
+        )
+    }
+}
+
+@Composable
+fun QuickDateSelectItem(modifier: Modifier, isSelected: Boolean) {
+    val borderColor = if (isSelected) Color(0XFF6e45f6) else Color(0XFFe5e5ec)
+    val containerColor = if (isSelected) Color(0XFFf2eefc) else Color(0XFFfdfdfd)
+
+    Box(
+        modifier = modifier
+            .background(color = containerColor, shape = RoundedCornerShape(12.dp))
+            .border(
+                width = 1.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(12.dp)
+            )
+
+    ) {
+        Row(modifier = Modifier.padding(start = 8.dp, end = 4.dp, top = 16.dp, bottom = 16.dp)) {
+            Image(
+                painter = painterResource(R.drawable.ic_calendar),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color(0XFF754ffe)),
+                modifier = Modifier.align(
+                    Alignment.CenterVertically
+                )
+            )
+
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                Text(
+                    text = "Сегодня",
+                    color = Color(0XFF9599ae),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    lineHeight = 12.sp
+                )
+                Text(
+                    text = "17.07.26",
+                    color = Color(0XFF9599ae),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    lineHeight = 12.sp
+                )
+            }
+        }
     }
 }
 
@@ -196,7 +303,6 @@ fun MonthHeader(month: CalendarMonth) {
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(Color(0XFF784ff1)),
                 modifier = Modifier
-                    .padding(start = 8.dp)
                     .align(Alignment.CenterStart)
             )
             Text(
@@ -212,7 +318,6 @@ fun MonthHeader(month: CalendarMonth) {
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(Color(0XFF784ff1)),
                 modifier = Modifier
-                    .padding(end = 8.dp)
                     .align(Alignment.CenterEnd)
             )
         }
