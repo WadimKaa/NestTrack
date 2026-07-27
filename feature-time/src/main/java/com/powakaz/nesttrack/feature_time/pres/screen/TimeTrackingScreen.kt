@@ -51,8 +51,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_time.R
+import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.UserAvatar
+import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesColorToUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconToUi
 
@@ -153,18 +155,14 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
 
         }
 
-        val items = listOf("One", "Two", "Two", "Two", "Two", "Two", "Two")
-        items(items) { item ->
-            ShowListConcession()
+        items(uiState.concessionList) { concessionItem ->
+            ShowListConcession(concessionItem, context)
         }
-
-
-
     }
 }
 
 @Composable
-fun ShowListConcession() {
+fun ShowListConcession(concessionItem: ConcessionUi,context: Context) {
 
     Row(
         modifier = Modifier
@@ -186,30 +184,35 @@ fun ShowListConcession() {
             modifier = Modifier
                 .width(36.dp)
                 .height(36.dp),
-            icon = painterResource(id = R.drawable.bus),
-            backgroundColor = Color(0xFFD2FCD5),
+            icon = painterResource(context.findActivitiesIconToUi(concessionItem.activityIcon)),
+            backgroundColor = concessionItem.activityBackgroundColor,
             shape = CircleShape,
-            tint = Color.Unspecified ////!!!!!
+            tint = concessionItem.activityIconColor,
         )
 
         Spacer(modifier = Modifier.width(10.dp))
 
         Column(
-            modifier = Modifier.widthIn(max = 90.dp)
+            modifier = Modifier
+                .width(80.dp)
+                .align(Alignment.Top)
         ) {
+
+            Spacer(modifier = Modifier.height(18.dp))
+
             Text(
-                text = "Велосипед",
-                fontSize = 13.sp,
+                text = concessionItem.activityName,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
                 fontFamily = FontFamily.SansSerif
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             Text(
-                text = "Сегодня, 18:00",
-                fontSize = 10.sp,
+                text = concessionItem.activityDate.toString(),
+                fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.Gray,
                 fontFamily = FontFamily.SansSerif
@@ -228,27 +231,34 @@ fun ShowListConcession() {
         Column(
             modifier = Modifier
                 .widthIn(max = 100.dp)
-                .padding(start = 6.dp)
+                .padding(start = 10.dp)
+                .align(Alignment.Top),
+
         ) {
+            Spacer(modifier = Modifier.height(18.dp))
+
             Text(
-                text = "2 ч 00 мин",
-                fontSize = 14.sp,
+                text = concessionItem.durationHours,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
                 fontFamily = FontFamily.SansSerif
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            if (!concessionItem.description.isNullOrBlank()) {
 
-            Text(
-                text = "Покатались по лесу",
-                fontSize = 9.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Gray,
-                fontFamily = FontFamily.SansSerif,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = concessionItem.description,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray,
+                    fontFamily = FontFamily.SansSerif,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -360,9 +370,9 @@ fun ShowActivities(uiState: TimeTrackingUiState, context: Context) {
                     text = item.name,
                     modifier = Modifier.width(50.dp),
                     icon = painterResource(context.findActivitiesIconToUi(item.iconName)),
-                    backgroundColor = item.iconColor.findActivitiesColorToUi(alpha = 0.2f),
+                    backgroundColor = item.backgroundColor,
                     shape = RoundedCornerShape(16.dp),
-                    tint = item.iconColor.findActivitiesColorToUi(),
+                    tint = item.iconColor,
                 )
             }
         }

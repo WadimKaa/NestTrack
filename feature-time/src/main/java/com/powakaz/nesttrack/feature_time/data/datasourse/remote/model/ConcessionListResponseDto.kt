@@ -32,7 +32,9 @@ data class ConcessionDto(
     val durationHours: Double,
     val description: String?,
     @SerialName("created_at")
-    val createdAt: String
+    val createdAt: String,
+    @SerialName("activity_date")
+    val activityDate: String
 
 ) {
 }

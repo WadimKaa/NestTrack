@@ -1,5 +1,7 @@
 package com.powakaz.nesttrack.feature_time.data.mapper
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.ActivitiesResponseDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.ConcessionDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.ConcessionListResponseDto
@@ -8,6 +10,7 @@ import com.powakaz.nesttrack.feature_time.domain.model.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.ConcessionList
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
+import java.time.OffsetDateTime
 
 fun TimeBalanceResponseDto.toDomain(): TimeBalance {
     return TimeBalance(
@@ -26,6 +29,7 @@ fun ActivitiesResponseDto.toDomain(): Activities {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun ConcessionListResponseDto.toDomain(): ConcessionList {
     return ConcessionList(
         page = page,
@@ -36,6 +40,7 @@ fun ConcessionListResponseDto.toDomain(): ConcessionList {
         }
     )
 }
+@RequiresApi(Build.VERSION_CODES.O)
 fun ConcessionDto.toDomain(): Concession {
     return Concession(
         id = id,
@@ -44,8 +49,9 @@ fun ConcessionDto.toDomain(): Concession {
         activityName = activityName,
         activityIcon = activityIcon,
         activityIconColor = activityIconColor,
-        durationHours = durationHours.toString(),
+        durationHours = durationHours,
         description = description,
-        createdAt = createdAt
+        createdAt = createdAt,
+        activityDate = OffsetDateTime.parse(activityDate).toLocalDate()
     )
 }

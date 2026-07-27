@@ -10,7 +10,10 @@ import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.domain.model.TimeData
 import com.powakaz.nesttrack.feature_time.domain.usecase.LoadTimeTrackingUseCase
+import com.powakaz.nesttrack.feature_time.pres.model.ActivitiesUi
+import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.formatter.DateFormatter
+import com.powakaz.nesttrack.feature_time.pres.utils.mapper.toUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,9 +65,13 @@ class TimeTrackingScreenViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             timeBalance = DateFormatter.formatDurationHours(timeBalance),
-                            activitiesList = activitiesList,
+                            activitiesList = activitiesList.map { activities ->
+                                activities.toUi()
+                            },
                             currentBalanceState = currentBalanceState,
-                            concessionList = concessionList
+                            concessionList = concessionList.map { concession ->
+                                concession.toUi()
+                            }
                         )
                     }
                     Log.e("LOL", concessionList.toString())
@@ -79,8 +86,8 @@ class TimeTrackingScreenViewModel @Inject constructor(
 data class TimeTrackingUiState(
     val timeBalance: String = "",
     val currentBalanceState: BalanceState = BalanceState.BALANCE,
-    val activitiesList: List<Activities> = emptyList(),
-    val concessionList: List<Concession> = emptyList()
+    val activitiesList: List<ActivitiesUi> = emptyList(),
+    val concessionList: List<ConcessionUi> = emptyList()
 ) {
 
 }
