@@ -1,14 +1,14 @@
 package com.powakaz.feature_finance.presentation.create_transaction
 
-import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,9 +33,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -51,11 +51,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.core.daysOfWeek
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 @Composable
@@ -114,15 +123,23 @@ fun CreateTransactionScreen(
     }
 
 
-    if (false) {
-        DataBottomSheet()
+    if (true) {
+        DateBottomSheet(LocalDate.now())
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DataBottomSheet() {
+fun DateBottomSheet(selectedDate: LocalDate) {
+    val month = remember { YearMonth.now() }
+    val state = rememberCalendarState(
+        startMonth = month.minusMonths(100),
+        endMonth = month.plusMonths(100),
+        firstVisibleMonth = month,
+        firstDayOfWeek = firstDayOfWeekFromLocale()
+    )
+
     ModalBottomSheet(onDismissRequest = {}, dragHandle = {
         Box(
             modifier = Modifier
@@ -147,30 +164,121 @@ fun DataBottomSheet() {
                 .align(Alignment.CenterHorizontally)
         )
 
-        HorizontalCalendar(state = rememberCalendarState(), dayContent = { day ->
+        HorizontalCalendar(
+            state = state,
+            dayContent = { day ->
+                DayCell(day, selectedDate)
+            },
+            monthHeader = { month ->
+                MonthHeader(month)
+            },
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+        )
+    }
+}
+
+
+val calendarHeadFormatter = DateTimeFormatter.ofPattern("LLLL yyyy", Locale("ru"))
+val dayOfWeekFormatter = DateTimeFormatter.ofPattern("E", Locale("ru"))
+
+@Composable
+fun MonthHeader(month: CalendarMonth) {
+    val daysOfWeek = remember { daysOfWeek() }
+
+    Column() {
+        Box(
+            modifier = Modifier
+                .padding(top = 16.dp, bottom = 16.dp)
+                .fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_arrow_left),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color(0XFF784ff1)),
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .align(Alignment.CenterStart)
+            )
+            Text(
+                text = month.yearMonth.format(calendarHeadFormatter)
+                    .replaceFirstChar { it.uppercase() },
+                modifier = Modifier.align(Alignment.Center),
+                color = Color(0XFF042154),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+            )
+            Image(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color(0XFF784ff1)),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .align(Alignment.CenterEnd)
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            daysOfWeek.forEach { day ->
+                Text(
+                    text = dayOfWeekFormatter.format(day).replaceFirstChar { it.uppercase() },
+                    modifier = Modifier.weight(1f),
+                    color = Color(0XFF5d6484),
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp
+                )
+            }
+
+        }
+    }
+}
+
+enum class DayType { NORMAL, WEEKEND, OUT_MONTH, SELECTED }
+
+fun getDayType(day: CalendarDay, selectedDate: LocalDate): DayType {
+    return when {
+        day.position != DayPosition.MonthDate -> {
+            DayType.OUT_MONTH
+        }
+
+        day.date == selectedDate -> {
+            DayType.SELECTED
+        }
+
+        day.date.dayOfWeek == DayOfWeek.SATURDAY || day.date.dayOfWeek == DayOfWeek.SUNDAY -> {
+            DayType.WEEKEND
+        }
+
+        else -> {
+            DayType.NORMAL
+        }
+    }
+}
+
+@Composable
+fun DayCell(day: CalendarDay, selectedDate: LocalDate) {
+    val dateType = getDayType(day, selectedDate)
+
+    var textColor = when (dateType) {
+        DayType.NORMAL -> Color(0XFF040508)
+        DayType.WEEKEND -> Color(0XFF643df6)
+        DayType.OUT_MONTH -> Color(0XFF9c9ca6)
+        DayType.SELECTED -> Color(0xFFFFFFFF)
+    }
+
+    Box(modifier = Modifier.aspectRatio(1f), contentAlignment = Alignment.Center) {
+        if (dateType == DayType.SELECTED) {
             Box(
                 modifier = Modifier
                     .padding(4.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (false)
-                            androidx.compose.material3.MaterialTheme.colorScheme.primary
-                        else
-                            androidx.compose.ui.graphics.Color.Transparent
-                    )
-                    .clickable(
-                        enabled = day.position == DayPosition.MonthDate,
-                        onClick = {}
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Text(
-                    text = day.date.dayOfMonth.toString()
-                )
-            }
-        })
+                    .fillMaxSize()
+                    .background(color = Color(0XFF7149f8), shape = CircleShape)
+            )
+        }
+        Text(text = day.date.dayOfMonth.toString(), color = textColor)
     }
 }
 

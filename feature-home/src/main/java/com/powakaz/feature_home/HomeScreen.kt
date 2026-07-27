@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.feature_finance.presentation.FinanceDashboardScreen
 import com.powakaz.feature_finance.presentation.FinanceDashboardScreenRoute
+import com.powakaz.feature_finance.presentation.create_transaction.CreateTransactionScreenRoute
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +91,7 @@ fun HomeScreenContent(homeScreenUiState: HomeScreenUiState, onEvent: (HomeScreen
             contentAlignment = Alignment.Center
         ) {
             when(homeScreenUiState.selectedItem){
-                0 -> FinanceDashboardScreenRoute()
+                0 -> CreateTransactionScreenRoute()
             }
         }
     }
