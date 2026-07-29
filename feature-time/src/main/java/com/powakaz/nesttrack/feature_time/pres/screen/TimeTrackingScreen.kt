@@ -26,14 +26,22 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,9 +64,11 @@ import com.powakaz.nesttrack.feature_time.R
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.UserAvatar
+import com.powakaz.nesttrack.feature_time.pres.components.dialogs.NewActivitiesDialog
 import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesColorToUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconToUi
+import kotlinx.coroutines.flow.MutableStateFlow
 
 private val shape20 = RoundedCornerShape(20.dp)
 
@@ -76,8 +86,14 @@ fun TimeTrackingScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
+
+    var showNewActivitySheet by rememberSaveable {
+        mutableStateOf(false)
+    }
+
 
     LazyColumn(
         modifier = Modifier
@@ -136,7 +152,13 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
         item {
             Spacer(modifier = Modifier.height(20.dp))
 
-            ShowActivities(uiState, context)
+            ShowActivities(
+                uiState,
+                context,
+                onAddActivityClick = {
+                showNewActivitySheet = true
+            }
+            )
         }
 
         item {
@@ -162,10 +184,35 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
             ShowListConcession(concessionItem, context)
         }
     }
+
+    if (showNewActivitySheet) {
+
+        ModalBottomSheet(
+            sheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = true
+                ),
+            onDismissRequest = {
+                showNewActivitySheet = false
+            },
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(
+                    color = Color.Gray
+                )
+            },
+            containerColor = Color.White
+        ) {
+            NewActivitiesDialog(
+                onDismiss = {
+                    showNewActivitySheet = false
+                }
+            )
+        }
+    }
+
 }
 
 @Composable
-fun ShowListConcession(concessionItem: ConcessionUi,context: Context) {
+fun ShowListConcession(concessionItem: ConcessionUi, context: Context) {
 
     Row(
         modifier = Modifier
@@ -214,7 +261,7 @@ fun ShowListConcession(concessionItem: ConcessionUi,context: Context) {
             Spacer(modifier = Modifier.height(2.dp))
 
             Text(
-                text = concessionItem.activityDate.toString(),
+                text = concessionItem.activityDate,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.Gray,
@@ -237,7 +284,7 @@ fun ShowListConcession(concessionItem: ConcessionUi,context: Context) {
                 .padding(start = 10.dp)
                 .align(Alignment.Top),
 
-        ) {
+            ) {
             Spacer(modifier = Modifier.height(18.dp))
 
             Text(
@@ -312,7 +359,7 @@ fun ShowListConcession(concessionItem: ConcessionUi,context: Context) {
 }
 
 @Composable
-fun ShowActivities(uiState: TimeTrackingUiState, context: Context) {
+fun ShowActivities(uiState: TimeTrackingUiState, context: Context, onAddActivityClick: () -> Unit) {
 
     Column(
         modifier = Modifier
@@ -364,7 +411,9 @@ fun ShowActivities(uiState: TimeTrackingUiState, context: Context) {
         ) {
 
             item {
-                AddNewActivity()
+                AddNewActivity(
+                    openAddNewActivities = onAddActivityClick
+                )
             }
 
             items(uiState.activitiesList) { item ->
@@ -386,22 +435,29 @@ fun ShowActivities(uiState: TimeTrackingUiState, context: Context) {
 }
 
 @Composable
-fun AddNewActivity() {
+fun AddNewActivity(openAddNewActivities: () -> Unit) {
+
     Column(
         modifier = Modifier.width(50.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
+        IconButton(
+            onClick = {
+                openAddNewActivities()
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color(0xFFEAEAEA))
-                .padding(6.dp),
-            contentDescription = null,
-            painter = painterResource(id = R.drawable.outline_add_24),
-            tint = Color.Unspecified,
-        )
+                .padding(6.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.outline_add_24),
+                contentDescription = null,
+                tint = Color.Unspecified,
+            )
+        }
 
         Spacer(modifier = Modifier.height(6.dp))
 

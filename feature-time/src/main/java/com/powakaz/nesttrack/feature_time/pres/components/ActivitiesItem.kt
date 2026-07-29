@@ -77,14 +77,14 @@ fun ActivitiesItemContent(text: String? = null,
             )
             .border(
                 width = if (isSelected) 1.dp else 0.dp,
-                color = if (isSelected) Color(0xFFA17CDE) else Color.Transparent
+                color = if (isSelected) Color(0xFFA17CDE) else Color.Transparent,
+                shape = RoundedCornerShape(12.dp),
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(2.dp)
                 .size(40.dp)
                 .clip(shape)
                 .background(backgroundColor)
