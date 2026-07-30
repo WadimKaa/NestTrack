@@ -12,27 +12,17 @@ data class FinanceDashboard(
 )
 
 
-enum class WalletType { CARD, CASH }
+enum class WalletType { CARD, CASH, OUTSIDE }
 enum class Currency { BYN, USD }
 
 data class Wallet(
-    val id: Int,
+    val id: Int?,
     val userId: Int?,
     val name: String,
     val description: String,
     val currency: Currency,
     val type: WalletType,
-    val balance: Float,
-    val iconId: Int,
-)
-
-
-data class Category(
-    val id: Int,
-    val userId: Int?,
-    val name: String,
-    val iconName: String,
-    val colorHex: String
+    val balance: Float
 )
 
 

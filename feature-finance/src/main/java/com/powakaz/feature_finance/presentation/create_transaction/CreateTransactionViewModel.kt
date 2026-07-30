@@ -7,6 +7,7 @@ import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.feature_finance.domain.constants.FinanceConstants
 import com.powakaz.feature_finance.domain.model.Category
 import com.powakaz.feature_finance.domain.model.CreateTransactionData
+import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.domain.usecase.GetCreateTransactionDataUseCase
@@ -23,6 +24,8 @@ enum class WalletDialogTarget { FROM, TO }
 
 data class CreateTransactionUiState(
     val name: String = "",
+    val amount: Int = 0,
+    val maxAmountLetterCount: Int = 5,
     val selectedCategoryIndex: Int = 0,
     val wallets: List<Wallet> = listOf(),
     val categories: List<Category> = listOf(),
@@ -40,8 +43,10 @@ sealed interface DialogState {
 sealed interface CreateTransactionEvent {
     data class NameChange(val text: String) : CreateTransactionEvent
     data class OpenWalletPicker(val walletDialogTarget: WalletDialogTarget) : CreateTransactionEvent
-    data class SelectWallet(val walletId: Int) : CreateTransactionEvent
+    data class SelectWallet(val walletId: Int?) : CreateTransactionEvent
     object CloseWalletPicker : CreateTransactionEvent
+    data class AmountChange(val amount: Int) : CreateTransactionEvent
+    data class IncreaseAmount(val increaseAmount: Int) : CreateTransactionEvent
 
 }
 
@@ -124,6 +129,26 @@ class CreateTransactionViewModel @Inject constructor(private val getCreateTransa
                     _uiState.update {
                         it.copy(
                             isWalletDialogVisible = false
+                        )
+                    }
+                }
+            }
+
+            is CreateTransactionEvent.AmountChange -> {
+                if (createTransactionEvent.amount.toString().length <= _uiState.value.maxAmountLetterCount) {
+                    _uiState.update {
+                        it.copy(
+                            amount = createTransactionEvent.amount
+                        )
+                    }
+                }
+            }
+
+            is CreateTransactionEvent.IncreaseAmount -> {
+                if ((_uiState.value.amount + createTransactionEvent.increaseAmount).toString().length <= _uiState.value.maxAmountLetterCount) {
+                    _uiState.update {
+                        it.copy(
+                            amount = _uiState.value.amount + createTransactionEvent.increaseAmount
                         )
                     }
                 }

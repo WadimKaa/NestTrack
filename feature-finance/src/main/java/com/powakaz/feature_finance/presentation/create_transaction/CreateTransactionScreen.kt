@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -61,6 +62,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.powakaz.feature_finance.R
+import com.powakaz.feature_finance.domain.model.Category
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
 import java.time.DayOfWeek
@@ -106,9 +108,9 @@ fun CreateTransactionScreen(
             Label("Кошелек")
             WalletsCard(uiState, onEvent)
             Label("Сумма")
-            InputSum()
+            InputSum(uiState.amount, onEvent)
             Label("Категория")
-            SelectCategory(uiState.selectedCategoryIndex)
+            SelectCategory(uiState)
             Label("Дата")
             SelectDate()
             ButtonSaveTransaction()
@@ -489,7 +491,9 @@ fun ChoiceWalletDialog(
 ) {
     val destinationType =
         if (uiState.walletDialogTarget == WalletDialogTarget.FROM) "Откуда" else "Куда"
-    val currentWalletId = if (uiState.walletDialogTarget == WalletDialogTarget.FROM) uiState.fromWallet?.id ?: -1 else uiState.toWallet?.id ?: -1
+    val currentWalletId =
+        if (uiState.walletDialogTarget == WalletDialogTarget.FROM) uiState.fromWallet?.id
+            ?: -1 else uiState.toWallet?.id ?: -1
 
     Dialog(onDismissRequest = { onEvent(CreateTransactionEvent.CloseWalletPicker) }) {
         Card(
@@ -529,7 +533,7 @@ fun ChoiceWalletDialog(
                             Spacer(modifier = Modifier.height(4.dp))
                         }
 
-                        items(items = uiState.wallets, key = { it.id }) {
+                        items(items = uiState.wallets, key = { it.id ?: -1 }) {
                             WalletItem(it, it.id == currentWalletId, onEvent)
                         }
                         item {
@@ -545,7 +549,8 @@ fun ChoiceWalletDialog(
 @Composable
 fun WalletItem(wallet: Wallet, isSelected: Boolean, onEvent: (CreateTransactionEvent) -> Unit) {
     val iconId = if (wallet.type == WalletType.CARD) R.drawable.ic_card else R.drawable.ic_cash
-    val radioButtonImageId = if (isSelected) R.drawable.ic_radiobutton_selected else R.drawable.ic_radiobutton_unselected
+    val radioButtonImageId =
+        if (isSelected) R.drawable.ic_radiobutton_selected else R.drawable.ic_radiobutton_unselected
     val borderColor = if (isSelected) Color(0XFF7d4efc) else Color(0XFFe5e5ec)
     val containerColor = if (isSelected) Color(0XFFf7f4fc) else Color(0XFFfefefe)
 
@@ -562,7 +567,7 @@ fun WalletItem(wallet: Wallet, isSelected: Boolean, onEvent: (CreateTransactionE
                 shape = RoundedCornerShape(8.dp)
             )
             .fillMaxWidth()
-            .clickable(onClick = {onEvent(CreateTransactionEvent.SelectWallet(wallet.id))})
+            .clickable(onClick = { onEvent(CreateTransactionEvent.SelectWallet(wallet.id)) })
     ) {
         Image(
             painter = painterResource(iconId),
@@ -783,7 +788,14 @@ fun WalletCard(
     val balance = if (wallet != null) wallet.balance.toInt().toString() else "..."
     val walletName = if (wallet != null) wallet.name else "Загрузка"
     val icon =
-        if (wallet != null && wallet.type == WalletType.CARD) R.drawable.ic_card else R.drawable.ic_cash
+        if (wallet != null && wallet.type == WalletType.CARD) {
+            R.drawable.ic_card
+        } else if (wallet != null && wallet.type == WalletType.OUTSIDE) {
+            R.drawable.ic_check
+        } else {
+            R.drawable.ic_cash
+        }
+
     val type = if (destination == "Откуда") WalletDialogTarget.FROM else WalletDialogTarget.TO
 
     Column(modifier = modifier) {
@@ -849,7 +861,9 @@ fun WalletCard(
 }
 
 @Composable
-fun InputSum() {
+fun InputSum(amount: Int, onEvent: (CreateTransactionEvent) -> Unit) {
+    val amountText = if (amount == 0) "" else amount.toString()
+
     Column() {
         Row(
             modifier = Modifier
@@ -868,8 +882,10 @@ fun InputSum() {
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
             )
             BasicTextField(
-                value = "150",
-                onValueChange = {},
+                value = amountText,
+                onValueChange = {
+                    onEvent(CreateTransactionEvent.AmountChange(if (it.isNotEmpty()) it.toInt() else 0))
+                },
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(start = 4.dp)
@@ -895,28 +911,32 @@ fun InputSum() {
         }
 
         Row(modifier = Modifier.padding(top = 8.dp, start = 12.dp, end = 12.dp)) {
-            SumCard("+25 BYN", Modifier.weight(1f))
-            SumCard("+50 BYN", Modifier.weight(1f))
-            SumCard("+100 BYN", Modifier.weight(1f))
-            SumCard("+200 BYN", Modifier.weight(1f))
+            SumCard(25, Modifier.weight(1f), onEvent)
+            SumCard(50, Modifier.weight(1f), onEvent)
+            SumCard(100, Modifier.weight(1f), onEvent)
+            SumCard(200, Modifier.weight(1f), onEvent)
         }
     }
 }
 
 @Composable
-fun SumCard(sum: String, modifier: Modifier) {
+fun SumCard(sum: Int, modifier: Modifier, onEvent: (CreateTransactionEvent) -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+
     Box(
         modifier = modifier
             .padding(start = 4.dp, end = 4.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(12.dp))
+            .clip(shape)
+            .background(color = Color.White)
             .border(
                 width = 1.dp,
                 color = Color(0XFFe5e5ec),
-                shape = RoundedCornerShape(12.dp)
+                shape = shape
             )
+            .clickable(onClick = { onEvent(CreateTransactionEvent.IncreaseAmount(sum)) })
     ) {
         Text(
-            text = sum,
+            text = "+$sum BYN",
             color = Color(0XFF793ffc),
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
@@ -930,19 +950,21 @@ fun SumCard(sum: String, modifier: Modifier) {
 
 
 @Composable
-fun SelectCategory(selectedCategoryIndex: Int) {
+fun SelectCategory(uiState: CreateTransactionUiState) {
     Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp)) {
-        Row(modifier = Modifier.padding(top = 8.dp)) {
-            CategoryCard(modifier = Modifier.weight(1f), true)
-            CategoryCard(modifier = Modifier.weight(1f), false)
-            CategoryCard(modifier = Modifier.weight(1f), false)
-            CategoryCard(modifier = Modifier.weight(1f), false)
-        }
-        Row(modifier = Modifier.padding(top = 8.dp)) {
-            CategoryCard(modifier = Modifier.weight(1f), false)
-            CategoryCard(modifier = Modifier.weight(1f), false)
-            CategoryCard(modifier = Modifier.weight(1f), false)
-            CategoryCard(modifier = Modifier.weight(1f), false)
+        if (uiState.categories.isNotEmpty()) {
+            Row(modifier = Modifier.padding(top = 8.dp)) {
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[0])
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[1])
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[2])
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[3])
+            }
+            Row(modifier = Modifier.padding(top = 8.dp)) {
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[4])
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[5])
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[6])
+                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[7])
+            }
         }
     }
 
@@ -950,7 +972,8 @@ fun SelectCategory(selectedCategoryIndex: Int) {
 }
 
 @Composable
-fun CategoryCard(modifier: Modifier, isSelected: Boolean) {
+fun CategoryCard(modifier: Modifier, category: Category) {
+    val isSelected = false
     val cardContainerColor = if (isSelected) Color(0XFFf4effd) else Color(0XFFffffff)
     val borderColor = if (isSelected) Color(0XFF9670f5) else Color(0XFFe5e5ec)
     val iconColor = if (isSelected) Color(0XFF9063fd) else Color(0XFF4aa361)

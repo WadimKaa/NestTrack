@@ -13,7 +13,6 @@ fun GetWalletsDto.toDomain(): Wallet {
         description = this.description,
         currency = if (this.currency == "BYN") Currency.BYN else Currency.USD,
         type = if (this.type == "cash") WalletType.CASH else WalletType.CARD,
-        balance = this.balance,
-        iconId = -1
+        balance = this.balance
     )
 }
