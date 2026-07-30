@@ -1,4 +1,4 @@
-package com.powakaz.feature_finance.presentation
+package com.powakaz.feature_finance.presentation.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,8 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.domain.model.WalletType
-import com.powakaz.feature_finance.presentation.model.FinanceDayUiState
-import com.powakaz.feature_finance.presentation.model.TransactionUiState
+import com.powakaz.feature_finance.presentation.dashboard.model.FinanceDayUiState
+import com.powakaz.feature_finance.presentation.dashboard.model.TransactionUiState
 
 @Composable
 fun FinanceDashboardScreenRoute(viewModel: FinanceDashboardViewModel = hiltViewModel()) {

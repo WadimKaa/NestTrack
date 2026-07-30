@@ -1,4 +1,4 @@
-package com.powakaz.feature_finance.presentation.mapper
+package com.powakaz.feature_finance.presentation.dashboard.mapper
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
@@ -6,12 +6,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.powakaz.feature_finance.domain.model.FinanceDay
 import com.powakaz.feature_finance.domain.model.Transaction
-import com.powakaz.feature_finance.presentation.model.FinanceDayUiState
-import com.powakaz.feature_finance.presentation.model.TransactionUiState
+import com.powakaz.feature_finance.presentation.dashboard.model.FinanceDayUiState
+import com.powakaz.feature_finance.presentation.dashboard.model.TransactionUiState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-import kotlin.text.toInt
 
 class FinanceDayUiStateMapper @Inject constructor(@ApplicationContext private val context: Context) {
 

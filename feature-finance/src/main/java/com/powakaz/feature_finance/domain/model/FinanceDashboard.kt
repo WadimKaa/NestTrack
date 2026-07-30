@@ -32,8 +32,7 @@ data class Category(
     val userId: Int?,
     val name: String,
     val iconName: String,
-    val colorHex: String,
-    val isIncome: Boolean,
+    val colorHex: String
 )
 
 

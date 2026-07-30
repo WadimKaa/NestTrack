@@ -3,6 +3,7 @@ package com.powakaz.feature_finance.presentation.create_transaction
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +25,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -59,7 +61,6 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.powakaz.feature_finance.R
-import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
 import java.time.DayOfWeek
@@ -103,7 +104,7 @@ fun CreateTransactionScreen(
             CreateTransactionTopBar()
             NameTransactionCard(uiState.name, onEvent)
             Label("Кошелек")
-            WalletsCard()
+            WalletsCard(uiState, onEvent)
             Label("Сумма")
             InputSum()
             Label("Категория")
@@ -111,12 +112,11 @@ fun CreateTransactionScreen(
             Label("Дата")
             SelectDate()
             ButtonSaveTransaction()
-
         }
     }
 
-    if (false) {
-        ChoiceWalletDialog()
+    if (uiState.isWalletDialogVisible) {
+        ChoiceWalletDialog(uiState, onEvent)
     }
 
 
@@ -125,7 +125,7 @@ fun CreateTransactionScreen(
     }
 
 
-    if (true) {
+    if (false) {
         DateBottomSheet(LocalDate.now())
     }
 }
@@ -483,8 +483,15 @@ fun CategoryItem() {
 }
 
 @Composable
-fun ChoiceWalletDialog() {
-    Dialog(onDismissRequest = {}) {
+fun ChoiceWalletDialog(
+    uiState: CreateTransactionUiState,
+    onEvent: (CreateTransactionEvent) -> Unit
+) {
+    val destinationType =
+        if (uiState.walletDialogTarget == WalletDialogTarget.FROM) "Откуда" else "Куда"
+    val currentWalletId = if (uiState.walletDialogTarget == WalletDialogTarget.FROM) uiState.fromWallet?.id ?: -1 else uiState.toWallet?.id ?: -1
+
+    Dialog(onDismissRequest = { onEvent(CreateTransactionEvent.CloseWalletPicker) }) {
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = Color(0XFFfafafa)
@@ -500,10 +507,11 @@ fun ChoiceWalletDialog() {
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 16.dp, end = 16.dp)
+                        .clickable(onClick = { onEvent(CreateTransactionEvent.CloseWalletPicker) })
                 )
                 Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
                     Text(
-                        text = "Откуда",
+                        text = destinationType,
                         color = Color(0XFF042154),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
@@ -516,12 +524,18 @@ fun ChoiceWalletDialog() {
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 4.dp)
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    WalletItem()
-                    WalletItem()
-                    WalletItem()
-                    WalletItem()
-                    Spacer(modifier = Modifier.height(16.dp))
+                    LazyColumn {
+                        item {
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+
+                        items(items = uiState.wallets, key = { it.id }) {
+                            WalletItem(it, it.id == currentWalletId, onEvent)
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
                 }
             }
         }
@@ -529,23 +543,29 @@ fun ChoiceWalletDialog() {
 }
 
 @Composable
-fun WalletItem() {
+fun WalletItem(wallet: Wallet, isSelected: Boolean, onEvent: (CreateTransactionEvent) -> Unit) {
+    val iconId = if (wallet.type == WalletType.CARD) R.drawable.ic_card else R.drawable.ic_cash
+    val radioButtonImageId = if (isSelected) R.drawable.ic_radiobutton_selected else R.drawable.ic_radiobutton_unselected
+    val borderColor = if (isSelected) Color(0XFF7d4efc) else Color(0XFFe5e5ec)
+    val containerColor = if (isSelected) Color(0XFFf7f4fc) else Color(0XFFfefefe)
+
     Row(
         modifier = Modifier
             .padding(top = 4.dp)
             .background(
-                color = Color(0XFFfefefe),
+                color = containerColor,
                 shape = RoundedCornerShape(16.dp)
             )
             .border(
                 width = 1.dp,
-                color = Color(0XFFe5e5ec),
+                color = borderColor,
                 shape = RoundedCornerShape(8.dp)
             )
             .fillMaxWidth()
+            .clickable(onClick = {onEvent(CreateTransactionEvent.SelectWallet(wallet.id))})
     ) {
         Image(
-            painter = painterResource(R.drawable.ic_cash),
+            painter = painterResource(iconId),
             contentDescription = null,
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
@@ -557,14 +577,14 @@ fun WalletItem() {
                 .align(Alignment.CenterVertically)
         ) {
             Text(
-                text = "Наличные",
+                text = wallet.name,
                 color = Color(0XFF042154),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 12.sp
             )
             Text(
-                text = "870 BYN",
+                text = wallet.balance.toInt().toString(),
                 fontSize = 16.sp,
                 color = Color(0XFF9599ae),
                 lineHeight = 16.sp
@@ -572,7 +592,7 @@ fun WalletItem() {
         }
         Spacer(modifier = Modifier.weight(1f))
         Image(
-            painter = painterResource(R.drawable.ic_radiobutton_selected),
+            painter = painterResource(radioButtonImageId),
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
@@ -675,7 +695,10 @@ fun NameTransactionCard(name: String, onEvent: (CreateTransactionEvent) -> Unit)
 
 
 @Composable
-fun WalletsCard() {
+fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
+    val availableMoneyText =
+        if (uiState.fromWallet != null) "${uiState.fromWallet.balance.toInt()} BYN" else "0 BYN"
+
     Card(
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, top = 8.dp)
@@ -699,9 +722,8 @@ fun WalletsCard() {
                     .fillMaxWidth()
                     .padding(start = 8.dp, end = 8.dp, top = 12.dp)
             ) {
-                Wallet(
-                    "Откуда", Wallet(1, 1, "", "", Currency.USD, WalletType.CARD, 0.4f, 1),
-                    Modifier.weight(1f)
+                WalletCard(
+                    "Откуда", uiState.fromWallet, Modifier.weight(1f), onEvent
                 )
                 Box(
                     modifier = Modifier
@@ -720,24 +742,29 @@ fun WalletsCard() {
                         modifier = Modifier.padding(6.dp)
                     )
                 }
-                Wallet(
+                WalletCard(
                     "Куда",
-                    Wallet(1, 1, "", "", Currency.USD, WalletType.CARD, 0.4f, 1),
-                    Modifier.weight(1f)
+                    uiState.toWallet,
+                    Modifier.weight(1f),
+                    onEvent
                 )
             }
 
-            Box(
+            Row(
                 modifier = Modifier
                     .padding(start = 8.dp, end = 8.dp, top = 12.dp, bottom = 12.dp)
                     .fillMaxWidth()
                     .background(color = Color(0XFFf4effd), shape = RoundedCornerShape(8.dp))
             ) {
-                //TODO подкраска текста
                 Text(
-                    text = "Доступно для перевода: 870 BYN",
+                    text = "Доступно для перевода:",
                     color = Color(0XFF9599ae),
                     modifier = Modifier.padding(start = 18.dp, top = 12.dp, bottom = 12.dp)
+                )
+                Text(
+                    text = availableMoneyText,
+                    color = Color(0XFFa17afd),
+                    modifier = Modifier.padding(start = 2.dp, top = 12.dp, bottom = 12.dp)
                 )
             }
         }
@@ -746,9 +773,19 @@ fun WalletsCard() {
 }
 
 
-//TODO разоабраться с адаптивной версткой
 @Composable
-fun Wallet(destination: String, wallet: Wallet, modifier: Modifier) {
+fun WalletCard(
+    destination: String,
+    wallet: Wallet?,
+    modifier: Modifier,
+    onEvent: (CreateTransactionEvent) -> Unit
+) {
+    val balance = if (wallet != null) wallet.balance.toInt().toString() else "..."
+    val walletName = if (wallet != null) wallet.name else "Загрузка"
+    val icon =
+        if (wallet != null && wallet.type == WalletType.CARD) R.drawable.ic_card else R.drawable.ic_cash
+    val type = if (destination == "Откуда") WalletDialogTarget.FROM else WalletDialogTarget.TO
+
     Column(modifier = modifier) {
         Text(
             text = destination,
@@ -767,9 +804,10 @@ fun Wallet(destination: String, wallet: Wallet, modifier: Modifier) {
                     color = Color(0XFFe5e5ec),
                     shape = RoundedCornerShape(8.dp)
                 )
+                .clickable(onClick = { onEvent(CreateTransactionEvent.OpenWalletPicker(type)) })
         ) {
             Image(
-                painter = painterResource(R.drawable.ic_cash),
+                painter = painterResource(icon),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
@@ -781,15 +819,16 @@ fun Wallet(destination: String, wallet: Wallet, modifier: Modifier) {
                     .align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "Наличные",
+                    text = walletName,
                     color = Color(0XFF042154),
-                    fontSize = 12.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.SemiBold,
-                    lineHeight = 12.sp
+                    lineHeight = 10.sp,
+                    modifier = Modifier.widthIn(max = 50.dp)
                 )
                 Text(
-                    text = "870 BYN",
-                    fontSize = 16.sp,
+                    text = balance,
+                    fontSize = 14.sp,
                     color = Color(0XFF9599ae),
                     lineHeight = 16.sp
                 )

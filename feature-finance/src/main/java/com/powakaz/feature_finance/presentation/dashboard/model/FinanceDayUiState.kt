@@ -1,9 +1,8 @@
-package com.powakaz.feature_finance.presentation.model
+package com.powakaz.feature_finance.presentation.dashboard.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.powakaz.feature_finance.domain.model.WalletType
-import java.time.LocalDate
 
 @Immutable
 data class FinanceDayUiState(

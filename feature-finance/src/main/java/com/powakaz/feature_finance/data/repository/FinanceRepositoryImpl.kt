@@ -4,11 +4,13 @@ import com.powakaz.core_common.repository.UserIdRepository
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.core_network.utils.safeApiCall
 import com.powakaz.feature_finance.data.mapper.FinanceDashboardMapper
+import com.powakaz.feature_finance.data.mapper.toDomain
 import com.powakaz.feature_finance.data.remote.NetworkFinanceApi
 import com.powakaz.feature_finance.data.remote.model.GetCategoriesDto
 import com.powakaz.feature_finance.data.remote.model.GetTransactionsPageDto
 import com.powakaz.feature_finance.data.remote.model.GetWalletsDto
 import com.powakaz.feature_finance.di.NetworkModule
+import com.powakaz.feature_finance.domain.model.CreateTransactionData
 import com.powakaz.feature_finance.domain.model.FinanceDashboard
 import com.powakaz.feature_finance.domain.repository.FinanceRepository
 import kotlinx.coroutines.async
@@ -47,22 +49,58 @@ class FinanceRepositoryImpl @Inject constructor(
         return coroutineScope {
             val walletsReq = async { getAllWallets() }
             val transactionsReq = async { getStartTransactionsPage() }
-            //val currentUserId = userIdRepository.getUserId().first()
+            val currentUserId = userIdRepository.getUserId().first()
 
-            val wallets = when(val result = walletsReq.await()){
+            val wallets = when (val result = walletsReq.await()) {
                 is NetworkResult.Success<List<GetWalletsDto>> -> result.data
                 is NetworkResult.Error -> return@coroutineScope result
                 is NetworkResult.Exception -> return@coroutineScope result
             }
 
-            val transactions = when(val result = transactionsReq.await()){
+            val transactions = when (val result = transactionsReq.await()) {
                 is NetworkResult.Success<GetTransactionsPageDto> -> result.data
                 is NetworkResult.Error -> return@coroutineScope result
                 is NetworkResult.Exception -> return@coroutineScope result
             }
 
-            NetworkResult.Success(financeDashboardMapper.map(wallets, transactions, 1, weeklyWalletId))
+            NetworkResult.Success(
+                financeDashboardMapper.map(
+                    wallets,
+                    transactions,
+                    currentUserId,
+                    weeklyWalletId
+                )
+            )
         }
     }
+
+    override suspend fun getCreateTransactionData(): NetworkResult<CreateTransactionData> {
+        return coroutineScope {
+            val walletsReq = async { getAllWallets() }
+            val categoriesReq = async { getAllCategories() }
+            val currentUserId = userIdRepository.getUserId().first()
+
+            val wallets = when (val result = walletsReq.await()) {
+                is NetworkResult.Success<List<GetWalletsDto>> -> result.data
+                is NetworkResult.Error -> return@coroutineScope result
+                is NetworkResult.Exception -> return@coroutineScope result
+            }
+
+            val categories = when (val result = categoriesReq.await()) {
+                is NetworkResult.Success<List<GetCategoriesDto>>-> result.data
+                is NetworkResult.Error -> return@coroutineScope result
+                is NetworkResult.Exception -> return@coroutineScope result
+            }
+
+            NetworkResult.Success(
+                CreateTransactionData(
+                    userId = currentUserId,
+                    wallets = wallets.map { it.toDomain() },
+                    categories = categories.map { it.toDomain() }
+                )
+            )
+        }
+    }
+
 
 }

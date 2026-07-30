@@ -15,7 +15,5 @@ data class GetCategoriesDto(
     @SerialName("icon_name")
     val iconName : String,
     @SerialName("color_hex")
-    val colorHex : String,
-    @SerialName("is_income")
-    val isIncome : Boolean,
+    val colorHex : String
 )

@@ -1,18 +1,15 @@
-package com.powakaz.feature_finance.presentation
+package com.powakaz.feature_finance.presentation.dashboard
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.feature_finance.domain.constants.FinanceConstants
 import com.powakaz.feature_finance.domain.model.FinanceDashboard
-import com.powakaz.feature_finance.domain.model.FinanceDay
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.domain.usecase.GetFinancialDashboardUseCase
-import com.powakaz.feature_finance.presentation.mapper.FinanceDayUiStateMapper
-import com.powakaz.feature_finance.presentation.model.FinanceDayUiState
+import com.powakaz.feature_finance.presentation.dashboard.mapper.FinanceDayUiStateMapper
+import com.powakaz.feature_finance.presentation.dashboard.model.FinanceDayUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
