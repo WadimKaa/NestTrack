@@ -28,7 +28,7 @@ data class CreateTransactionUiState(
     val categories: List<Category> = listOf(),
     val fromWallet: Wallet? = null,
     val toWallet: Wallet? = null,
-    val isWalletDialogVisible: Boolean = true,
+    val isWalletDialogVisible: Boolean = false,
     val walletDialogTarget: WalletDialogTarget = WalletDialogTarget.FROM
 )
 
@@ -120,7 +120,7 @@ class CreateTransactionViewModel @Inject constructor(private val getCreateTransa
                 }
 
                 viewModelScope.launch {
-                    delay(300)
+                    delay(160)
                     _uiState.update {
                         it.copy(
                             isWalletDialogVisible = false

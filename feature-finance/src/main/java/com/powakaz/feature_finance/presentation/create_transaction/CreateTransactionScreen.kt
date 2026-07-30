@@ -794,6 +794,7 @@ fun WalletCard(
         )
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(top = 4.dp)
                 .background(
                     color = Color(0XFFfefefe),
@@ -824,7 +825,7 @@ fun WalletCard(
                     fontSize = 10.sp,
                     fontWeight = FontWeight.SemiBold,
                     lineHeight = 10.sp,
-                    modifier = Modifier.widthIn(max = 50.dp)
+                    modifier = Modifier.widthIn(max = 60.dp)
                 )
                 Text(
                     text = balance,
@@ -833,6 +834,7 @@ fun WalletCard(
                     lineHeight = 16.sp
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
             Image(
                 painter = painterResource(R.drawable.ic_arrow_schevron_down),
                 contentDescription = null,
