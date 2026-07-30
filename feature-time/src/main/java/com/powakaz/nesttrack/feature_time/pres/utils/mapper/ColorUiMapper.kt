@@ -16,3 +16,14 @@ fun String.findActivitiesColorToUi(
     }
 }
 
+fun Color.findActivitiesColorToUi(
+    default: Color = Color.Gray,
+    alpha: Float = 1f
+): Color {
+    return try {
+        Color(this.value)
+            .copy(alpha = alpha)
+    } catch (_: IllegalArgumentException) {
+        default.copy(alpha = alpha)
+    }
+}

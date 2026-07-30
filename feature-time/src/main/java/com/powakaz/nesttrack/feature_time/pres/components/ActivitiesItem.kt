@@ -45,11 +45,8 @@ fun ActivitiesItem(
     backgroundColor: Color,
     shape: Shape,
     tint: Color,
-    isSelected: Boolean = false,
-    onClick: (() -> Unit)? = null
 ) {
-    ActivitiesItemContent(text, modifier, icon, backgroundColor, shape, tint, isSelected,
-        onClick)
+    ActivitiesItemContent(text, modifier, icon, backgroundColor, shape, tint)
 }
 
 @Composable
@@ -58,28 +55,12 @@ fun ActivitiesItemContent(text: String? = null,
                           icon: Painter,
                           backgroundColor: Color,
                           shape: Shape,
-                          tint: Color,
-                          isSelected: Boolean = false,
-                          onClick: (() -> Unit)? = null)
+                          tint: Color)
 {
 
 
     Column(
-        modifier = modifier
-            .then(
-                if (onClick != null) {
-                    Modifier.clickable {
-                        onClick() ////
-                    }
-                } else {
-                    Modifier
-                }
-            )
-            .border(
-                width = if (isSelected) 1.dp else 0.dp,
-                color = if (isSelected) Color(0xFFA17CDE) else Color.Transparent,
-                shape = RoundedCornerShape(12.dp),
-            ),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(

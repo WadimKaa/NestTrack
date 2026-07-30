@@ -27,7 +27,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,14 +60,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_time.R
-import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.UserAvatar
-import com.powakaz.nesttrack.feature_time.pres.components.dialogs.NewActivitiesDialog
+import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.NewActivitiesSheet
 import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
-import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesColorToUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconToUi
-import kotlinx.coroutines.flow.MutableStateFlow
 
 private val shape20 = RoundedCornerShape(20.dp)
 
@@ -90,7 +86,7 @@ fun TimeTrackingScreen(
 @Composable
 fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
 
-    var showNewActivitySheet by rememberSaveable {
+    var showNewActivitiesSheet by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -156,7 +152,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
                 uiState,
                 context,
                 onAddActivityClick = {
-                showNewActivitySheet = true
+                    showNewActivitiesSheet = true
             }
             )
         }
@@ -185,14 +181,14 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
         }
     }
 
-    if (showNewActivitySheet) {
+    if (showNewActivitiesSheet) {
 
         ModalBottomSheet(
             sheetState = rememberModalBottomSheetState(
                 skipPartiallyExpanded = true
                 ),
             onDismissRequest = {
-                showNewActivitySheet = false
+                showNewActivitiesSheet = false
             },
             dragHandle = {
                 BottomSheetDefaults.DragHandle(
@@ -201,9 +197,9 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
             },
             containerColor = Color.White
         ) {
-            NewActivitiesDialog(
+            NewActivitiesSheet(
                 onDismiss = {
-                    showNewActivitySheet = false
+                    showNewActivitiesSheet = false
                 }
             )
         }
