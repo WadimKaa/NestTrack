@@ -42,19 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.powakaz.nesttrack.feature_time.R
-import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
+import com.powakaz.nesttrack.feature_time.pres.components.items.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.lists.AvailableActivitiesColors
 import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.lists.AvailableActivitiesIcons
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesColorToUi
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.focus.onFocusChanged
 
 
 @Composable
@@ -71,7 +63,11 @@ fun NewActivitiesSheet(
         onIconSelected = viewModel::onSelectedIcon,
         onColorSelected = viewModel::onSelectedColor,
         onNameChanged = viewModel::onNameChanged,
-        onSaveActivities = viewModel::onSaveActivities,
+        onSaveActivities = {
+            viewModel.onSaveActivities()
+            onDismiss()
+        }
+        ,
         isCreateButtonEnabled = uiState.isCreateButtonEnabled
         )
 }

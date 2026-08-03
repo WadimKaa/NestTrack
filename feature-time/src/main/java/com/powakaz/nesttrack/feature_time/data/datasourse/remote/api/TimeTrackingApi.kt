@@ -1,15 +1,13 @@
 package com.powakaz.nesttrack.feature_time.data.datasourse.remote.api
 
-import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.ActivitiesResponseDto
+import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities.ActivitiesResponseDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.ConcessionListResponseDto
-import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.CreateActivityRequestDto
+import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities.CreateActivitiesRequestDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.TimeBalanceResponseDto
-import okhttp3.MultipartBody
+import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities.CreateActivitiesResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Part
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TimeTrackingApi {
@@ -33,8 +31,8 @@ interface TimeTrackingApi {
 
     @POST("time/activities")
     suspend fun addNewActivities(
-        @Body activities: CreateActivityRequestDto ///??
-    ): ActivitiesResponseDto
+        @Body activities: CreateActivitiesRequestDto
+    ): CreateActivitiesResponseDto
 
 
 }

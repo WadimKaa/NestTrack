@@ -5,6 +5,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_common.R
+import com.powakaz.core_network.model.NetworkResult
+import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesRequest
+import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesResponse
+import com.powakaz.nesttrack.feature_time.domain.usecase.CreateNewActivitiesUseCase
 import com.powakaz.nesttrack.feature_time.pres.model.ActivitiesUi
 import com.powakaz.nesttrack.feature_time.pres.screen.TimeTrackingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NewActivitiesSheetViewModel @Inject constructor(
+    val createNewActivitiesUseCase: CreateNewActivitiesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewActivitiesUiState())
@@ -50,11 +55,48 @@ class NewActivitiesSheetViewModel @Inject constructor(
     }
 
     fun onSaveActivities() {
-        val state = uiState.value
+
+        val state = _uiState.value
+
+        val request = CreateActivitiesRequest(
+            name = state.activitiesName,
+            iconName = state.selectedIcon!!,
+            iconColor = state.selectedColor!!
+        )
 
         viewModelScope.launch {
-            ///
+
+            val result = createNewActivitiesUseCase(request)
+
+            when (result) {
+                is NetworkResult.Success<CreateActivitiesResponse> -> {
+                    if (result.data.status) {
+                        _uiState.update {
+                            it.copy(
+                                activitiesName = "",
+                                selectedColor = null,
+                                selectedIcon = null,
+                                hasEditedName = false
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(error = "Не удалось сохранить активность")
+                        }
+                    }
+                }
+
+                is NetworkResult.Error -> {
+                    NetworkResult.Error(result.code, result.message)
+                }
+
+                is NetworkResult.Exception -> {
+                    NetworkResult.Exception(result.e)
+                }
+            }
         }
+
+
     }
 
 }
@@ -65,6 +107,7 @@ data class NewActivitiesUiState(
     val selectedColor: Color? = null,
 
     val hasEditedName: Boolean = false,
+    val error: String? = null,
 
     ) {
     val isCreateButtonEnabled =

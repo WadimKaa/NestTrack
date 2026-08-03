@@ -1,6 +1,4 @@
-package com.powakaz.nesttrack.feature_time.domain.model
-
-import kotlinx.serialization.SerialName
+package com.powakaz.nesttrack.feature_time.domain.model.activities
 
 data class Activities(
     val id: Int,

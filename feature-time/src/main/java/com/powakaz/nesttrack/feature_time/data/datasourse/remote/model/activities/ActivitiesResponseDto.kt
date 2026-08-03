@@ -1,8 +1,7 @@
-package com.powakaz.nesttrack.feature_time.data.datasourse.remote.model
+package com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 data class ActivitiesResponseDto(

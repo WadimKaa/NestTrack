@@ -3,7 +3,7 @@ package com.powakaz.nesttrack.feature_time.pres.utils.mapper
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
-import com.powakaz.nesttrack.feature_time.domain.model.Activities
+import com.powakaz.nesttrack.feature_time.domain.model.activities.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.pres.model.ActivitiesUi
 import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi

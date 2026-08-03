@@ -60,8 +60,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_time.R
-import com.powakaz.nesttrack.feature_time.pres.components.ActivitiesItem
-import com.powakaz.nesttrack.feature_time.pres.components.UserAvatar
+import com.powakaz.nesttrack.feature_time.pres.components.items.ActivitiesItem
+import com.powakaz.nesttrack.feature_time.pres.components.items.UserAvatar
 import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.NewActivitiesSheet
 import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconToUi
@@ -408,7 +408,7 @@ fun ShowActivities(uiState: TimeTrackingUiState, context: Context, onAddActivity
 
             item {
                 AddNewActivity(
-                    openAddNewActivities = onAddActivityClick
+                    openCreateActivities = onAddActivityClick
                 )
             }
 
@@ -431,7 +431,7 @@ fun ShowActivities(uiState: TimeTrackingUiState, context: Context, onAddActivity
 }
 
 @Composable
-fun AddNewActivity(openAddNewActivities: () -> Unit) {
+fun AddNewActivity(openCreateActivities: () -> Unit) {
 
     Column(
         modifier = Modifier.width(50.dp),
@@ -439,7 +439,7 @@ fun AddNewActivity(openAddNewActivities: () -> Unit) {
     ) {
         IconButton(
             onClick = {
-                openAddNewActivities()
+                openCreateActivities()
             },
             modifier = Modifier
                 .fillMaxWidth()

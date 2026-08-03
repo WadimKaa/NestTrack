@@ -1,5 +1,6 @@
 package com.powakaz.nesttrack.feature_time.di
 
+import android.content.Context
 import com.powakaz.core_common.repository.UserIdRepository
 import com.powakaz.core_network.di.NetworkModule
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.api.TimeTrackingApi
@@ -8,6 +9,7 @@ import com.powakaz.nesttrack.feature_time.domain.repository.TimeTrackingReposito
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
@@ -36,12 +38,14 @@ object TimeTrackingDataModule {
     fun provideTimeTrackingRepository(
         @PublicTimeTrackingApi publicApi: TimeTrackingApi,
         @PrivateTimeTrackingApi privateApi: TimeTrackingApi,
-        userIdRepository: UserIdRepository
+        userIdRepository: UserIdRepository,
+        @ApplicationContext context: Context
     ): TimeTrackingRepository {
         return TimeTrackingRepositoryImpl(
             publicApi = publicApi,
             privateApi = privateApi,
-            userIdRepository = userIdRepository
+            userIdRepository = userIdRepository,
+            context = context
         )
     }
 }
