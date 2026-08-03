@@ -11,6 +11,8 @@ import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.domain.usecase.GetCreateTransactionDataUseCase
+import com.powakaz.feature_finance.presentation.create_transaction.mapper.CategoryUiMapper
+import com.powakaz.feature_finance.presentation.create_transaction.model.CategoryUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,13 +28,14 @@ data class CreateTransactionUiState(
     val name: String = "",
     val amount: Int = 0,
     val maxAmountLetterCount: Int = 5,
-    val selectedCategoryIndex: Int = 0,
+    val selectedCategoryIndex: Int = -1,
     val wallets: List<Wallet> = listOf(),
-    val categories: List<Category> = listOf(),
+    val categories: List<CategoryUi> = listOf(),
     val fromWallet: Wallet? = null,
     val toWallet: Wallet? = null,
     val isWalletDialogVisible: Boolean = false,
-    val walletDialogTarget: WalletDialogTarget = WalletDialogTarget.FROM
+    val walletDialogTarget: WalletDialogTarget = WalletDialogTarget.FROM,
+    val isDateDialogVisible : Boolean = false
 )
 
 sealed interface DialogState {
@@ -47,11 +50,14 @@ sealed interface CreateTransactionEvent {
     object CloseWalletPicker : CreateTransactionEvent
     data class AmountChange(val amount: Int) : CreateTransactionEvent
     data class IncreaseAmount(val increaseAmount: Int) : CreateTransactionEvent
-
+    data class SelectCategory(val categoryIndex : Int) : CreateTransactionEvent
 }
 
 @HiltViewModel
-class CreateTransactionViewModel @Inject constructor(private val getCreateTransactionDataUseCase: GetCreateTransactionDataUseCase) :
+class CreateTransactionViewModel @Inject constructor(
+    private val getCreateTransactionDataUseCase: GetCreateTransactionDataUseCase,
+    private val categoryUiMapper: CategoryUiMapper
+) :
     ViewModel() {
     private val _uiState = MutableStateFlow(CreateTransactionUiState())
     val uiState = _uiState.asStateFlow()
@@ -71,11 +77,12 @@ class CreateTransactionViewModel @Inject constructor(private val getCreateTransa
                     _uiState.update {
                         it.copy(
                             wallets = result.data.wallets,
-                            categories = result.data.categories,
+                            categories = result.data.categories.map { categoryUiMapper.map(it) },
                             fromWallet = result.data.wallets.find { it.userId == result.data.userId && it.type == WalletType.CASH }
                                 ?: null,
                             toWallet = result.data.wallets.find { it.id == FinanceConstants.WEEKLY_WALLET_ID }
                                 ?: null,
+                            selectedCategoryIndex = result.data.categories.first().id
                         )
                     }
                 }
@@ -151,6 +158,12 @@ class CreateTransactionViewModel @Inject constructor(private val getCreateTransa
                             amount = _uiState.value.amount + createTransactionEvent.increaseAmount
                         )
                     }
+                }
+            }
+
+            is CreateTransactionEvent.SelectCategory -> {
+                _uiState.update {
+                    it.copy(selectedCategoryIndex = createTransactionEvent.categoryIndex)
                 }
             }
         }

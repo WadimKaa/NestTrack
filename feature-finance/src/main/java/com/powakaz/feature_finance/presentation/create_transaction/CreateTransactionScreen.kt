@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,13 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -62,9 +63,9 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.powakaz.feature_finance.R
-import com.powakaz.feature_finance.domain.model.Category
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
+import com.powakaz.feature_finance.presentation.create_transaction.model.CategoryUi
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -85,7 +86,30 @@ fun CreateTransactionScreenRoute(viewModel: CreateTransactionViewModel = hiltVie
 fun CreateTransactionScreenPreview() {
     CreateTransactionScreen(
         CreateTransactionUiState(
-            name = "Kekek"
+            name = "Kekek",
+            categories = listOf(
+                CategoryUi(
+                    -1, null, "Рефенансирование", R.drawable.ic_calendar, Color(
+                        0xFFFF4747
+                    )
+                ),
+                CategoryUi(
+                    -1, null, "Рефенансирование", R.drawable.ic_calendar, Color(
+                        0xFFFF4747
+                    )
+                ),
+                CategoryUi(
+                    -1, null, "Рефенансирование", R.drawable.ic_calendar, Color(
+                        0xFFFF4747
+                    )
+                ),
+                CategoryUi(
+                    -1, null, "Рефенансирование", R.drawable.ic_calendar, Color(
+                        0xFFFF4747
+                    )
+                )
+
+            )
         ),
         {}
     )
@@ -97,23 +121,66 @@ fun CreateTransactionScreen(
     uiState: CreateTransactionUiState,
     onEvent: (CreateTransactionEvent) -> Unit
 ) {
+
+    val categoryRow = uiState.categories.chunked(4)
+
     Scaffold() { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
         ) {
-            CreateTransactionTopBar()
-            NameTransactionCard(uiState.name, onEvent)
-            Label("Кошелек")
-            WalletsCard(uiState, onEvent)
-            Label("Сумма")
-            InputSum(uiState.amount, onEvent)
-            Label("Категория")
-            SelectCategory(uiState)
-            Label("Дата")
-            SelectDate()
-            ButtonSaveTransaction()
+            item {
+                CreateTransactionTopBar()
+            }
+            item {
+                NameTransactionCard(uiState.name, onEvent)
+            }
+            item {
+                Label("Кошелек")
+            }
+            item {
+                WalletsCard(uiState, onEvent)
+            }
+            item {
+                Label("Сумма")
+            }
+            item {
+                InputSum(uiState.amount, onEvent)
+            }
+            item {
+                Label("Категория")
+            }
+            items(items = categoryRow, key = { it.first().id }) { row ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    row.forEach { category ->
+                        CategoryCard(
+                            category,
+                            Modifier.weight(1f),
+                            uiState.selectedCategoryIndex == category.id,
+                            onEvent
+                        )
+                    }
+
+
+                    repeat(4 - row.size) {
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
+            }
+            item {
+                Label("Дата")
+            }
+            item {
+                SelectDate()
+            }
+            item {
+                ButtonSaveTransaction()
+            }
         }
     }
 
@@ -127,7 +194,7 @@ fun CreateTransactionScreen(
     }
 
 
-    if (false) {
+    if (uiState.isDateDialogVisible) {
         DateBottomSheet(LocalDate.now())
     }
 }
@@ -948,62 +1015,48 @@ fun SumCard(sum: Int, modifier: Modifier, onEvent: (CreateTransactionEvent) -> U
     }
 }
 
-
 @Composable
-fun SelectCategory(uiState: CreateTransactionUiState) {
-    Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp)) {
-        if (uiState.categories.isNotEmpty()) {
-            Row(modifier = Modifier.padding(top = 8.dp)) {
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[0])
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[1])
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[2])
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[3])
-            }
-            Row(modifier = Modifier.padding(top = 8.dp)) {
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[4])
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[5])
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[6])
-                CategoryCard(modifier = Modifier.weight(1f), uiState.categories[7])
-            }
-        }
-    }
-
-
-}
-
-@Composable
-fun CategoryCard(modifier: Modifier, category: Category) {
-    val isSelected = false
+fun CategoryCard(
+    category: CategoryUi,
+    modifier: Modifier,
+    isSelected: Boolean,
+    onEvent: (CreateTransactionEvent) -> Unit
+) {
     val cardContainerColor = if (isSelected) Color(0XFFf4effd) else Color(0XFFffffff)
     val borderColor = if (isSelected) Color(0XFF9670f5) else Color(0XFFe5e5ec)
-    val iconColor = if (isSelected) Color(0XFF9063fd) else Color(0XFF4aa361)
+    val iconColor = if (isSelected) Color(0XFF9063fd) else category.iconColor
     val textColor = if (isSelected) Color(0XFF834efc) else Color(0XFF616a84)
 
     Column(
         modifier = modifier
-            .padding(start = 4.dp, end = 4.dp)
             .background(color = cardContainerColor, shape = RoundedCornerShape(12.dp))
             .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(12.dp))
-            .height(90.dp)
+            .height(80.dp)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {
+                    onEvent(CreateTransactionEvent.SelectCategory(category.id))
+                })
     ) {
         Image(
-            painterResource(R.drawable.ic_week_category),
+            painterResource(category.iconResourceId),
             contentDescription = null,
             colorFilter = ColorFilter.tint(iconColor),
             modifier = Modifier
                 .padding(top = 12.dp)
-                .size(26.dp)
+                .size(30.dp)
                 .align(Alignment.CenterHorizontally)
         )
         Text(
-            text = "Недельное разделение",
-            fontSize = 10.sp,
+            text = category.name.uppercase(),
+            fontSize = 8.sp,
             fontWeight = FontWeight.SemiBold,
             color = textColor,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 12.dp, top = 6.dp)
+                .padding(bottom = 12.dp, top = 6.dp, start = 8.dp, end = 8.dp)
                 .widthIn(max = 80.dp)
         )
     }
