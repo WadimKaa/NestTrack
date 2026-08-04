@@ -7,6 +7,7 @@ data class FinanceDashboard(
     val totalBalance: Float,
     val weekBalance: Float,
     val userWalletList: List<Wallet>,
+    val allWallets: List<Wallet>,
     val financeDays: List<FinanceDay>,
     val currentUserId : Int
 )
@@ -23,7 +24,17 @@ data class Wallet(
     val currency: Currency,
     val type: WalletType,
     val balance: Float
-)
+){
+
+    companion object {
+        fun getExternalWallet(): Wallet {
+            return Wallet(
+                null, null, "Источник", "",
+                Currency.BYN, WalletType.OUTSIDE, 999999999f
+            )
+        }
+    }
+}
 
 
 data class FinanceDay(

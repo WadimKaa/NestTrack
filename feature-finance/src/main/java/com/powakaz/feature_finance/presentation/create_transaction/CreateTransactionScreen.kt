@@ -67,6 +67,10 @@ import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.presentation.create_transaction.model.CategoryUi
+import com.powakaz.feature_finance.presentation.create_transaction.model.CreateTransactionUiState
+import com.powakaz.feature_finance.presentation.create_transaction.model.WalletDialogTarget
+import com.powakaz.feature_finance.presentation.create_transaction.model.WalletInitType
+import com.powakaz.feature_finance.presentation.create_transaction.model.WalletUi
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -622,8 +626,7 @@ fun ChoiceWalletDialog(
     val destinationType =
         if (uiState.walletDialogTarget == WalletDialogTarget.FROM) "Откуда" else "Куда"
     val currentWalletId =
-        if (uiState.walletDialogTarget == WalletDialogTarget.FROM) uiState.fromWallet?.id
-            ?: -1 else uiState.toWallet?.id ?: -1
+        if (uiState.walletDialogTarget == WalletDialogTarget.FROM) uiState.fromWallet.id else uiState.toWallet.id
 
     Dialog(onDismissRequest = { onEvent(CreateTransactionEvent.CloseWalletPicker) }) {
         Card(
@@ -677,8 +680,7 @@ fun ChoiceWalletDialog(
 }
 
 @Composable
-fun WalletItem(wallet: Wallet, isSelected: Boolean, onEvent: (CreateTransactionEvent) -> Unit) {
-    val iconId = if (wallet.type == WalletType.CARD) R.drawable.ic_card else R.drawable.ic_cash
+fun WalletItem(wallet: WalletUi, isSelected: Boolean, onEvent: (CreateTransactionEvent) -> Unit) {
     val radioButtonImageId =
         if (isSelected) R.drawable.ic_radiobutton_selected else R.drawable.ic_radiobutton_unselected
     val borderColor = if (isSelected) Color(0XFF7d4efc) else Color(0XFFe5e5ec)
@@ -700,7 +702,7 @@ fun WalletItem(wallet: Wallet, isSelected: Boolean, onEvent: (CreateTransactionE
             .clickable(onClick = { onEvent(CreateTransactionEvent.SelectWallet(wallet.id)) })
     ) {
         Image(
-            painter = painterResource(iconId),
+            painter = painterResource(wallet.iconId),
             contentDescription = null,
             modifier = Modifier
                 .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
@@ -719,7 +721,7 @@ fun WalletItem(wallet: Wallet, isSelected: Boolean, onEvent: (CreateTransactionE
                 lineHeight = 12.sp
             )
             Text(
-                text = wallet.balance.toInt().toString(),
+                text = wallet.balanceLabel,
                 fontSize = 16.sp,
                 color = Color(0XFF9599ae),
                 lineHeight = 16.sp
@@ -832,7 +834,7 @@ fun NameTransactionCard(name: String, onEvent: (CreateTransactionEvent) -> Unit)
 @Composable
 fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
     val availableMoneyText =
-        if (uiState.fromWallet != null) "${uiState.fromWallet.balance.toInt()} BYN" else "0 BYN"
+        if (uiState.fromWallet.initType != WalletInitType.INIT) "${uiState.fromWallet.balanceLabel} BYN" else "0 BYN"
 
     Card(
         modifier = Modifier
@@ -911,20 +913,13 @@ fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEv
 @Composable
 fun WalletCard(
     destination: String,
-    wallet: Wallet?,
+    wallet: WalletUi,
     modifier: Modifier,
     onEvent: (CreateTransactionEvent) -> Unit
 ) {
-    val balance = if (wallet != null) wallet.balance.toInt().toString() else "..."
-    val walletName = if (wallet != null) wallet.name else "Загрузка"
-    val icon =
-        if (wallet != null && wallet.type == WalletType.CARD) {
-            R.drawable.ic_card
-        } else if (wallet != null && wallet.type == WalletType.OUTSIDE) {
-            R.drawable.ic_check
-        } else {
-            R.drawable.ic_cash
-        }
+    val icon = if (wallet.initType != WalletInitType.INIT) wallet.iconId else R.drawable.ic_cash
+    val balance = if (wallet.initType != WalletInitType.INIT) wallet.balanceLabel else "..."
+    val walletName = if (wallet.initType != WalletInitType.INIT) wallet.name else "Загрузка"
 
     val type = if (destination == "Откуда") WalletDialogTarget.FROM else WalletDialogTarget.TO
 

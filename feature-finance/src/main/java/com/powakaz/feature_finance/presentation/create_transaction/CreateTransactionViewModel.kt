@@ -1,19 +1,18 @@
 package com.powakaz.feature_finance.presentation.create_transaction
 
-import android.icu.util.LocaleData
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.feature_finance.domain.constants.FinanceConstants
-import com.powakaz.feature_finance.domain.model.Category
 import com.powakaz.feature_finance.domain.model.CreateTransactionData
-import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.domain.usecase.GetCreateTransactionDataUseCase
 import com.powakaz.feature_finance.presentation.create_transaction.mapper.CategoryUiMapper
-import com.powakaz.feature_finance.presentation.create_transaction.model.CategoryUi
+import com.powakaz.feature_finance.presentation.create_transaction.mapper.WalletUiMapper
+import com.powakaz.feature_finance.presentation.create_transaction.model.CreateTransactionUiState
+import com.powakaz.feature_finance.presentation.create_transaction.model.WalletDialogTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,68 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import javax.inject.Inject
-
-
-enum class WalletDialogTarget { FROM, TO }
-
-
-data class QuickActionDate(val localDate: LocalDate, val label: String, val readableDate: String)
-
-data class CreateTransactionUiState(
-    val name: String = "",
-    val amount: Int = 0,
-    val maxAmountLetterCount: Int = 5,
-    val selectedCategoryIndex: Int = -1,
-    val wallets: List<Wallet> = listOf(),
-    val categories: List<CategoryUi> = listOf(),
-    val fromWallet: Wallet? = null,
-    val toWallet: Wallet? = null,
-    val isWalletDialogVisible: Boolean = false,
-    val walletDialogTarget: WalletDialogTarget = WalletDialogTarget.FROM,
-    val isDateDialogVisible: Boolean = false,
-    val todayDate: LocalDate = LocalDate.now(),
-    val selectedDate: LocalDate = LocalDate.now(),
-    val tempSelectedDate: LocalDate = LocalDate.now(),
-) {
-
-    private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy", Locale("ru"))
-
-    val clickDateLabel = if (selectedDate == todayDate) {
-        "(сегодня)"
-    } else if (selectedDate == todayDate.minusDays(1)) {
-        "(вчера)"
-    } else if (selectedDate == todayDate.minusDays(2)) {
-        "(позавчера)"
-    } else {
-        ""
-    }
-
-
-    val quickDateActions = createQuickActions()
-
-    private fun createQuickActions(): List<QuickActionDate> {
-        return listOf(
-            QuickActionDate(
-                LocalDate.now(), "Сегодня", LocalDate.now().format(dateFormatter)
-            ),
-            QuickActionDate(
-                LocalDate.now().minusDays(1),
-                "Вчера",
-                LocalDate.now().minusDays(1).format(dateFormatter)
-            ),
-            QuickActionDate(
-                LocalDate.now().minusDays(2),
-                "Позавчера",
-                LocalDate.now().format(dateFormatter)
-            )
-        )
-    }
-
-
-}
 
 sealed interface CreateTransactionEvent {
     data class NameChange(val text: String) : CreateTransactionEvent
@@ -101,9 +39,12 @@ sealed interface CreateTransactionEvent {
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor(
     private val getCreateTransactionDataUseCase: GetCreateTransactionDataUseCase,
-    private val categoryUiMapper: CategoryUiMapper
+    private val categoryUiMapper: CategoryUiMapper,
+    private val walletUiMapper: WalletUiMapper
 ) :
     ViewModel() {
+
+
     private val _uiState = MutableStateFlow(CreateTransactionUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -121,12 +62,12 @@ class CreateTransactionViewModel @Inject constructor(
                 is NetworkResult.Success<CreateTransactionData> -> {
                     _uiState.update {
                         it.copy(
-                            wallets = result.data.wallets,
+                            wallets = result.data.wallets.map { walletUiMapper.map(it) },
                             categories = result.data.categories.map { categoryUiMapper.map(it) },
-                            fromWallet = result.data.wallets.find { it.userId == result.data.userId && it.type == WalletType.CASH }
-                                ?: null,
-                            toWallet = result.data.wallets.find { it.id == FinanceConstants.WEEKLY_WALLET_ID }
-                                ?: null,
+                            fromWallet = walletUiMapper.map(result.data.wallets.find { it.userId == result.data.userId && it.type == WalletType.CASH }
+                                ?: Wallet.getExternalWallet()),
+                            toWallet = walletUiMapper.map(result.data.wallets.find { it.id == FinanceConstants.WEEKLY_WALLET_ID }
+                                ?: Wallet.getExternalWallet()),
                             selectedCategoryIndex = result.data.categories.first().id
                         )
                     }
@@ -165,13 +106,13 @@ class CreateTransactionViewModel @Inject constructor(
                 if (_uiState.value.walletDialogTarget == WalletDialogTarget.FROM) {
                     _uiState.update {
                         it.copy(
-                            fromWallet = _uiState.value.wallets.find { it.id == createTransactionEvent.walletId }
+                            fromWallet = _uiState.value.wallets.find { it.id == createTransactionEvent.walletId }!!
                         )
                     }
                 } else {
                     _uiState.update {
                         it.copy(
-                            toWallet = _uiState.value.wallets.find { it.id == createTransactionEvent.walletId }
+                            toWallet = _uiState.value.wallets.find { it.id == createTransactionEvent.walletId }!!
                         )
                     }
                 }

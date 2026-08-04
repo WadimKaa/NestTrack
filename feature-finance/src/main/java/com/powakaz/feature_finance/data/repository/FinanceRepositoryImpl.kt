@@ -12,6 +12,7 @@ import com.powakaz.feature_finance.data.remote.model.GetWalletsDto
 import com.powakaz.feature_finance.di.NetworkModule
 import com.powakaz.feature_finance.domain.model.CreateTransactionData
 import com.powakaz.feature_finance.domain.model.FinanceDashboard
+import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.repository.FinanceRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -95,7 +96,7 @@ class FinanceRepositoryImpl @Inject constructor(
             NetworkResult.Success(
                 CreateTransactionData(
                     userId = currentUserId,
-                    wallets = wallets.map { it.toDomain() },
+                    wallets = wallets.map { it.toDomain() } + Wallet.getExternalWallet(),
                     categories = categories.map { it.toDomain() }
                 )
             )

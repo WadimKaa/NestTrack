@@ -1,17 +1,25 @@
 package com.powakaz.feature_finance.data.mapper
 
+import android.content.Context
 import com.powakaz.feature_finance.data.remote.model.GetTransactionsPageDto
 import com.powakaz.feature_finance.data.remote.model.GetWalletsDto
 import com.powakaz.feature_finance.data.remote.model.TransactionDto
+import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.FinanceDashboard
 import com.powakaz.feature_finance.domain.model.FinanceDay
 import com.powakaz.feature_finance.domain.model.Transaction
+import com.powakaz.feature_finance.domain.model.Wallet
+import com.powakaz.feature_finance.domain.model.WalletType
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class FinanceDashboardMapper @Inject constructor(private val transactionMapper: TransactionMapper) {
+class FinanceDashboardMapper @Inject constructor(
+    @ApplicationContext context: Context,
+    private val transactionMapper: TransactionMapper
+) {
 
 
     fun map(
@@ -24,6 +32,7 @@ class FinanceDashboardMapper @Inject constructor(private val transactionMapper: 
             totalBalance = calculateTotalBalance(walletsDto, currentUserId),
             weekBalance = calculateWeekBalance(walletsDto, weeklyWalletId),
             userWalletList = walletsDto.filter { it.userId == currentUserId }.map { it.toDomain() },
+            allWallets = walletsDto.map { it.toDomain() } + Wallet.getExternalWallet(),
             financeDays = bindFinanceDays(transactionsDto, walletsDto, currentUserId),
             currentUserId = currentUserId
         )
