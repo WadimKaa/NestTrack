@@ -71,14 +71,16 @@ class NewActivitiesSheetViewModel @Inject constructor(
             when (result) {
                 is NetworkResult.Success<CreateActivitiesResponse> -> {
                     if (result.data.status) {
-                        _uiState.update {
+                        /*_uiState.update {
                             it.copy(
                                 activitiesName = "",
                                 selectedColor = null,
                                 selectedIcon = null,
                                 hasEditedName = false
+
                             )
-                        }
+                        }*/
+                        clearField()
                     } else {
                         _uiState.update {
                             it.copy(error = "Не удалось сохранить активность")
@@ -97,6 +99,10 @@ class NewActivitiesSheetViewModel @Inject constructor(
         }
 
 
+    }
+
+    fun clearField() {
+        _uiState.value = NewActivitiesUiState()
     }
 
 }

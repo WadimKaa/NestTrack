@@ -63,6 +63,7 @@ import com.powakaz.nesttrack.feature_time.R
 import com.powakaz.nesttrack.feature_time.pres.components.items.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.items.UserAvatar
 import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.NewActivitiesSheet
+import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.NewActivitiesSheetViewModel
 import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconToUi
 
@@ -72,10 +73,10 @@ private val shape20 = RoundedCornerShape(20.dp)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimeTrackingScreen(
-    viewModel: TimeTrackingScreenViewModel = hiltViewModel()
+    timeTrackingViewModel: TimeTrackingScreenViewModel = hiltViewModel()
 ) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by timeTrackingViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     TimeTrackingScreenContent(uiState, context)
@@ -183,11 +184,14 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
 
     if (showNewActivitiesSheet) {
 
+        val newActivitiesSheetViewModel: NewActivitiesSheetViewModel = hiltViewModel()
+
         ModalBottomSheet(
             sheetState = rememberModalBottomSheetState(
                 skipPartiallyExpanded = true
                 ),
             onDismissRequest = {
+                newActivitiesSheetViewModel.clearField()
                 showNewActivitiesSheet = false
             },
             dragHandle = {

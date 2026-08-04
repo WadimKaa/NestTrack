@@ -66,8 +66,7 @@ fun NewActivitiesSheet(
         onSaveActivities = {
             viewModel.onSaveActivities()
             onDismiss()
-        }
-        ,
+        },
         isCreateButtonEnabled = uiState.isCreateButtonEnabled
         )
 }
