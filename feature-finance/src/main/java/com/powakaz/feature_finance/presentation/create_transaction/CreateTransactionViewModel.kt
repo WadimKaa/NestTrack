@@ -1,5 +1,6 @@
 package com.powakaz.feature_finance.presentation.create_transaction
 
+import android.icu.util.LocaleData
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,10 +20,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 
 enum class WalletDialogTarget { FROM, TO }
+
+
+data class QuickActionDate(val localDate: LocalDate, val label: String, val readableDate: String)
 
 data class CreateTransactionUiState(
     val name: String = "",
@@ -35,22 +42,60 @@ data class CreateTransactionUiState(
     val toWallet: Wallet? = null,
     val isWalletDialogVisible: Boolean = false,
     val walletDialogTarget: WalletDialogTarget = WalletDialogTarget.FROM,
-    val isDateDialogVisible : Boolean = false
-)
+    val isDateDialogVisible: Boolean = false,
+    val todayDate: LocalDate = LocalDate.now(),
+    val selectedDate: LocalDate = LocalDate.now(),
+    val tempSelectedDate: LocalDate = LocalDate.now(),
+) {
 
-sealed interface DialogState {
-    object None : DialogState
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy", Locale("ru"))
+
+    val clickDateLabel = if (selectedDate == todayDate) {
+        "(сегодня)"
+    } else if (selectedDate == todayDate.minusDays(1)) {
+        "(вчера)"
+    } else if (selectedDate == todayDate.minusDays(2)) {
+        "(позавчера)"
+    } else {
+        ""
+    }
+
+
+    val quickDateActions = createQuickActions()
+
+    private fun createQuickActions(): List<QuickActionDate> {
+        return listOf(
+            QuickActionDate(
+                LocalDate.now(), "Сегодня", LocalDate.now().format(dateFormatter)
+            ),
+            QuickActionDate(
+                LocalDate.now().minusDays(1),
+                "Вчера",
+                LocalDate.now().minusDays(1).format(dateFormatter)
+            ),
+            QuickActionDate(
+                LocalDate.now().minusDays(2),
+                "Позавчера",
+                LocalDate.now().format(dateFormatter)
+            )
+        )
+    }
+
 
 }
 
 sealed interface CreateTransactionEvent {
     data class NameChange(val text: String) : CreateTransactionEvent
     data class OpenWalletPicker(val walletDialogTarget: WalletDialogTarget) : CreateTransactionEvent
-    data class SelectWallet(val walletId: Int?) : CreateTransactionEvent
     object CloseWalletPicker : CreateTransactionEvent
+    data class SelectWallet(val walletId: Int?) : CreateTransactionEvent
     data class AmountChange(val amount: Int) : CreateTransactionEvent
     data class IncreaseAmount(val increaseAmount: Int) : CreateTransactionEvent
-    data class SelectCategory(val categoryIndex : Int) : CreateTransactionEvent
+    data class SelectCategory(val categoryIndex: Int) : CreateTransactionEvent
+    object OpenDateDialog : CreateTransactionEvent
+    object CloseDateDialog : CreateTransactionEvent
+    object SaveDate : CreateTransactionEvent
+    data class SelectTempDate(val tempLocalDate: LocalDate) : CreateTransactionEvent
 }
 
 @HiltViewModel
@@ -165,6 +210,35 @@ class CreateTransactionViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(selectedCategoryIndex = createTransactionEvent.categoryIndex)
                 }
+            }
+
+            CreateTransactionEvent.CloseDateDialog -> {
+                _uiState.update {
+                    it.copy(
+                        isDateDialogVisible = false,
+                        tempSelectedDate = _uiState.value.selectedDate
+                    )
+                }
+            }
+
+            CreateTransactionEvent.OpenDateDialog -> {
+                _uiState.update {
+                    it.copy(
+                        isDateDialogVisible = true
+                    )
+                }
+            }
+
+            is CreateTransactionEvent.SaveDate -> {
+                _uiState.update {
+                    it.copy(
+                        selectedDate = _uiState.value.tempSelectedDate
+                    )
+                }
+            }
+
+            is CreateTransactionEvent.SelectTempDate -> {
+                _uiState.update { it.copy(tempSelectedDate = createTransactionEvent.tempLocalDate) }
             }
         }
     }

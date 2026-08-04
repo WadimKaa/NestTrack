@@ -39,6 +39,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,10 +56,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
-import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
@@ -66,6 +67,7 @@ import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.presentation.create_transaction.model.CategoryUi
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -87,6 +89,7 @@ fun CreateTransactionScreenPreview() {
     CreateTransactionScreen(
         CreateTransactionUiState(
             name = "Kekek",
+            isDateDialogVisible = true,
             categories = listOf(
                 CategoryUi(
                     -1, null, "Рефенансирование", R.drawable.ic_calendar, Color(
@@ -176,7 +179,7 @@ fun CreateTransactionScreen(
                 Label("Дата")
             }
             item {
-                SelectDate()
+                SelectDate(uiState, onEvent)
             }
             item {
                 ButtonSaveTransaction()
@@ -195,15 +198,15 @@ fun CreateTransactionScreen(
 
 
     if (uiState.isDateDialogVisible) {
-        DateBottomSheet(LocalDate.now())
+        DateBottomSheet(uiState, onEvent)
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateBottomSheet(selectedDate: LocalDate) {
-    val month = remember { YearMonth.now() }
+fun DateBottomSheet(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
+    val month = YearMonth.from(uiState.tempSelectedDate)
     val state = rememberCalendarState(
         startMonth = month.minusMonths(100),
         endMonth = month.plusMonths(100),
@@ -214,21 +217,30 @@ fun DateBottomSheet(selectedDate: LocalDate) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+    val scope = rememberCoroutineScope()
 
-    ModalBottomSheet(sheetState = sheetState, onDismissRequest = {}, dragHandle = {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        ) {
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = {
+            scope.launch {
+                sheetState.hide()
+                onEvent(CreateTransactionEvent.CloseDateDialog)
+            }
+        },
+        dragHandle = {
             Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(width = 30.dp, height = 4.dp)
-                    .background(color = Color(0XFFcdccdb), shape = RoundedCornerShape(32.dp))
-            )
-        }
-    }) {
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(width = 30.dp, height = 4.dp)
+                        .background(color = Color(0XFFcdccdb), shape = RoundedCornerShape(32.dp))
+                )
+            }
+        }) {
         Column {
             Text(
                 text = "Выберите дату",
@@ -240,21 +252,30 @@ fun DateBottomSheet(selectedDate: LocalDate) {
                     .align(Alignment.CenterHorizontally)
             )
 
+
+            MonthHeader(state.firstVisibleMonth.yearMonth, state)
+
             HorizontalCalendar(
                 state = state,
                 dayContent = { day ->
-                    DayCell(day, selectedDate)
+                    DayCell(day, uiState.tempSelectedDate, onEvent)
                 },
-                monthHeader = { month ->
-                    MonthHeader(month)
-                },
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .height((6 * 58).dp)
             )
 
-            QuickDateSelect()
+            QuickDateSelect(uiState, onEvent)
 
             Button(
-                onClick = {}, colors = ButtonDefaults.buttonColors(
+                onClick = {
+                    scope.launch {
+                        onEvent(CreateTransactionEvent.SaveDate)
+                        sheetState.hide()
+                        onEvent(CreateTransactionEvent.CloseDateDialog)
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0XFF6f46f6)
                 ),
                 modifier = Modifier
@@ -272,6 +293,15 @@ fun DateBottomSheet(selectedDate: LocalDate) {
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 16.dp, bottom = 16.dp)
+                    .clickable(
+                        onClick = {
+                            scope.launch {
+                                sheetState.hide()
+                                onEvent(CreateTransactionEvent.CloseDateDialog)
+                            }
+                        },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() })
             )
 
         }
@@ -279,48 +309,49 @@ fun DateBottomSheet(selectedDate: LocalDate) {
 }
 
 @Composable
-fun QuickDateSelect() {
+fun QuickDateSelect(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
     Text(
         text = "Быстрый выбор",
         color = Color(0XFF575e7d),
-        modifier = Modifier.padding(top = 24.dp, start = 16.dp)
+        modifier = Modifier.padding(start = 16.dp)
     )
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .padding(top = 8.dp, start = 16.dp, end = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        QuickDateSelectItem(
-            Modifier
-                .padding(start = 8.dp, end = 8.dp)
-                .weight(1f), true
-        )
-        QuickDateSelectItem(
-            Modifier
-                .padding(start = 8.dp, end = 8.dp)
-                .weight(1f), false
-        )
-        QuickDateSelectItem(
-            Modifier
-                .padding(start = 8.dp, end = 8.dp)
-                .weight(1f), false
-        )
+        repeat(3) { index ->
+            QuickDateSelectItem(
+                Modifier
+                    .weight(1f), index, uiState, onEvent
+            )
+        }
     }
 }
 
 @Composable
-fun QuickDateSelectItem(modifier: Modifier, isSelected: Boolean) {
+fun QuickDateSelectItem(
+    modifier: Modifier,
+    index: Int,
+    uiState: CreateTransactionUiState,
+    onEvent: (CreateTransactionEvent) -> Unit
+) {
+    val isSelected = uiState.quickDateActions[index].localDate == uiState.tempSelectedDate
     val borderColor = if (isSelected) Color(0XFF6e45f6) else Color(0XFFe5e5ec)
+    val textColor = if (isSelected) Color(0XFF6e45f6) else Color(0XFF606487)
     val containerColor = if (isSelected) Color(0XFFf2eefc) else Color(0XFFfdfdfd)
 
     Box(
         modifier = modifier
-            .background(color = containerColor, shape = RoundedCornerShape(12.dp))
+            .clip(shape = RoundedCornerShape(12.dp))
+            .background(color = containerColor)
             .border(
                 width = 1.dp,
                 color = borderColor,
                 shape = RoundedCornerShape(12.dp)
             )
+            .clickable(onClick = { onEvent(CreateTransactionEvent.SelectTempDate(uiState.quickDateActions[index].localDate)) })
 
     ) {
         Row(modifier = Modifier.padding(start = 8.dp, end = 4.dp, top = 16.dp, bottom = 16.dp)) {
@@ -335,15 +366,15 @@ fun QuickDateSelectItem(modifier: Modifier, isSelected: Boolean) {
 
             Column(modifier = Modifier.padding(start = 8.dp)) {
                 Text(
-                    text = "Сегодня",
-                    color = Color(0XFF9599ae),
+                    text = uiState.quickDateActions[index].label,
+                    color = textColor,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
                     lineHeight = 12.sp
                 )
                 Text(
-                    text = "17.07.26",
-                    color = Color(0XFF9599ae),
+                    text = uiState.quickDateActions[index].readableDate,
+                    color = textColor,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
                     lineHeight = 12.sp
@@ -355,13 +386,15 @@ fun QuickDateSelectItem(modifier: Modifier, isSelected: Boolean) {
 
 
 val calendarHeadFormatter = DateTimeFormatter.ofPattern("LLLL yyyy", Locale("ru"))
+val clickerDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale("ru"))
 val dayOfWeekFormatter = DateTimeFormatter.ofPattern("E", Locale("ru"))
 
 @Composable
-fun MonthHeader(month: CalendarMonth) {
+fun MonthHeader(month: YearMonth, state: CalendarState) {
     val daysOfWeek = remember { daysOfWeek() }
+    val scope = rememberCoroutineScope()
 
-    Column() {
+    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
         Box(
             modifier = Modifier
                 .padding(top = 16.dp, bottom = 16.dp)
@@ -373,9 +406,17 @@ fun MonthHeader(month: CalendarMonth) {
                 colorFilter = ColorFilter.tint(Color(0XFF784ff1)),
                 modifier = Modifier
                     .align(Alignment.CenterStart)
+                    .clickable(
+                        onClick = {
+                            scope.launch {
+                                state.animateScrollToMonth(month.minusMonths(1))
+                            }
+                        },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() })
             )
             Text(
-                text = month.yearMonth.format(calendarHeadFormatter)
+                text = month.format(calendarHeadFormatter)
                     .replaceFirstChar { it.uppercase() },
                 modifier = Modifier.align(Alignment.Center),
                 color = Color(0XFF042154),
@@ -388,6 +429,14 @@ fun MonthHeader(month: CalendarMonth) {
                 colorFilter = ColorFilter.tint(Color(0XFF784ff1)),
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
+                    .clickable(
+                        onClick = {
+                            scope.launch {
+                                state.animateScrollToMonth(month.plusMonths(1))
+                            }
+                        },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() })
             )
         }
 
@@ -433,7 +482,7 @@ fun getDayType(day: CalendarDay, selectedDate: LocalDate): DayType {
 }
 
 @Composable
-fun DayCell(day: CalendarDay, selectedDate: LocalDate) {
+fun DayCell(day: CalendarDay, selectedDate: LocalDate, onEvent: (CreateTransactionEvent) -> Unit) {
     val dateType = getDayType(day, selectedDate)
 
     var textColor = when (dateType) {
@@ -443,7 +492,21 @@ fun DayCell(day: CalendarDay, selectedDate: LocalDate) {
         DayType.SELECTED -> Color(0xFFFFFFFF)
     }
 
-    Box(modifier = Modifier.aspectRatio(1f), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .aspectRatio(1f)
+            .clickable(
+                onClick = {
+                    if (dateType == DayType.NORMAL || dateType == DayType.WEEKEND) onEvent(
+                        CreateTransactionEvent.SelectTempDate(
+                            day.date
+                        )
+                    )
+                },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }),
+        contentAlignment = Alignment.Center
+    ) {
         if (dateType == DayType.SELECTED) {
             Box(
                 modifier = Modifier
@@ -1064,17 +1127,19 @@ fun CategoryCard(
 
 
 @Composable
-fun SelectDate() {
+fun SelectDate(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
+            .background(color = Color.White)
             .border(
                 width = 1.dp,
                 color = Color(0XFFe5e5ec),
                 shape = RoundedCornerShape(12.dp)
             )
+            .clickable(onClick = { onEvent(CreateTransactionEvent.OpenDateDialog) })
     ) {
         Image(
             painter = painterResource(R.drawable.ic_calendar),
@@ -1085,7 +1150,7 @@ fun SelectDate() {
                 .size(32.dp)
         )
         Text(
-            text = "17 июля 2026",
+            text = clickerDateFormatter.format(uiState.selectedDate),
             color = Color(0XFF14274e),
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp,
@@ -1094,7 +1159,7 @@ fun SelectDate() {
                 .padding(start = 16.dp)
         )
         Text(
-            text = "(сегодня)",
+            text = uiState.clickDateLabel,
             color = Color(0XFF9599ae),
             fontSize = 12.sp,
             modifier = Modifier
