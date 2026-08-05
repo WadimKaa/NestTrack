@@ -38,6 +38,8 @@ data class CreateTransactionUiState(
         ""
     }
 
+    val MAX_NAME_LETTER_COUNT : Int = 15
+    val letterCount = name.length
 
     val quickDateActions = createQuickActions()
 

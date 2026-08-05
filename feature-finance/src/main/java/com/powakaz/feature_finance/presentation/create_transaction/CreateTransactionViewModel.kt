@@ -80,8 +80,10 @@ class CreateTransactionViewModel @Inject constructor(
     fun onEvent(createTransactionEvent: CreateTransactionEvent) {
         when (createTransactionEvent) {
             is CreateTransactionEvent.NameChange -> {
-                _uiState.update {
-                    it.copy(name = createTransactionEvent.text)
+                if (createTransactionEvent.text.length <= _uiState.value.MAX_NAME_LETTER_COUNT) {
+                    _uiState.update {
+                        it.copy(name = createTransactionEvent.text)
+                    }
                 }
             }
 

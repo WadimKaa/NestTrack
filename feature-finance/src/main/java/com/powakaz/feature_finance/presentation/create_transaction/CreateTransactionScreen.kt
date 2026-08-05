@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,8 +65,6 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.powakaz.feature_finance.R
-import com.powakaz.feature_finance.domain.model.Wallet
-import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.presentation.create_transaction.model.CategoryUi
 import com.powakaz.feature_finance.presentation.create_transaction.model.CreateTransactionUiState
 import com.powakaz.feature_finance.presentation.create_transaction.model.WalletDialogTarget
@@ -140,7 +139,7 @@ fun CreateTransactionScreen(
                 CreateTransactionTopBar()
             }
             item {
-                NameTransactionCard(uiState.name, onEvent)
+                NameTransactionCard(uiState, onEvent)
             }
             item {
                 Label("Кошелек")
@@ -775,7 +774,8 @@ fun CreateTransactionTopBar() {
 }
 
 @Composable
-fun NameTransactionCard(name: String, onEvent: (CreateTransactionEvent) -> Unit) {
+fun NameTransactionCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
+
     Card(
         modifier = Modifier
             .padding(top = 12.dp, start = 16.dp, end = 16.dp)
@@ -805,26 +805,34 @@ fun NameTransactionCard(name: String, onEvent: (CreateTransactionEvent) -> Unit)
                         .size(56.dp)
                 )
                 OutlinedTextField(
-                    value = name,
+                    value = uiState.name,
                     onValueChange = { onEvent(CreateTransactionEvent.NameChange(it)) },
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color(0XFFe2e3e7),
-                        focusedTextColor = Color(0XFF6750a4)
+                        focusedBorderColor = Color(0xFF9682C7),
+                        focusedTextColor = Color(0XFF042154),
+                        unfocusedTextColor = Color(0XFF616a84)
                     ),
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
                         .fillMaxWidth(),
                     placeholder = {
                         Text(text = "Введите название", color = Color(0XFF9599ae))
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences
+                    )
                 )
             }
             Text(
-                text = "Например: Продукты, Кофе, Зарплата",
-                modifier = Modifier.padding(start = 88.dp, top = 6.dp, bottom = 12.dp),
+                text = "${uiState.letterCount}/${uiState.MAX_NAME_LETTER_COUNT}",
                 fontSize = 12.sp,
-                color = Color(0XFF9599ae)
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0XFF9599ae),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 18.dp, bottom = 20.dp, top = 2.dp)
             )
         }
     }
