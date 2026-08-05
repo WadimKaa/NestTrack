@@ -30,6 +30,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -774,7 +776,10 @@ fun CreateTransactionTopBar() {
 }
 
 @Composable
-fun NameTransactionCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
+fun NameTransactionCard(
+    uiState: CreateTransactionUiState,
+    onEvent: (CreateTransactionEvent) -> Unit
+) {
 
     Card(
         modifier = Modifier
@@ -820,6 +825,16 @@ fun NameTransactionCard(uiState: CreateTransactionUiState, onEvent: (CreateTrans
                     placeholder = {
                         Text(text = "Введите название", color = Color(0XFF9599ae))
                     },
+                    trailingIcon = {
+                        if (uiState.letterCount > 0) {
+                            IconButton(onClick = { onEvent(CreateTransactionEvent.NameChange("")) }) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_close),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences
                     )
@@ -843,6 +858,8 @@ fun NameTransactionCard(uiState: CreateTransactionUiState, onEvent: (CreateTrans
 fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
     val availableMoneyText =
         if (uiState.fromWallet.initType != WalletInitType.INIT) "${uiState.fromWallet.balanceLabel} BYN" else "0 BYN"
+    val availableMoneyTextColor =
+        if (uiState.fromWallet.balance == 0f) Color(0xFFFD7AB3) else Color(0XFFa17afd)
 
     Card(
         modifier = Modifier
@@ -908,7 +925,7 @@ fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEv
                 )
                 Text(
                     text = availableMoneyText,
-                    color = Color(0XFFa17afd),
+                    color = availableMoneyTextColor,
                     modifier = Modifier.padding(start = 2.dp, top = 12.dp, bottom = 12.dp)
                 )
             }
