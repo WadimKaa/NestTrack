@@ -18,9 +18,20 @@ interface TimeTrackingApi {
     ): List<TimeBalanceResponseDto>
 
 
+    //////////////activities////////////////
+
+
     @GET("time/activities")
     suspend fun getListActivities(
     ): List<ActivitiesResponseDto>
+
+    @POST("time/activities")
+    suspend fun addNewActivities(
+        @Body activities: CreateActivitiesRequestDto
+    ): CreateActivitiesResponseDto
+
+
+    //////////////concession////////////////
 
 
     @GET("time/logs")
@@ -28,11 +39,6 @@ interface TimeTrackingApi {
        // @Query("page") page: Int
     ): ConcessionListResponseDto
 
-
-    @POST("time/activities")
-    suspend fun addNewActivities(
-        @Body activities: CreateActivitiesRequestDto
-    ): CreateActivitiesResponseDto
 
 
 }

@@ -14,6 +14,7 @@ import com.powakaz.nesttrack.feature_time.data.mapper.findActivitiesColorToServe
 import com.powakaz.nesttrack.feature_time.data.mapper.findActivitiesIconToServerName
 import com.powakaz.nesttrack.feature_time.data.mapper.toDomain
 import com.powakaz.nesttrack.feature_time.data.mapper.toDto
+import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.activities.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.ConcessionList
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
@@ -21,11 +22,25 @@ import com.powakaz.nesttrack.feature_time.domain.model.TimeData
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesRequest
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesResponse
 import com.powakaz.nesttrack.feature_time.domain.repository.TimeTrackingRepository
+import com.powakaz.nesttrack.feature_time.pres.screen.TimeTrackingScreen
+import com.powakaz.nesttrack.feature_time.pres.utils.mapper.toUi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.update
+import okhttp3.internal.http2.Http2Reader
+import okhttp3.internal.wait
+import java.util.logging.Handler
 import javax.inject.Inject
+import kotlin.collections.emptyList
 
 class TimeTrackingRepositoryImpl @Inject constructor(
 
@@ -38,10 +53,14 @@ class TimeTrackingRepositoryImpl @Inject constructor(
 
 ) : TimeTrackingRepository {
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun getTimeScreenData(): NetworkResult<TimeData> {
+    private val _timeData = MutableStateFlow<TimeData?>(null)
+    val timeData: StateFlow<TimeData?> = _timeData.asStateFlow()
 
-        val result = safeApiCall {
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun loadTimeScreenData() {
+
+        _timeData.value =
             coroutineScope {
                 val userId = userIdRepository.getUserId().first()
 
@@ -49,7 +68,6 @@ class TimeTrackingRepositoryImpl @Inject constructor(
                     publicApi.getBalanceConcession(userId).map {
                         it.toDomain()
                     }
-
                 }
 
                 val activitiesDeferred = async {
@@ -68,22 +86,23 @@ class TimeTrackingRepositoryImpl @Inject constructor(
                     concessions = concessionsDeferred.await()
                 )
             }
-        }
 
-
-        return result
     }
 
-    override suspend fun createNewActivities(newActivities: CreateActivitiesRequest): NetworkResult<CreateActivitiesResponse> {
+    override fun observeTimeData(): StateFlow<TimeData?> {
+        return timeData
+    }
 
-        val result = safeApiCall {
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun createNewActivities(newActivities: CreateActivitiesRequest) {
+        safeApiCall {
 
             val dtoData = CreateActivitiesRequestDto(
                 name = newActivities.name,
                 iconName = context.findActivitiesIconToServerName(newActivities.iconName),
                 iconColor = newActivities.iconColor.findActivitiesColorToServer()
             )
-
 
             val createActivities = privateApi.addNewActivities(
                 activities = dtoData
@@ -92,6 +111,22 @@ class TimeTrackingRepositoryImpl @Inject constructor(
             createActivities.toDomain()
         }
 
-        return result
+        loadListActivities()
+
+    }
+
+    suspend fun loadListActivities() {
+        coroutineScope {
+            val listActivities = publicApi.getListActivities().map {
+                it.toDomain()
+            }
+
+            _timeData.update {
+                it?.copy(
+                    activities = listActivities
+                )
+            }
+        }
+
     }
 }

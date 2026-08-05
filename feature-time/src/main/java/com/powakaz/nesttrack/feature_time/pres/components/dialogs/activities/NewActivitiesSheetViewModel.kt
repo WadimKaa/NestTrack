@@ -1,6 +1,7 @@
 package com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities
 
 import android.graphics.drawable.Icon
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,7 +27,6 @@ class NewActivitiesSheetViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewActivitiesUiState())
-
     val uiState: StateFlow<NewActivitiesUiState> = _uiState.asStateFlow()
 
     init {
@@ -65,39 +65,9 @@ class NewActivitiesSheetViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-
-            val result = createNewActivitiesUseCase(request)
-
-            when (result) {
-                is NetworkResult.Success<CreateActivitiesResponse> -> {
-                    if (result.data.status) {
-                        /*_uiState.update {
-                            it.copy(
-                                activitiesName = "",
-                                selectedColor = null,
-                                selectedIcon = null,
-                                hasEditedName = false
-
-                            )
-                        }*/
-                        clearField()
-                    } else {
-                        _uiState.update {
-                            it.copy(error = "Не удалось сохранить активность")
-                        }
-                    }
-                }
-
-                is NetworkResult.Error -> {
-                    NetworkResult.Error(result.code, result.message)
-                }
-
-                is NetworkResult.Exception -> {
-                    NetworkResult.Exception(result.e)
-                }
-            }
+            createNewActivitiesUseCase(request)
         }
-
+        clearField()
 
     }
 

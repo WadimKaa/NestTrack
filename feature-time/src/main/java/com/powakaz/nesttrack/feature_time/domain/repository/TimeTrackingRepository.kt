@@ -8,10 +8,15 @@ import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.domain.model.TimeData
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesRequest
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface TimeTrackingRepository {
 
-    suspend fun getTimeScreenData() : NetworkResult<TimeData>
+    suspend fun loadTimeScreenData()
 
-    suspend fun createNewActivities(newActivities: CreateActivitiesRequest) : NetworkResult<CreateActivitiesResponse>
+    fun observeTimeData() : StateFlow<TimeData?>
+
+    suspend fun createNewActivities(newActivities: CreateActivitiesRequest)
 }

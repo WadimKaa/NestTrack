@@ -13,7 +13,7 @@ import javax.inject.Inject
 class LoadTimeTrackingUseCase @Inject constructor(
     private val timeTrackingRepository: TimeTrackingRepository
 ){
-    suspend operator fun invoke(): NetworkResult<TimeData>  {
-        return timeTrackingRepository.getTimeScreenData()
+    suspend operator fun invoke() {
+        timeTrackingRepository.loadTimeScreenData()
     }
 }

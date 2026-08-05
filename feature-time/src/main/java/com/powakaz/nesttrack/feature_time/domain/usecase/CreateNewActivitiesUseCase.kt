@@ -9,7 +9,7 @@ import javax.inject.Inject
 class CreateNewActivitiesUseCase @Inject constructor(
     private val repository: TimeTrackingRepository
 ){
-    suspend operator fun invoke(newActivities: CreateActivitiesRequest) : NetworkResult<CreateActivitiesResponse> {
+    suspend operator fun invoke(newActivities: CreateActivitiesRequest)  {
         return repository.createNewActivities(newActivities)
     }
 }
