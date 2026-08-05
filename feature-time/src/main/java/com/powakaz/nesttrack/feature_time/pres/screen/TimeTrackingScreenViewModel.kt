@@ -12,6 +12,7 @@ import com.powakaz.nesttrack.feature_time.domain.model.activities.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.domain.model.TimeData
+import com.powakaz.nesttrack.feature_time.domain.usecase.LoadAvatarsUseCase
 import com.powakaz.nesttrack.feature_time.domain.usecase.LoadTimeTrackingUseCase
 import com.powakaz.nesttrack.feature_time.domain.usecase.ObserveTimeDataUseCase
 import com.powakaz.nesttrack.feature_time.pres.model.ActivitiesUi
@@ -35,7 +36,8 @@ private const val balanceCountdownStart = 0.0
 @HiltViewModel
 class TimeTrackingScreenViewModel @Inject constructor(
     val loadTimeTrackingUseCase: LoadTimeTrackingUseCase,
-    val observeTimeDataUseCase: ObserveTimeDataUseCase
+    val observeTimeDataUseCase: ObserveTimeDataUseCase,
+    val loadAvatarsUseCase: LoadAvatarsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TimeTrackingUiState())
@@ -43,6 +45,14 @@ class TimeTrackingScreenViewModel @Inject constructor(
 
     init {
         loadScreen()
+        loadAvatars()
+    }
+
+    fun loadAvatars() {
+        viewModelScope.launch {
+            val avatars = loadAvatarsUseCase()
+            Log.e("LOL", avatars.toString())
+        }
     }
 
     fun loadScreen() {

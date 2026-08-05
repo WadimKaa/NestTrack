@@ -5,6 +5,7 @@ import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.Concessio
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities.CreateActivitiesRequestDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.TimeBalanceResponseDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities.CreateActivitiesResponseDto
+import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.avatar.UserProfileResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -16,6 +17,10 @@ interface TimeTrackingApi {
     suspend fun getBalanceConcession(
         @Query("user_id") userId: Int
     ): List<TimeBalanceResponseDto>
+
+    @GET("users")
+    suspend fun getUsersProfile(): List<UserProfileResponseDto>
+
 
 
     //////////////activities////////////////

@@ -13,12 +13,14 @@ import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.Concessio
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.TimeBalanceResponseDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities.CreateActivitiesRequestDto
 import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.activities.CreateActivitiesResponseDto
+import com.powakaz.nesttrack.feature_time.data.datasourse.remote.model.avatar.UserProfileResponseDto
 import com.powakaz.nesttrack.feature_time.domain.model.activities.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.ConcessionList
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesRequest
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesResponse
+import com.powakaz.nesttrack.feature_time.domain.model.avatar.UserProfile
 import java.time.OffsetDateTime
 
 fun TimeBalanceResponseDto.toDomain(): TimeBalance {
@@ -26,6 +28,14 @@ fun TimeBalanceResponseDto.toDomain(): TimeBalance {
         userIdWith = userIdWith,
         userNameWith = userNameWith,
         balanceHours = balanceHours
+    )
+}
+
+fun UserProfileResponseDto.toDomain() : UserProfile {
+    return UserProfile(
+        id = id,
+        name = name,
+        avatarUrl = avatarUrl.toString()
     )
 }
 

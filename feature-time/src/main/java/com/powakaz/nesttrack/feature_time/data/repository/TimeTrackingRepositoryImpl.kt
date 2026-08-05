@@ -21,6 +21,7 @@ import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.domain.model.TimeData
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesRequest
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesResponse
+import com.powakaz.nesttrack.feature_time.domain.model.avatar.UserProfile
 import com.powakaz.nesttrack.feature_time.domain.repository.TimeTrackingRepository
 import com.powakaz.nesttrack.feature_time.pres.screen.TimeTrackingScreen
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.toUi
@@ -56,6 +57,19 @@ class TimeTrackingRepositoryImpl @Inject constructor(
     private val _timeData = MutableStateFlow<TimeData?>(null)
     val timeData: StateFlow<TimeData?> = _timeData.asStateFlow()
 
+
+
+    override suspend fun loadAvatars(): NetworkResult<List<UserProfile>> {
+
+        val result = safeApiCall {
+            val avatarList = publicApi.getUsersProfile()
+            avatarList.map {
+                it.toDomain()
+            }
+        }
+
+        return result
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun loadTimeScreenData() {
