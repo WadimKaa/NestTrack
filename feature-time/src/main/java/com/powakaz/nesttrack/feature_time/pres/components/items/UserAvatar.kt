@@ -1,8 +1,12 @@
 package com.powakaz.nesttrack.feature_time.pres.components.items
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -16,12 +20,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.powakaz.nesttrack.feature_time.R
+import com.powakaz.nesttrack.feature_time.domain.model.avatar.Avatar
 
 
 @Composable
 fun UserAvatar(
-    icon: Painter,
+    icon: String,
     size: Dp,
     modifier: Modifier,
 ) {
@@ -29,40 +35,41 @@ fun UserAvatar(
 }
 
 @Composable
-fun UserAvatarContent(icon: Painter, size: Dp, modifier: Modifier) {
+fun UserAvatarContent(icon: String, size: Dp, modifier: Modifier) {
 
 
-    Image(
-        painter = icon,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
+    Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(
-                brush = Brush.linearGradient(
-                    listOf(
-                        Color(0xFFEDF0FF),
-                        Color(0xFFB7C1FA)
-                    )
-                )
-            )
+            .background(Color.White)
             .border(
-                2.dp,
-                Color.White,
+                1.dp,
+                Color(0xFF835EFF),
                 CircleShape
             )
 
-    )
+    ) {
+        AsyncImage(
+            model = icon,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(R.drawable.ic_walk_activities),
+            error = painterResource(R.drawable.ic_walk_activities),
+            modifier = Modifier.fillMaxSize(),
+            onError = { state ->
+                Log.e("AvatarError", "Failed to load image: ${state.result.throwable}") },
+            onSuccess = { Log.d("AvatarError", "Image loaded successfully!")}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun UserAvatarPreview() {
     UserAvatarContent(
-        icon = painterResource(id = R.drawable.man),
+        icon = "",
         size = (40.dp),
-
         modifier = Modifier
     )
 }

@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,12 +61,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.powakaz.nesttrack.feature_time.R
+import com.powakaz.nesttrack.feature_time.domain.model.avatar.Avatar
 import com.powakaz.nesttrack.feature_time.pres.components.items.ActivitiesItem
 import com.powakaz.nesttrack.feature_time.pres.components.items.UserAvatar
 import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.NewActivitiesSheet
 import com.powakaz.nesttrack.feature_time.pres.components.dialogs.activities.NewActivitiesSheetViewModel
 import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.findActivitiesIconToUi
+import com.powakaz.nesttrack.feature_time.pres.utils.mapper.mapDefaultAvatar
 
 private val shape20 = RoundedCornerShape(20.dp)
 
@@ -112,7 +115,11 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
 
         item {
             Spacer(modifier = Modifier.height(20.dp))
-            ShowTimeBalance(uiState.timeBalance, uiState.currentBalanceState)
+            ShowTimeBalance(
+                uiState.timeBalance,
+                uiState.currentBalanceState,
+                uiState.avatar1,
+                uiState.avatar2) // avatar1 = "", avatar2 = ""
         }
 
         item {
@@ -313,11 +320,11 @@ fun ShowListConcession(concessionItem: ConcessionUi, context: Context) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        UserAvatar(
-            icon = painterResource(id = R.drawable.man),
+        /*UserAvatar(
+            icon = ,
             size = (30.dp),
             modifier = Modifier
-        )
+        )*/
 
         Spacer(modifier = Modifier.width(2.dp))
 
@@ -329,11 +336,11 @@ fun ShowListConcession(concessionItem: ConcessionUi, context: Context) {
 
         Spacer(modifier = Modifier.width(2.dp))
 
-        UserAvatar(
-            icon = painterResource(id = R.drawable.girl),
+       /* UserAvatar(
+            icon = "",
             size = (30.dp),
             modifier = Modifier
-        )
+        )*/
 
         Spacer(modifier = Modifier.width(2.dp))
 
@@ -473,7 +480,7 @@ fun AddNewActivity(openCreateActivities: () -> Unit) {
 }
 
 @Composable
-fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState) {
+fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState, avatar1: Avatar, avatar2: Avatar) { // avatar1: Avatar, avatar2: Avatar
 
     val (textRes, textColor) = when (currentBalanceState) {
         BalanceState.I_OWE -> R.string.you_owe_time to Color(0xFFFB3662)
@@ -524,21 +531,80 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState) {
                     .padding(10.dp)
             )
 
-            UserAvatar(
-                icon = painterResource(id = R.drawable.man),
-                size = (40.dp),
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset(x = 18.dp, y = 10.dp)
-            )
+            when (avatar1) {
+                Avatar.Default -> {
 
-            UserAvatar(
-                icon = painterResource(id = R.drawable.girl),
-                size = (40.dp),
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .offset(x = (-20).dp, y = (-14).dp)
-            )
+                    val avatar = mapDefaultAvatar(1) ////!!!!!!
+
+                    Image(
+                        painter = painterResource(id = avatar.avatarRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .align(Alignment.CenterStart)
+                            .offset(x = 18.dp, y = 10.dp)
+                            .clip(CircleShape)
+                            .background(
+                                brush = Brush.linearGradient(
+                                    avatar.gradient
+                                )
+                            )
+                            .border(
+                                1.dp,
+                                Color(0xFF835EFF),
+                                CircleShape
+                            )
+                    )
+                }
+
+                is Avatar.Remote -> {
+                    UserAvatar(
+                        icon = avatar1.url,
+                        size = (40.dp),
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .offset(x = 18.dp, y = 10.dp)
+                    )
+                }
+            }
+            when (avatar2) {
+                Avatar.Default -> {
+
+                    val avatar = mapDefaultAvatar(2) ////!!!!!!
+
+                    Image(
+                        painter = painterResource(id = avatar.avatarRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .align(Alignment.CenterEnd)
+                            .offset(x = (-20).dp, y = (-14).dp)
+                            .clip(CircleShape)
+                            .background(
+                                brush = Brush.linearGradient(
+                                    avatar.gradient
+                                )
+                            )
+                            .border(
+                                1.dp,
+                                Color(0xFF835EFF),
+                                CircleShape
+                            )
+                    )
+                }
+
+                is Avatar.Remote -> {
+                    UserAvatar(
+                        icon = avatar2.url,
+                        size = (40.dp),
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .offset(x = (-20).dp, y = (-14).dp)
+                    )
+                }
+            }
         }
 
         Column(

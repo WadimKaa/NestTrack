@@ -58,19 +58,6 @@ class TimeTrackingRepositoryImpl @Inject constructor(
     val timeData: StateFlow<TimeData?> = _timeData.asStateFlow()
 
 
-
-    override suspend fun loadAvatars(): NetworkResult<List<UserProfile>> {
-
-        val result = safeApiCall {
-            val avatarList = publicApi.getUsersProfile()
-            avatarList.map {
-                it.toDomain()
-            }
-        }
-
-        return result
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun loadTimeScreenData() {
 
@@ -94,10 +81,18 @@ class TimeTrackingRepositoryImpl @Inject constructor(
                     publicApi.getListConcession().toDomain()//page = 1
                 }
 
+                val usersListDiffered = async {
+                    publicApi.getUsersProfile().map {
+                        it.toDomain()
+                    }
+                }
+
                 TimeData(
                     timeBalance = timeBalanceDeferred.await(),
                     activities = activitiesDeferred.await(),
-                    concessions = concessionsDeferred.await()
+                    concessions = concessionsDeferred.await(),
+                    users = usersListDiffered.await(),
+                    myId = userId
                 )
             }
 

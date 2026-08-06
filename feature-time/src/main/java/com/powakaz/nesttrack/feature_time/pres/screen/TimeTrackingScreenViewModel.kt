@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.util.CoilUtils.result
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.core_network.model.NetworkResult.*
 import com.powakaz.nesttrack.feature_time.data.mapper.toDomain
@@ -12,7 +13,8 @@ import com.powakaz.nesttrack.feature_time.domain.model.activities.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
 import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
 import com.powakaz.nesttrack.feature_time.domain.model.TimeData
-import com.powakaz.nesttrack.feature_time.domain.usecase.LoadAvatarsUseCase
+import com.powakaz.nesttrack.feature_time.domain.model.avatar.Avatar
+import com.powakaz.nesttrack.feature_time.domain.model.avatar.UserProfile
 import com.powakaz.nesttrack.feature_time.domain.usecase.LoadTimeTrackingUseCase
 import com.powakaz.nesttrack.feature_time.domain.usecase.ObserveTimeDataUseCase
 import com.powakaz.nesttrack.feature_time.pres.model.ActivitiesUi
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.first
 
 private const val balanceCountdownStart = 0.0
 
@@ -36,8 +39,7 @@ private const val balanceCountdownStart = 0.0
 @HiltViewModel
 class TimeTrackingScreenViewModel @Inject constructor(
     val loadTimeTrackingUseCase: LoadTimeTrackingUseCase,
-    val observeTimeDataUseCase: ObserveTimeDataUseCase,
-    val loadAvatarsUseCase: LoadAvatarsUseCase
+    val observeTimeDataUseCase: ObserveTimeDataUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TimeTrackingUiState())
@@ -45,14 +47,7 @@ class TimeTrackingScreenViewModel @Inject constructor(
 
     init {
         loadScreen()
-        loadAvatars()
-    }
 
-    fun loadAvatars() {
-        viewModelScope.launch {
-            val avatars = loadAvatarsUseCase()
-            Log.e("LOL", avatars.toString())
-        }
     }
 
     fun loadScreen() {
@@ -63,23 +58,22 @@ class TimeTrackingScreenViewModel @Inject constructor(
 
                     when (result) {
 
-                        null -> {
-
-                        }
+                        null -> {}
 
                         else -> {
                             val timeBalance = result.timeBalance.first().balanceHours
                             val activitiesList = result.activities
                             val concessionList = result.concessions.dataConcession
+                            val usersProfile = result.users
+                            val myId = result.myId
 
 
-                            val currentBalanceState = if (timeBalance > balanceCountdownStart) {
-                                BalanceState.OWE_ME
-                            } else if (timeBalance < balanceCountdownStart) {
-                                BalanceState.I_OWE
-                            } else {
-                                BalanceState.BALANCE
+                            var avatarMap: Map<Int, Avatar?> = emptyMap()
+
+                            avatarMap = result.users.associate { profile ->
+                                profile.id to profile.avatarUrl
                             }
+                            Log.e("LOL", avatarMap.toString())
 
                             _uiState.update {
                                 it.copy(
@@ -87,10 +81,12 @@ class TimeTrackingScreenViewModel @Inject constructor(
                                     activitiesList = activitiesList.map { activities ->
                                         activities.toUi()
                                     },
-                                    currentBalanceState = currentBalanceState,
+                                    currentBalanceState = mapBalance(timeBalance), //.currentBalanceState
                                     concessionList = concessionList.map { concession ->
                                         concession.toUi()
-                                    }
+                                    },
+                                    avatar1 = avatarMap[1] ?: Avatar.Default,
+                                    avatar2 = avatarMap[2]?: Avatar.Default //result.timeBalance.first().userIdWith]
                                 )
                             }
                         }
@@ -103,13 +99,31 @@ class TimeTrackingScreenViewModel @Inject constructor(
     }
 }
 
+fun mapBalance(timeBalance: Double): BalanceState {
+    val currentBalanceState = if (timeBalance > balanceCountdownStart) {
+        BalanceState.OWE_ME
+    } else if (timeBalance < balanceCountdownStart) {
+        BalanceState.I_OWE
+    } else {
+        BalanceState.BALANCE
+    }
+    return currentBalanceState
+}
+
+
 data class TimeTrackingUiState(
     val timeBalance: String = "",
     val currentBalanceState: BalanceState = BalanceState.BALANCE,
     val activitiesList: List<ActivitiesUi> = emptyList(),
-    val concessionList: List<ConcessionUi> = emptyList()
+    val concessionList: List<ConcessionUi> = emptyList(),
+    val usersProfile: List<UserProfile> = emptyList(),
+
+    val avatar1: Avatar = Avatar.Default,
+    val avatar2: Avatar = Avatar.Default
+
 ) {
 
 }
+
 
 enum class BalanceState { I_OWE, OWE_ME, BALANCE }

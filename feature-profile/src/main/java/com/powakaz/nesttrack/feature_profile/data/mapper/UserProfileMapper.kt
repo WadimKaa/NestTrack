@@ -39,7 +39,7 @@ fun UserProfileResponseDto.toDomain(): UserProfile {
         id = id,
         name = name,
         birthDate = birthDate?.let { LocalDate.parse(it) },
-        avatarUrl = if (avatarUrl == null) {
+        avatarUrl = if (avatarUrl == null || avatarUrl == "" || avatarUrl == "NULL") {
             Avatar.Default
         } else {
             Avatar.Remote(buildUrl(avatarUrl))

@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface TimeTrackingRepository {
-    suspend fun loadAvatars() : NetworkResult<List<UserProfile>>
 
     suspend fun loadTimeScreenData()
 

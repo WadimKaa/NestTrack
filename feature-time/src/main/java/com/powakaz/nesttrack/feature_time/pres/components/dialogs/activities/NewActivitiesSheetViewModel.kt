@@ -11,7 +11,6 @@ import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateA
 import com.powakaz.nesttrack.feature_time.domain.model.activities.create.CreateActivitiesResponse
 import com.powakaz.nesttrack.feature_time.domain.usecase.CreateNewActivitiesUseCase
 import com.powakaz.nesttrack.feature_time.pres.model.ActivitiesUi
-import com.powakaz.nesttrack.feature_time.pres.screen.TimeTrackingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
