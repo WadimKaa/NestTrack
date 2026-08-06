@@ -1,5 +1,6 @@
 package com.powakaz.feature_finance.presentation.create_transaction.model
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.powakaz.feature_finance.domain.model.Currency
 import com.powakaz.feature_finance.domain.model.Wallet
@@ -38,7 +39,8 @@ data class CreateTransactionUiState(
         ""
     }
 
-    val MAX_NAME_LETTER_COUNT : Int = 20
+    val MAX_NAME_LETTER_COUNT: Int = 20
+    val MIN_NAME_LETTER_COUNT: Int = 3
     val letterCount = name.length
 
     val quickDateActions = createQuickActions()
@@ -60,9 +62,57 @@ data class CreateTransactionUiState(
             )
         )
     }
+
+    var error = ScreenState.SHORT_NAME_ERROR
+    val isCanSave = getSavePossibility()
+
+
+    private fun getSavePossibility(): Boolean {
+        return when {
+            letterCount <= MIN_NAME_LETTER_COUNT -> {
+                Log.e("LOL", ScreenState.SHORT_NAME_ERROR.name)
+                error = ScreenState.SHORT_NAME_ERROR
+                Log.e("LOL", error.name)
+                false
+            }
+
+            fromWallet.id == toWallet.id -> {
+                Log.e("LOL", ScreenState.SAME_WALLET_ERROR.name)
+
+                error = ScreenState.SAME_WALLET_ERROR
+                Log.e("LOL", error.name)
+
+                false
+            }
+
+            amount == 0 -> {
+                Log.e("LOL", ScreenState.NULL_TRANSACTION_ERROR.name)
+
+                error = ScreenState.NULL_TRANSACTION_ERROR
+                Log.e("LOL", error.name)
+
+                false
+            }
+
+            amount > fromWallet.balance -> {
+                Log.e("LOL", ScreenState.NOT_ENOUGH_MONEY_ERROR.name)
+
+                error = ScreenState.NOT_ENOUGH_MONEY_ERROR
+                Log.e("LOL", error.name)
+
+                false
+            }
+
+            else -> {
+                true
+            }
+
+        }
+    }
 }
 
-enum class WalletInitType {INIT, NOT_INIT}
+enum class ScreenState { SHORT_NAME_ERROR, SAME_WALLET_ERROR, NOT_ENOUGH_MONEY_ERROR, NULL_TRANSACTION_ERROR, }
+enum class WalletInitType { INIT, NOT_INIT }
 
 data class WalletUi(
     val initType: WalletInitType,
@@ -70,11 +120,11 @@ data class WalletUi(
     val userId: Int?,
     val name: String,
     val balanceLabel: String,
-    val balance : Float,
-    val iconId : Int
-){
-    companion object{
-        fun getInitWallet() : WalletUi{
+    val balance: Float,
+    val iconId: Int
+) {
+    companion object {
+        fun getInitWallet(): WalletUi {
             return WalletUi(
                 initType = WalletInitType.INIT,
                 id = null,

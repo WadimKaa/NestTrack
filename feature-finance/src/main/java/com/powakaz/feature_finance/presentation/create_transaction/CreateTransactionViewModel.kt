@@ -12,10 +12,13 @@ import com.powakaz.feature_finance.domain.usecase.GetCreateTransactionDataUseCas
 import com.powakaz.feature_finance.presentation.create_transaction.mapper.CategoryUiMapper
 import com.powakaz.feature_finance.presentation.create_transaction.mapper.WalletUiMapper
 import com.powakaz.feature_finance.presentation.create_transaction.model.CreateTransactionUiState
+import com.powakaz.feature_finance.presentation.create_transaction.model.ScreenState
 import com.powakaz.feature_finance.presentation.create_transaction.model.WalletDialogTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,6 +37,11 @@ sealed interface CreateTransactionEvent {
     object CloseDateDialog : CreateTransactionEvent
     object SaveDate : CreateTransactionEvent
     data class SelectTempDate(val tempLocalDate: LocalDate) : CreateTransactionEvent
+    object ClickSaveButton : CreateTransactionEvent
+}
+
+sealed interface UiEvent {
+    object ShowErrorToast : UiEvent
 }
 
 @HiltViewModel
@@ -44,7 +52,9 @@ class CreateTransactionViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-
+    private val _events = MutableSharedFlow<UiEvent>()
+    val events = _events.asSharedFlow()
+        
     private val _uiState = MutableStateFlow(CreateTransactionUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -182,6 +192,16 @@ class CreateTransactionViewModel @Inject constructor(
 
             is CreateTransactionEvent.SelectTempDate -> {
                 _uiState.update { it.copy(tempSelectedDate = createTransactionEvent.tempLocalDate) }
+            }
+
+            CreateTransactionEvent.ClickSaveButton -> {
+                if (_uiState.value.isCanSave){
+
+                }else{
+                    viewModelScope.launch {
+                        _events.emit(UiEvent.ShowErrorToast)
+                    }
+                }
             }
         }
     }

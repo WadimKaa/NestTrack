@@ -1,5 +1,7 @@
 package com.powakaz.feature_finance.presentation.create_transaction
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,7 +32,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -39,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +72,7 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.presentation.create_transaction.model.CategoryUi
 import com.powakaz.feature_finance.presentation.create_transaction.model.CreateTransactionUiState
+import com.powakaz.feature_finance.presentation.create_transaction.model.ScreenState
 import com.powakaz.feature_finance.presentation.create_transaction.model.WalletDialogTarget
 import com.powakaz.feature_finance.presentation.create_transaction.model.WalletInitType
 import com.powakaz.feature_finance.presentation.create_transaction.model.WalletUi
@@ -84,6 +88,25 @@ import java.util.Locale
 @Preview
 fun CreateTransactionScreenRoute(viewModel: CreateTransactionViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            if (event is UiEvent.ShowErrorToast) {
+                Log.e("LOL", uiState.error.toString())
+
+                val errorText = when (uiState.error) {
+                    ScreenState.SHORT_NAME_ERROR -> "Слишком короткое название"
+                    ScreenState.SAME_WALLET_ERROR -> "Выбраны одинаковые кошельки"
+                    ScreenState.NOT_ENOUGH_MONEY_ERROR -> "Недостаточно денег"
+                    ScreenState.NULL_TRANSACTION_ERROR -> "Введите сумму"
+                }
+
+                Toast.makeText(context, errorText, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     CreateTransactionScreen(uiState, viewModel::onEvent)
 }
 
@@ -187,7 +210,7 @@ fun CreateTransactionScreen(
                 SelectDate(uiState, onEvent)
             }
             item {
-                ButtonSaveTransaction()
+                ButtonSaveTransaction(uiState, onEvent)
             }
         }
     }
@@ -1201,16 +1224,23 @@ fun SelectDate(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEve
 
 
 @Composable
-fun ButtonSaveTransaction() {
+fun ButtonSaveTransaction(
+    uiState: CreateTransactionUiState,
+    onEvent: (CreateTransactionEvent) -> Unit
+) {
+    val containerColor = if (uiState.isCanSave) Color(0XFF6d3dfd) else Color(0XFFe8e8ec)
+    val textColor = if (uiState.isCanSave) Color(0xFFFFFFFF) else Color(0XFF959ab3)
+
     Button(
-        onClick = {}, colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0XFF6d3dfd)
+        onClick = { onEvent(CreateTransactionEvent.ClickSaveButton) },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor
         ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 12.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = "Создать транзакцию")
+        Text(text = "Создать транзакцию", color = textColor)
     }
 }
