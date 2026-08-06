@@ -10,7 +10,6 @@ import javax.inject.Inject
 
 class CategoryUiMapper @Inject constructor(@ApplicationContext private val context : Context) {
 
-
     fun map(category : Category) : CategoryUi{
         return CategoryUi(
             id = category.id,

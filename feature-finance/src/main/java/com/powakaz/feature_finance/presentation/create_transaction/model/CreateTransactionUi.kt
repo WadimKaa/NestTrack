@@ -1,10 +1,8 @@
 package com.powakaz.feature_finance.presentation.create_transaction.model
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
-import com.powakaz.feature_finance.domain.model.Currency
-import com.powakaz.feature_finance.domain.model.Wallet
-import com.powakaz.feature_finance.domain.model.WalletType
+import com.powakaz.feature_finance.R
+import com.powakaz.feature_finance.utils.UiText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -30,13 +28,13 @@ data class CreateTransactionUiState(
     private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yy", Locale("ru"))
 
     val clickDateLabel = if (selectedDate == todayDate) {
-        "(сегодня)"
+        UiText.StringResource(R.string.transaction_today_clicker)
     } else if (selectedDate == todayDate.minusDays(1)) {
-        "(вчера)"
+        UiText.StringResource(R.string.transaction_yesterday_clicker)
     } else if (selectedDate == todayDate.minusDays(2)) {
-        "(позавчера)"
+        UiText.StringResource(R.string.transaction_before_yesterday_clicker)
     } else {
-        ""
+        UiText.StringResource(R.string.transaction_null_clicker)
     }
 
     val MAX_NAME_LETTER_COUNT: Int = 20
@@ -48,16 +46,18 @@ data class CreateTransactionUiState(
     private fun createQuickActions(): List<QuickActionDate> {
         return listOf(
             QuickActionDate(
-                LocalDate.now(), "Сегодня", LocalDate.now().format(dateFormatter)
+                LocalDate.now(),
+                UiText.StringResource(R.string.transaction_today),
+                LocalDate.now().format(dateFormatter)
             ),
             QuickActionDate(
                 LocalDate.now().minusDays(1),
-                "Вчера",
+                UiText.StringResource(R.string.transaction_yesterday),
                 LocalDate.now().minusDays(1).format(dateFormatter)
             ),
             QuickActionDate(
                 LocalDate.now().minusDays(2),
-                "Позавчера",
+                UiText.StringResource(R.string.transaction_before_yesterday),
                 LocalDate.now().format(dateFormatter)
             )
         )
@@ -70,36 +70,22 @@ data class CreateTransactionUiState(
     private fun getSavePossibility(): Boolean {
         return when {
             letterCount <= MIN_NAME_LETTER_COUNT -> {
-                Log.e("LOL", ScreenState.SHORT_NAME_ERROR.name)
                 error = ScreenState.SHORT_NAME_ERROR
-                Log.e("LOL", error.name)
                 false
             }
 
             fromWallet.id == toWallet.id -> {
-                Log.e("LOL", ScreenState.SAME_WALLET_ERROR.name)
-
                 error = ScreenState.SAME_WALLET_ERROR
-                Log.e("LOL", error.name)
-
                 false
             }
 
             amount == 0 -> {
-                Log.e("LOL", ScreenState.NULL_TRANSACTION_ERROR.name)
-
                 error = ScreenState.NULL_TRANSACTION_ERROR
-                Log.e("LOL", error.name)
-
                 false
             }
 
             amount > fromWallet.balance -> {
-                Log.e("LOL", ScreenState.NOT_ENOUGH_MONEY_ERROR.name)
-
                 error = ScreenState.NOT_ENOUGH_MONEY_ERROR
-                Log.e("LOL", error.name)
-
                 false
             }
 
@@ -142,7 +128,7 @@ data class WalletUi(
 enum class WalletDialogTarget { FROM, TO }
 
 
-data class QuickActionDate(val localDate: LocalDate, val label: String, val readableDate: String)
+data class QuickActionDate(val localDate: LocalDate, val label: UiText.StringResource, val readableDate: String)
 
 
 data class CategoryUi(

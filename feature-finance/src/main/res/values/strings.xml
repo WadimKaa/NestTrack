@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="transaction_short_name">Слишком короткое название</string>
+    <string name="transaction_same_wallets">Выбраны одинаковые кошельки</string>
+    <string name="transaction_not_enough_money">Недостаточно денег</string>
+    <string name="transaction_null_transaction">Введите сумму</string>
+    <string name="transaction_wallet">Кошелек</string>
+    <string name="transaction_sum">Сумма</string>
+    <string name="transaction_category">Категория</string>
+    <string name="transaction_date">Дата</string>
+    <string name="transaction_choise_date">Выберите дату</string>
+    <string name="transaction_choise_date_label">Выбрать дату</string>
+    <string name="transaction_cancel">Отмена</string>
+    <string name="transaction_quick_choise">Быстрый выбор</string>
+    <string name="transaction_category_label">Категория</string>
+    <string name="transaction_choise_category_transaction">Выберите категорию перевода</string>
+    <string name="transaction_from">Откуда</string>
+    <string name="transaction_to">Куда</string>
+    <string name="transaction_choise_wallet">Выберите кошелек</string>
+    <string name="transaction_creating">Создание транзакции</string>
+    <string name="transaction_name">Название</string>
+    <string name="transaction_input_name">Введите название</string>
+    <string name="transaction_with_byn">%1$s BYN</string>
+    <string name="transaction_0_byn">0 BYN</string>
+    <string name="transaction_available_amount">Доступно для перевода:</string>
+    <string name="transactions_dots">...</string>
+    <string name="transactions_loading">Загрузка</string>
+    <string name="transaction_plus_byn">+%1$d BYN</string>
+    <string name="transaction_create_transaction">Создать транзакцию</string>
+    <string name="transaction_inifinity">∞</string>
+    <string name="transaction_today_clicker">(сегодня)</string>
+    <string name="transaction_yesterday_clicker">(вчера)</string>
+    <string name="transaction_before_yesterday_clicker">(позавчера)</string>
+    <string name="transaction_null_clicker"></string>
+
+
+    <string name="transaction_today">Сегодня</string>
+    <string name="transaction_yesterday">Вчера</string>
+    <string name="transaction_before_yesterday">Позавчера</string>
+</resources>

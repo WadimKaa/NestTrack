@@ -11,14 +11,13 @@ import javax.inject.Inject
 
 class WalletUiMapper @Inject constructor(@ApplicationContext private val context: Context) {
 
-
     fun map(wallet : Wallet) : WalletUi{
         return WalletUi(
             initType = WalletInitType.NOT_INIT,
             id = wallet.id,
             userId = wallet.userId,
             name = wallet.name,
-            balanceLabel = if (wallet.id == null) "∞" else wallet.balance.toInt().toString(),
+            balanceLabel = if (wallet.id == null) context.getString(R.string.transaction_inifinity) else wallet.balance.toInt().toString(),
             balance = wallet.balance,
             iconId = when (wallet.type) {
                 WalletType.CARD -> R.drawable.ic_card

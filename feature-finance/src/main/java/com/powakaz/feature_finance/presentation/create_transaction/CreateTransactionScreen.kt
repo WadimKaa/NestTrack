@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -96,10 +97,10 @@ fun CreateTransactionScreenRoute(viewModel: CreateTransactionViewModel = hiltVie
                 Log.e("LOL", uiState.error.toString())
 
                 val errorText = when (uiState.error) {
-                    ScreenState.SHORT_NAME_ERROR -> "Слишком короткое название"
-                    ScreenState.SAME_WALLET_ERROR -> "Выбраны одинаковые кошельки"
-                    ScreenState.NOT_ENOUGH_MONEY_ERROR -> "Недостаточно денег"
-                    ScreenState.NULL_TRANSACTION_ERROR -> "Введите сумму"
+                    ScreenState.SHORT_NAME_ERROR -> context.getString(R.string.transaction_short_name)
+                    ScreenState.SAME_WALLET_ERROR -> context.getString(R.string.transaction_same_wallets)
+                    ScreenState.NOT_ENOUGH_MONEY_ERROR -> context.getString(R.string.transaction_not_enough_money)
+                    ScreenState.NULL_TRANSACTION_ERROR -> context.getString(R.string.transaction_null_transaction)
                 }
 
                 Toast.makeText(context, errorText, Toast.LENGTH_LONG).show()
@@ -167,19 +168,19 @@ fun CreateTransactionScreen(
                 NameTransactionCard(uiState, onEvent)
             }
             item {
-                Label("Кошелек")
+                Label(stringResource(R.string.transaction_wallet))
             }
             item {
                 WalletsCard(uiState, onEvent)
             }
             item {
-                Label("Сумма")
+                Label(stringResource(R.string.transaction_sum))
             }
             item {
                 InputSum(uiState.amount, onEvent)
             }
             item {
-                Label("Категория")
+                Label(stringResource(R.string.transaction_category))
             }
             items(items = categoryRow, key = { it.first().id }) { row ->
                 Row(
@@ -204,7 +205,7 @@ fun CreateTransactionScreen(
                 }
             }
             item {
-                Label("Дата")
+                Label(stringResource(R.string.transaction_date))
             }
             item {
                 SelectDate(uiState, onEvent)
@@ -271,7 +272,7 @@ fun DateBottomSheet(uiState: CreateTransactionUiState, onEvent: (CreateTransacti
         }) {
         Column {
             Text(
-                text = "Выберите дату",
+                text = stringResource(R.string.transaction_choise_date),
                 color = Color(0XFF042154),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
@@ -311,11 +312,11 @@ fun DateBottomSheet(uiState: CreateTransactionUiState, onEvent: (CreateTransacti
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = "Выбрать дату", color = Color.White, fontWeight = FontWeight.SemiBold)
+                Text(text = stringResource(R.string.transaction_choise_date_label), color = Color.White, fontWeight = FontWeight.SemiBold)
             }
 
             Text(
-                text = "Отмена",
+                text = stringResource(R.string.transaction_cancel),
                 color = Color(0XFF7047f8),
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -339,7 +340,7 @@ fun DateBottomSheet(uiState: CreateTransactionUiState, onEvent: (CreateTransacti
 @Composable
 fun QuickDateSelect(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
     Text(
-        text = "Быстрый выбор",
+        text = stringResource(R.string.transaction_quick_choise),
         color = Color(0XFF575e7d),
         modifier = Modifier.padding(start = 16.dp)
     )
@@ -394,7 +395,7 @@ fun QuickDateSelectItem(
 
             Column(modifier = Modifier.padding(start = 8.dp)) {
                 Text(
-                    text = uiState.quickDateActions[index].label,
+                    text = stringResource(uiState.quickDateActions[index].label.resId),
                     color = textColor,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
@@ -568,14 +569,14 @@ fun ChoiceCategoryDialog() {
                 )
                 Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
                     Text(
-                        text = "Категория",
+                        text = stringResource(R.string.transaction_category_label),
                         color = Color(0XFF042154),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
                         modifier = Modifier.padding(top = 16.dp)
                     )
                     Text(
-                        text = "Выберите категорию перевода",
+                        text = stringResource(R.string.transaction_choise_category_transaction),
                         color = Color(0XFF7a8198),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp,
@@ -621,7 +622,7 @@ fun CategoryItem() {
         )
 
         Text(
-            text = "Умный дом",
+            text = "",
             fontSize = 14.sp,
             color = Color(0XFF14274e),
             fontWeight = FontWeight.SemiBold,
@@ -648,7 +649,9 @@ fun ChoiceWalletDialog(
     onEvent: (CreateTransactionEvent) -> Unit
 ) {
     val destinationType =
-        if (uiState.walletDialogTarget == WalletDialogTarget.FROM) "Откуда" else "Куда"
+        if (uiState.walletDialogTarget == WalletDialogTarget.FROM) stringResource(R.string.transaction_from) else stringResource(
+            R.string.transaction_to
+        )
     val currentWalletId =
         if (uiState.walletDialogTarget == WalletDialogTarget.FROM) uiState.fromWallet.id else uiState.toWallet.id
 
@@ -679,7 +682,7 @@ fun ChoiceWalletDialog(
                         modifier = Modifier.padding(top = 16.dp)
                     )
                     Text(
-                        text = "Выберите кошелек",
+                        text = stringResource(R.string.transaction_choise_wallet),
                         color = Color(0XFF7a8198),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp,
@@ -787,7 +790,7 @@ fun CreateTransactionTopBar() {
                 .size(36.dp)
         )
         Text(
-            text = "Создание транзакции",
+            text = stringResource(R.string.transaction_creating),
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(start = 16.dp),
@@ -818,7 +821,7 @@ fun NameTransactionCard(
     ) {
         Column {
             Text(
-                text = "Название",
+                text = stringResource(R.string.transaction_name),
                 color = Color(0XFF14274e),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
@@ -846,7 +849,7 @@ fun NameTransactionCard(
                         .padding(start = 16.dp, end = 16.dp)
                         .fillMaxWidth(),
                     placeholder = {
-                        Text(text = "Введите название", color = Color(0XFF9599ae))
+                        Text(text = stringResource(R.string.transaction_input_name), color = Color(0XFF9599ae))
                     },
                     trailingIcon = {
                         if (uiState.letterCount > 0) {
@@ -880,7 +883,10 @@ fun NameTransactionCard(
 @Composable
 fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEvent) -> Unit) {
     val availableMoneyText =
-        if (uiState.fromWallet.initType != WalletInitType.INIT) "${uiState.fromWallet.balanceLabel} BYN" else "0 BYN"
+        if (uiState.fromWallet.initType != WalletInitType.INIT) stringResource(
+            R.string.transaction_with_byn,
+            uiState.fromWallet.balanceLabel
+        ) else stringResource(R.string.transaction_0_byn)
     val availableMoneyTextColor =
         if (uiState.fromWallet.balance == 0f) Color(0xFFFD7AB3) else Color(0XFFa17afd)
 
@@ -908,7 +914,7 @@ fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEv
                     .padding(start = 8.dp, end = 8.dp, top = 12.dp)
             ) {
                 WalletCard(
-                    "Откуда", uiState.fromWallet, Modifier.weight(1f), onEvent
+                    stringResource(R.string.transaction_from), uiState.fromWallet, Modifier.weight(1f), onEvent
                 )
                 Box(
                     modifier = Modifier
@@ -928,7 +934,7 @@ fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEv
                     )
                 }
                 WalletCard(
-                    "Куда",
+                    stringResource(R.string.transaction_to),
                     uiState.toWallet,
                     Modifier.weight(1f),
                     onEvent
@@ -942,7 +948,7 @@ fun WalletsCard(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEv
                     .background(color = Color(0XFFf4effd), shape = RoundedCornerShape(8.dp))
             ) {
                 Text(
-                    text = "Доступно для перевода:",
+                    text = stringResource(R.string.transaction_available_amount),
                     color = Color(0XFF9599ae),
                     modifier = Modifier.padding(start = 18.dp, top = 12.dp, bottom = 12.dp)
                 )
@@ -966,10 +972,12 @@ fun WalletCard(
     onEvent: (CreateTransactionEvent) -> Unit
 ) {
     val icon = if (wallet.initType != WalletInitType.INIT) wallet.iconId else R.drawable.ic_cash
-    val balance = if (wallet.initType != WalletInitType.INIT) wallet.balanceLabel else "..."
-    val walletName = if (wallet.initType != WalletInitType.INIT) wallet.name else "Загрузка"
+    val balance = if (wallet.initType != WalletInitType.INIT) wallet.balanceLabel else stringResource(
+        R.string.transactions_dots
+    )
+    val walletName = if (wallet.initType != WalletInitType.INIT) wallet.name else stringResource(R.string.transactions_loading)
 
-    val type = if (destination == "Откуда") WalletDialogTarget.FROM else WalletDialogTarget.TO
+    val type = if (destination == stringResource(R.string.transaction_from)) WalletDialogTarget.FROM else WalletDialogTarget.TO
 
     Column(modifier = modifier) {
         Text(
@@ -1109,7 +1117,7 @@ fun SumCard(sum: Int, modifier: Modifier, onEvent: (CreateTransactionEvent) -> U
             .clickable(onClick = { onEvent(CreateTransactionEvent.IncreaseAmount(sum)) })
     ) {
         Text(
-            text = "+$sum BYN",
+            text = stringResource(R.string.transaction_plus_byn, sum),
             color = Color(0XFF793ffc),
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
@@ -1202,7 +1210,7 @@ fun SelectDate(uiState: CreateTransactionUiState, onEvent: (CreateTransactionEve
                 .padding(start = 16.dp)
         )
         Text(
-            text = uiState.clickDateLabel,
+            text = stringResource(uiState.clickDateLabel.resId),
             color = Color(0XFF9599ae),
             fontSize = 12.sp,
             modifier = Modifier
@@ -1241,6 +1249,6 @@ fun ButtonSaveTransaction(
             .padding(start = 16.dp, end = 16.dp, top = 12.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = "Создать транзакцию", color = textColor)
+        Text(text = stringResource(R.string.transaction_create_transaction), color = textColor)
     }
 }
