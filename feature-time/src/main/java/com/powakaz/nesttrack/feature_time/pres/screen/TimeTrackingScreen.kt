@@ -564,10 +564,11 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState, avat
                         size = (40.dp),
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .offset(x = 18.dp, y = 10.dp)
+                            .offset(x = 18.dp, y = 10.dp),
                     )
                 }
             }
+
             when (avatar2) {
                 Avatar.Default -> {
 

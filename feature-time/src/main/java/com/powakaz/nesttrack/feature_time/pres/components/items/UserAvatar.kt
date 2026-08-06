@@ -29,7 +29,7 @@ import com.powakaz.nesttrack.feature_time.domain.model.avatar.Avatar
 fun UserAvatar(
     icon: String,
     size: Dp,
-    modifier: Modifier,
+    modifier: Modifier
 ) {
     UserAvatarContent(icon, size, modifier)
 }
@@ -54,12 +54,9 @@ fun UserAvatarContent(icon: String, size: Dp, modifier: Modifier) {
             model = icon,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.ic_walk_activities),
+
             error = painterResource(R.drawable.ic_walk_activities),
-            modifier = Modifier.fillMaxSize(),
-            onError = { state ->
-                Log.e("AvatarError", "Failed to load image: ${state.result.throwable}") },
-            onSuccess = { Log.d("AvatarError", "Image loaded successfully!")}
+            modifier = Modifier.fillMaxSize()
         )
     }
 }

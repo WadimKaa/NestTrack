@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.util.CoilUtils
 import coil3.util.CoilUtils.result
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.core_network.model.NetworkResult.*
@@ -65,15 +66,10 @@ class TimeTrackingScreenViewModel @Inject constructor(
                             val activitiesList = result.activities
                             val concessionList = result.concessions.dataConcession
                             val usersProfile = result.users
-                            val myId = result.myId
+                            val creditorUserId = result.timeBalance.first().userIdWith
 
+                            val (avatarCreditor, avatarDebitor) = avatarsBalance(usersProfile, creditorUserId)
 
-                            var avatarMap: Map<Int, Avatar?> = emptyMap()
-
-                            avatarMap = result.users.associate { profile ->
-                                profile.id to profile.avatarUrl
-                            }
-                            Log.e("LOL", avatarMap.toString())
 
                             _uiState.update {
                                 it.copy(
@@ -85,8 +81,8 @@ class TimeTrackingScreenViewModel @Inject constructor(
                                     concessionList = concessionList.map { concession ->
                                         concession.toUi()
                                     },
-                                    avatar1 = avatarMap[1] ?: Avatar.Default,
-                                    avatar2 = avatarMap[2]?: Avatar.Default //result.timeBalance.first().userIdWith]
+                                    avatar1 = avatarCreditor,
+                                    avatar2 = avatarDebitor
                                 )
                             }
                         }
@@ -97,6 +93,19 @@ class TimeTrackingScreenViewModel @Inject constructor(
             loadTimeTrackingUseCase()
         }
     }
+}
+fun avatarsBalance(usersProfile: List<UserProfile>, creditorUserId: Int) : Pair<Avatar, Avatar>{
+    var avatarMap: Map<Int, Avatar?> = emptyMap()
+
+    avatarMap = usersProfile.associate { profile ->
+        profile.id to profile.avatarUrl
+    }
+
+    val avatarCreditor = avatarMap[creditorUserId] ?: Avatar.Default
+    val debtorUserId = avatarMap.keys.first{it != creditorUserId}
+    val avatarDebitor = avatarMap[debtorUserId] ?: Avatar.Default
+
+    return Pair(avatarCreditor, avatarDebitor)
 }
 
 fun mapBalance(timeBalance: Double): BalanceState {
