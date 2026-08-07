@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import com.powakaz.nesttrack.feature_time.domain.model.activities.Activities
 import com.powakaz.nesttrack.feature_time.domain.model.Concession
+import com.powakaz.nesttrack.feature_time.domain.model.avatar.Avatar
 import com.powakaz.nesttrack.feature_time.pres.model.ActivitiesUi
 import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.formatter.DateFormatter
@@ -13,7 +14,10 @@ import com.powakaz.nesttrack.feature_time.pres.utils.formatter.DateFormatter.for
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun Concession.toUi() = ConcessionUi(
+fun Concession.toUi(
+    giverAvatar: Avatar,
+    receiverAvatar: Avatar
+) = ConcessionUi(
     id = id,
     giverName = giverName,
     receiverName = receiverName,
@@ -24,7 +28,9 @@ fun Concession.toUi() = ConcessionUi(
     description = description,
     createdAt = createdAt,
     activityBackgroundColor = activityIconColor.findActivitiesColorToUi(alpha = 0.2f),
-    activityDate = formatDate(activityDate) // форматируем
+    activityDate = formatDate(activityDate),
+    giverAvatar = giverAvatar,
+    receiverAvatar = receiverAvatar
 )
 
 fun Activities.toUi() = ActivitiesUi(

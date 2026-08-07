@@ -1,6 +1,7 @@
 package com.powakaz.nesttrack.feature_time.pres.screen
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -58,15 +59,30 @@ class TimeTrackingScreenViewModel @Inject constructor(
                             val (avatarCreditor, avatarDebitor) = avatarsBalance(usersProfile, myId, timeBalance)
 
 
+
+
+                           // Log.e("LOL", usersProfile.toString())
+                            //Log.e("LOL", concessionList.toString())
+
+
+                            val usersByName = usersProfile.associateBy { it.name }
+
                             _uiState.update {
                                 it.copy(
                                     timeBalance = DateFormatter.formatDurationHours(timeBalance),
                                     activitiesList = activitiesList.map { activities ->
                                         activities.toUi()
                                     },
-                                    currentBalanceState = mapBalance(timeBalance), //.currentBalanceState
+                                    currentBalanceState = mapBalance(timeBalance),
                                     concessionList = concessionList.map { concession ->
-                                        concession.toUi()
+
+                                        val giver = usersByName[concession.giverName]
+                                        val receiver = usersByName[concession.receiverName]
+
+                                        concession.toUi(
+                                            giverAvatar = giver!!.avatarUrl,
+                                            receiverAvatar = receiver!!.avatarUrl
+                                        )
                                     },
                                     avatarCreditor = avatarCreditor,
                                     avatarDebitor = avatarDebitor

@@ -185,7 +185,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
         }
 
         items(uiState.concessionList) { concessionItem ->
-            ShowListConcession(concessionItem, context)
+            ShowListConcession(concessionItem, context, concessionItem.giverAvatar, concessionItem.receiverAvatar)
         }
     }
 
@@ -219,7 +219,7 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
 }
 
 @Composable
-fun ShowListConcession(concessionItem: ConcessionUi, context: Context) {
+fun ShowListConcession(concessionItem: ConcessionUi, context: Context, giverAvatar: Avatar, receiverAvatar: Avatar) {
 
     Row(
         modifier = Modifier
@@ -320,11 +320,41 @@ fun ShowListConcession(concessionItem: ConcessionUi, context: Context) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        /*UserAvatar(
-            icon = ,
-            size = (30.dp),
-            modifier = Modifier
-        )*/
+        when (giverAvatar) {
+            is Avatar.Default -> {
+
+                val avatar = mapDefaultAvatar(giverAvatar.id)
+
+                Image(
+                    painter = painterResource(id = avatar.avatarRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.linearGradient(
+                                avatar.gradient
+                            )
+                        )
+                        .border(
+                            1.dp,
+                            Color(0xFF835EFF),
+                            CircleShape
+                        )
+                )
+            }
+
+            is Avatar.Remote -> {
+                UserAvatar(
+                    icon = giverAvatar.url,
+                    size = (30.dp),
+                    modifier = Modifier
+                )
+            }
+
+            else -> {}
+        }
 
         Spacer(modifier = Modifier.width(2.dp))
 
@@ -336,11 +366,41 @@ fun ShowListConcession(concessionItem: ConcessionUi, context: Context) {
 
         Spacer(modifier = Modifier.width(2.dp))
 
-       /* UserAvatar(
-            icon = "",
-            size = (30.dp),
-            modifier = Modifier
-        )*/
+        when (receiverAvatar) {
+            is Avatar.Default -> {
+
+                val avatar = mapDefaultAvatar(receiverAvatar.id)
+
+                Image(
+                    painter = painterResource(id = avatar.avatarRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(
+                            brush = Brush.linearGradient(
+                                avatar.gradient
+                            )
+                        )
+                        .border(
+                            1.dp,
+                            Color(0xFF835EFF),
+                            CircleShape
+                        )
+                )
+            }
+
+            is Avatar.Remote -> {
+                UserAvatar(
+                    icon = receiverAvatar.url,
+                    size = (30.dp),
+                    modifier = Modifier
+                )
+            }
+
+            else -> {}
+        }
 
         Spacer(modifier = Modifier.width(2.dp))
 
@@ -665,11 +725,11 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState, avat
 fun TimeTrackingScreenPreview() {
     TimeTrackingScreenContent(
         uiState = TimeTrackingUiState(
-            timeBalance = TODO(),
-            currentBalanceState = TODO(),
-            activitiesList = TODO(),
-            concessionList = TODO(),
-            usersProfile = TODO(),
+            timeBalance = "",
+            currentBalanceState = BalanceState.BALANCE,
+            activitiesList = listOf(),
+            concessionList = listOf(),
+            usersProfile = listOf(),
         ),
         context = LocalContext.current
     )
