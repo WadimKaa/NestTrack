@@ -8,9 +8,11 @@ import com.powakaz.feature_finance.domain.constants.FinanceConstants
 import com.powakaz.feature_finance.domain.model.CreateTransactionData
 import com.powakaz.feature_finance.domain.model.Wallet
 import com.powakaz.feature_finance.domain.model.WalletType
+import com.powakaz.feature_finance.domain.usecase.CreateTransactionUseCase
 import com.powakaz.feature_finance.domain.usecase.GetCreateTransactionDataUseCase
 import com.powakaz.feature_finance.presentation.create_transaction.mapper.CategoryUiMapper
 import com.powakaz.feature_finance.presentation.create_transaction.mapper.WalletUiMapper
+import com.powakaz.feature_finance.presentation.create_transaction.mapper.toDomain
 import com.powakaz.feature_finance.presentation.create_transaction.model.CreateTransactionUiState
 import com.powakaz.feature_finance.presentation.create_transaction.model.ScreenState
 import com.powakaz.feature_finance.presentation.create_transaction.model.WalletDialogTarget
@@ -48,7 +50,8 @@ sealed interface UiEvent {
 class CreateTransactionViewModel @Inject constructor(
     private val getCreateTransactionDataUseCase: GetCreateTransactionDataUseCase,
     private val categoryUiMapper: CategoryUiMapper,
-    private val walletUiMapper: WalletUiMapper
+    private val walletUiMapper: WalletUiMapper,
+    private val createTransactionUseCase: CreateTransactionUseCase
 ) :
     ViewModel() {
 
@@ -196,7 +199,9 @@ class CreateTransactionViewModel @Inject constructor(
 
             CreateTransactionEvent.ClickSaveButton -> {
                 if (_uiState.value.isCanSave){
-
+                    viewModelScope.launch {
+                        createTransactionUseCase(_uiState.value.toDomain())
+                    }
                 }else{
                     viewModelScope.launch {
                         _events.emit(UiEvent.ShowErrorToast)
