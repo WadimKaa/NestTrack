@@ -44,7 +44,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk)
     implementation(project(":feature-auth"))
     implementation(project(":feature-home"))
-    //implementation(project(":feature-finance"))
+    implementation(project(":feature-finance"))
     implementation(project(":core-common"))
     implementation(project(":core-network"))
     implementation(project(":navigation-api"))

@@ -22,21 +22,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.powakaz.feature_finance.presentation.create_transaction.CreateTransactionScreenRoute
+import com.powakaz.feature_finance.presentation.dashboard.FinanceDashboardActions
+import com.powakaz.feature_finance.presentation.dashboard.FinanceDashboardScreenRoute
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()){
+fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel(), onAction: (FinanceDashboardActions) -> Unit){
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeScreenContent(homeScreenUiState = state, onEvent = viewModel::onEvent)
+    HomeScreenContent(homeScreenUiState = state, onEvent = viewModel::onEvent, onAction)
 }
 
 
 @Preview
 @Composable
 fun PreviewHomeScreen(){
-    HomeScreenContent(HomeScreenUiState(), {})
+    HomeScreenContent(HomeScreenUiState(), {}, {})
 }
 
 data class BottomNavItem(
@@ -54,7 +55,11 @@ val navItems = listOf(
 
 
 @Composable
-fun HomeScreenContent(homeScreenUiState: HomeScreenUiState, onEvent: (HomeScreenUiEvent) -> Unit){
+fun HomeScreenContent(
+    homeScreenUiState: HomeScreenUiState,
+    onEvent: (HomeScreenUiEvent) -> Unit,
+    onAction: (FinanceDashboardActions) -> Unit
+){
     Scaffold(
         bottomBar = {
             NavigationBar(
@@ -89,7 +94,7 @@ fun HomeScreenContent(homeScreenUiState: HomeScreenUiState, onEvent: (HomeScreen
             contentAlignment = Alignment.Center
         ) {
             when(homeScreenUiState.selectedItem){
-                0 -> CreateTransactionScreenRoute()
+                0 -> FinanceDashboardScreenRoute(onAction = onAction)
             }
         }
     }

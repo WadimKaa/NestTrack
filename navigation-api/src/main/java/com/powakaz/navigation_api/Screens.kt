@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 sealed interface Screens {
     @Serializable object LoginScreen : Screens
     @Serializable object HomeScreen : Screens
-
+    @Serializable data class CreateTransactionScreen(val transactionType : TransactionScreenType) : Screens
 }

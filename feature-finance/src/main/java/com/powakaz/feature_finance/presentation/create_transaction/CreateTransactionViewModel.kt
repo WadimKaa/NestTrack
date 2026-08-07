@@ -1,8 +1,10 @@
 package com.powakaz.feature_finance.presentation.create_transaction
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.powakaz.core_network.model.NetworkResult
 import com.powakaz.feature_finance.domain.constants.FinanceConstants
 import com.powakaz.feature_finance.domain.model.CreateTransactionData
@@ -16,6 +18,9 @@ import com.powakaz.feature_finance.presentation.create_transaction.mapper.toDoma
 import com.powakaz.feature_finance.presentation.create_transaction.model.CreateTransactionUiState
 import com.powakaz.feature_finance.presentation.create_transaction.model.ScreenState
 import com.powakaz.feature_finance.presentation.create_transaction.model.WalletDialogTarget
+import com.powakaz.feature_finance.presentation.create_transaction.model.WalletUi
+import com.powakaz.navigation_api.Screens
+import com.powakaz.navigation_api.TransactionScreenType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -48,6 +53,7 @@ sealed interface UiEvent {
 
 @HiltViewModel
 class CreateTransactionViewModel @Inject constructor(
+    saveStateHandle: SavedStateHandle,
     private val getCreateTransactionDataUseCase: GetCreateTransactionDataUseCase,
     private val categoryUiMapper: CategoryUiMapper,
     private val walletUiMapper: WalletUiMapper,
@@ -57,9 +63,14 @@ class CreateTransactionViewModel @Inject constructor(
 
     private val _events = MutableSharedFlow<UiEvent>()
     val events = _events.asSharedFlow()
-        
+
     private val _uiState = MutableStateFlow(CreateTransactionUiState())
     val uiState = _uiState.asStateFlow()
+
+    val transactionScreenType =
+        saveStateHandle.toRoute<Screens.CreateTransactionScreen>().transactionType
+
+
 
 
     init {
@@ -77,14 +88,48 @@ class CreateTransactionViewModel @Inject constructor(
                         it.copy(
                             wallets = result.data.wallets.map { walletUiMapper.map(it) },
                             categories = result.data.categories.map { categoryUiMapper.map(it) },
-                            fromWallet = walletUiMapper.map(result.data.wallets.find { it.userId == result.data.userId && it.type == WalletType.CASH }
-                                ?: Wallet.getExternalWallet()),
-                            toWallet = walletUiMapper.map(result.data.wallets.find { it.id == FinanceConstants.WEEKLY_WALLET_ID }
-                                ?: Wallet.getExternalWallet()),
+                            fromWallet = getFromWallet(result.data) ,
+                            toWallet = getToWallet(result.data),
                             selectedCategoryIndex = result.data.categories.first().id
                         )
                     }
                 }
+            }
+        }
+    }
+
+
+    private fun getFromWallet(data: CreateTransactionData): WalletUi {
+        return when (transactionScreenType) {
+            TransactionScreenType.OUTCOME -> {
+                walletUiMapper.map(data.wallets.find { it.userId == data.userId && it.type == WalletType.CASH }
+                    ?: Wallet.getExternalWallet())
+            }
+            TransactionScreenType.INCOME -> {
+                walletUiMapper.map(data.wallets.find { it.type == WalletType.OUTSIDE }
+                    ?: Wallet.getExternalWallet())
+            }
+            TransactionScreenType.BETWEEN_WALLETS -> {
+                walletUiMapper.map(data.wallets.find { it.userId == data.userId && it.type == WalletType.CASH }
+                    ?: Wallet.getExternalWallet())
+            }
+        }
+    }
+
+
+    private fun getToWallet(data: CreateTransactionData): WalletUi {
+        return when (transactionScreenType) {
+            TransactionScreenType.OUTCOME -> {
+                walletUiMapper.map(data.wallets.find { it.type == WalletType.OUTSIDE }
+                    ?: Wallet.getExternalWallet())
+            }
+            TransactionScreenType.INCOME -> {
+                walletUiMapper.map(data.wallets.find { it.userId == data.userId && it.type == WalletType.CASH }
+                    ?: Wallet.getExternalWallet())
+            }
+            TransactionScreenType.BETWEEN_WALLETS -> {
+                walletUiMapper.map(data.wallets.find { it.userId != data.userId && it.type == WalletType.CASH }
+                    ?: Wallet.getExternalWallet())
             }
         }
     }
@@ -198,11 +243,11 @@ class CreateTransactionViewModel @Inject constructor(
             }
 
             CreateTransactionEvent.ClickSaveButton -> {
-                if (_uiState.value.isCanSave){
+                if (_uiState.value.isCanSave) {
                     viewModelScope.launch {
                         createTransactionUseCase(_uiState.value.toDomain())
                     }
-                }else{
+                } else {
                     viewModelScope.launch {
                         _events.emit(UiEvent.ShowErrorToast)
                     }

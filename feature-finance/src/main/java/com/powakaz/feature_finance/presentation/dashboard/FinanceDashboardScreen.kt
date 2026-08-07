@@ -39,52 +39,62 @@ import com.powakaz.feature_finance.R
 import com.powakaz.feature_finance.domain.model.WalletType
 import com.powakaz.feature_finance.presentation.dashboard.model.FinanceDayUiState
 import com.powakaz.feature_finance.presentation.dashboard.model.TransactionUiState
+import com.powakaz.navigation_api.TransactionScreenType
+
+
+sealed interface FinanceDashboardActions {
+    data class OnCreateTransaction(val typeTransaction: TransactionScreenType) : FinanceDashboardActions
+}
 
 @Composable
-fun FinanceDashboardScreenRoute(viewModel: FinanceDashboardViewModel = hiltViewModel()) {
+fun FinanceDashboardScreenRoute(
+    viewModel: FinanceDashboardViewModel = hiltViewModel(),
+    onAction: (FinanceDashboardActions) -> Unit
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    FinanceDashboardScreen(state)
+    FinanceDashboardScreen(state, onAction)
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun FinanceDashboardScreenPreview() {
-    FinanceDashboardScreen(FinDashboardUiState())
+    FinanceDashboardScreen(FinDashboardUiState(), {})
 }
 
 
-
-
 @Composable
-fun FinanceDashboardScreen(uiState: FinDashboardUiState) {
-        LazyColumn() {
-            item {
-                TopBar()
-            }
-            item {
-                Head(uiState.userBalance, uiState.weekBalance, uiState.progressWeekBalance)
-            }
-            item {
-                Wallets(uiState.cashBalance, uiState.cardBalance)
-            }
-            item {
-                QuickActions()
-            }
-            item {
-                Text(
-                    text = "Операции по дням",
-                    modifier = Modifier
-                        .padding(start = 16.dp, top = 12.dp),
-                    color = Color(0XFF071145),
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            items(items = uiState.listDays, key = { it.id}) {
-                OneDayCard(it)
-            }
-            item { Spacer(modifier = Modifier.height(4.dp)) }
+fun FinanceDashboardScreen(
+    uiState: FinDashboardUiState,
+    onAction: (FinanceDashboardActions) -> Unit
+) {
+    LazyColumn() {
+        item {
+            TopBar()
         }
+        item {
+            Head(uiState.userBalance, uiState.weekBalance, uiState.progressWeekBalance)
+        }
+        item {
+            Wallets(uiState.cashBalance, uiState.cardBalance)
+        }
+        item {
+            QuickActions(onAction)
+        }
+        item {
+            Text(
+                text = "Операции по дням",
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 12.dp),
+                color = Color(0XFF071145),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        items(items = uiState.listDays, key = { it.id }) {
+            OneDayCard(it)
+        }
+        item { Spacer(modifier = Modifier.height(4.dp)) }
+    }
 }
 
 
@@ -261,14 +271,18 @@ fun Wallets(cashBalance: String, cardBalance: String) {
             "Наличные",
             R.drawable.ic_cash,
             Color(0XFF67b667),
-            Modifier.fillMaxWidth(0.5f).padding(start = 16.dp, end = 8.dp)
+            Modifier
+                .fillMaxWidth(0.5f)
+                .padding(start = 16.dp, end = 8.dp)
         )
         WalletCard(
             cardBalance,
             "Безналичные",
             R.drawable.ic_card,
             Color(0XFF2d80ff),
-            Modifier.fillMaxWidth(1f).padding(end = 16.dp, start = 8.dp)
+            Modifier
+                .fillMaxWidth(1f)
+                .padding(end = 16.dp, start = 8.dp)
         )
     }
 }
@@ -355,9 +369,8 @@ fun WalletCard(
     }
 }
 
-
 @Composable
-fun QuickActions() {
+fun QuickActions(onAction: (FinanceDashboardActions) -> Unit) {
     Text(
         text = "Быстрые действия",
         modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 8.dp),
@@ -371,28 +384,47 @@ fun QuickActions() {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         QuicAction(
-            "Расход",
-            Color(0xFFFC665B),
-            R.drawable.ic_arrow_down,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            onAction,
+            TransactionScreenType.OUTCOME
         )
         QuicAction(
-            "Доход",
-            Color(0XFF50ae68),
-            R.drawable.ic_plus,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            onAction,
+            TransactionScreenType.INCOME
         )
         QuicAction(
-            "Перевод",
-            Color(0XFF9650fc),
-            R.drawable.ic_double_arrows,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            onAction,
+            TransactionScreenType.BETWEEN_WALLETS
         )
     }
 }
 
 @Composable
-fun QuicAction(text: String, color: Color, iconId: Int, modifier: Modifier) {
+fun QuicAction(
+    modifier: Modifier,
+    onAction: (FinanceDashboardActions) -> Unit,
+    transactionScreenType: TransactionScreenType
+) {
+    val text = when(transactionScreenType){
+        TransactionScreenType.OUTCOME -> "Расход"
+        TransactionScreenType.INCOME -> "Доход"
+        TransactionScreenType.BETWEEN_WALLETS -> "Перевод"
+    }
+
+    val color = when(transactionScreenType){
+        TransactionScreenType.OUTCOME -> Color(0xFFFC665B)
+        TransactionScreenType.INCOME -> Color(0XFF50ae68)
+        TransactionScreenType.BETWEEN_WALLETS -> Color(0XFF9650fc)
+    }
+    
+    val iconId = when(transactionScreenType){
+        TransactionScreenType.OUTCOME -> R.drawable.ic_arrow_down
+        TransactionScreenType.INCOME -> R.drawable.ic_plus
+        TransactionScreenType.BETWEEN_WALLETS -> R.drawable.ic_double_arrows
+    }
+
     Card(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 0.5.dp
@@ -401,7 +433,8 @@ fun QuicAction(text: String, color: Color, iconId: Int, modifier: Modifier) {
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
-        modifier = modifier
+        modifier = modifier,
+        onClick = { onAction(FinanceDashboardActions.OnCreateTransaction(transactionScreenType)) }
     ) {
         Column(
             modifier = Modifier

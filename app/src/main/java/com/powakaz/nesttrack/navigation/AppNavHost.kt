@@ -6,7 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.powakaz.feature_auth.presentation.LoginScreen
+import com.powakaz.feature_finance.presentation.create_transaction.CreateTransactionScreenRoute
+import com.powakaz.feature_finance.presentation.dashboard.FinanceDashboardActions
 import com.powakaz.feature_home.HomeScreen
 import com.powakaz.navigation_api.Screens
 import com.powakaz.nesttrack.presentation.LoginState
@@ -46,7 +49,20 @@ fun AppNavHost(
         }
 
         composable<Screens.HomeScreen> {
-            HomeScreen()
+            HomeScreen(
+                onAction = { it ->
+                    when(it){
+                        is FinanceDashboardActions.OnCreateTransaction -> {
+                            navController.navigate(Screens.CreateTransactionScreen(it.typeTransaction))
+                        }
+                    }
+                }
+            )
+        }
+
+
+        composable<Screens.CreateTransactionScreen>{backStackEntry ->
+            CreateTransactionScreenRoute()
         }
     }
 
