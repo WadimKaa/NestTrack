@@ -2,10 +2,9 @@ package com.powakaz.nesttrack.feature_time.pres.utils.mapper
 
 import androidx.compose.ui.graphics.Color
 import com.powakaz.nesttrack.feature_time.R
-import com.powakaz.nesttrack.feature_time.domain.model.avatar.Avatar
 import com.powakaz.nesttrack.feature_time.pres.model.AvatarUi
 
-fun mapDefaultAvatar(id: Int) : AvatarUi {
+fun mapDefaultAvatar(id: Int?) : AvatarUi {
 
     return when (id) {
         1 -> AvatarUi(

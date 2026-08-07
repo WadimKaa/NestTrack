@@ -118,8 +118,8 @@ fun TimeTrackingScreenContent(uiState: TimeTrackingUiState, context: Context) {
             ShowTimeBalance(
                 uiState.timeBalance,
                 uiState.currentBalanceState,
-                uiState.avatar1,
-                uiState.avatar2) // avatar1 = "", avatar2 = ""
+                uiState.avatarCreditor,
+                uiState.avatarDebitor) // avatar1 = "", avatar2 = ""
         }
 
         item {
@@ -532,9 +532,9 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState, avat
             )
 
             when (avatar1) {
-                Avatar.Default -> {
+                is Avatar.Default -> {
 
-                    val avatar = mapDefaultAvatar(1) ////!!!!!!
+                    val avatar = mapDefaultAvatar(avatar1.id)
 
                     Image(
                         painter = painterResource(id = avatar.avatarRes),
@@ -567,12 +567,14 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState, avat
                             .offset(x = 18.dp, y = 10.dp),
                     )
                 }
+
+                else -> {}
             }
 
             when (avatar2) {
-                Avatar.Default -> {
+                is Avatar.Default -> {
 
-                    val avatar = mapDefaultAvatar(2) ////!!!!!!
+                    val avatar = mapDefaultAvatar(avatar2.id)
 
                     Image(
                         painter = painterResource(id = avatar.avatarRes),
@@ -605,6 +607,8 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState, avat
                             .offset(x = (-20).dp, y = (-14).dp)
                     )
                 }
+
+                else -> {}
             }
         }
 
@@ -660,7 +664,13 @@ fun ShowTimeBalance(timeBalance: String, currentBalanceState: BalanceState, avat
 @Composable
 fun TimeTrackingScreenPreview() {
     TimeTrackingScreenContent(
-        uiState = TimeTrackingUiState(),
+        uiState = TimeTrackingUiState(
+            timeBalance = TODO(),
+            currentBalanceState = TODO(),
+            activitiesList = TODO(),
+            concessionList = TODO(),
+            usersProfile = TODO(),
+        ),
         context = LocalContext.current
     )
 }

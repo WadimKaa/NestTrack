@@ -1,19 +1,9 @@
 package com.powakaz.nesttrack.feature_time.pres.screen
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil3.util.CoilUtils
-import coil3.util.CoilUtils.result
-import com.powakaz.core_network.model.NetworkResult
-import com.powakaz.core_network.model.NetworkResult.*
-import com.powakaz.nesttrack.feature_time.data.mapper.toDomain
-import com.powakaz.nesttrack.feature_time.domain.model.activities.Activities
-import com.powakaz.nesttrack.feature_time.domain.model.Concession
-import com.powakaz.nesttrack.feature_time.domain.model.TimeBalance
-import com.powakaz.nesttrack.feature_time.domain.model.TimeData
 import com.powakaz.nesttrack.feature_time.domain.model.avatar.Avatar
 import com.powakaz.nesttrack.feature_time.domain.model.avatar.UserProfile
 import com.powakaz.nesttrack.feature_time.domain.usecase.LoadTimeTrackingUseCase
@@ -23,12 +13,9 @@ import com.powakaz.nesttrack.feature_time.pres.model.ConcessionUi
 import com.powakaz.nesttrack.feature_time.pres.utils.formatter.DateFormatter
 import com.powakaz.nesttrack.feature_time.pres.utils.mapper.toUi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -66,9 +53,9 @@ class TimeTrackingScreenViewModel @Inject constructor(
                             val activitiesList = result.activities
                             val concessionList = result.concessions.dataConcession
                             val usersProfile = result.users
-                            val creditorUserId = result.timeBalance.first().userIdWith
+                            val myId = result.myId
 
-                            val (avatarCreditor, avatarDebitor) = avatarsBalance(usersProfile, creditorUserId)
+                            val (avatarCreditor, avatarDebitor) = avatarsBalance(usersProfile, myId, timeBalance)
 
 
                             _uiState.update {
@@ -81,8 +68,8 @@ class TimeTrackingScreenViewModel @Inject constructor(
                                     concessionList = concessionList.map { concession ->
                                         concession.toUi()
                                     },
-                                    avatar1 = avatarCreditor,
-                                    avatar2 = avatarDebitor
+                                    avatarCreditor = avatarCreditor,
+                                    avatarDebitor = avatarDebitor
                                 )
                             }
                         }
@@ -94,18 +81,38 @@ class TimeTrackingScreenViewModel @Inject constructor(
         }
     }
 }
-fun avatarsBalance(usersProfile: List<UserProfile>, creditorUserId: Int) : Pair<Avatar, Avatar>{
-    var avatarMap: Map<Int, Avatar?> = emptyMap()
+fun avatarsBalance(usersProfile: List<UserProfile>, myId: Int, timeBalance: Double) : Pair<Avatar, Avatar> {
 
-    avatarMap = usersProfile.associate { profile ->
-        profile.id to profile.avatarUrl
+    val me = usersProfile.firstOrNull {
+        it.id == myId
     }
 
-    val avatarCreditor = avatarMap[creditorUserId] ?: Avatar.Default
-    val debtorUserId = avatarMap.keys.first{it != creditorUserId}
-    val avatarDebitor = avatarMap[debtorUserId] ?: Avatar.Default
+    val other = usersProfile.firstOrNull {
+        it.id != myId
+    }
 
-    return Pair(avatarCreditor, avatarDebitor)
+    val idOther = other?.id ?: 0
+
+    val avatarMe = me?.avatarUrl ?: Avatar.Default(myId)
+    val avatarOther = other?.avatarUrl ?: Avatar.Default(idOther)
+
+
+    return if(timeBalance > balanceCountdownStart) {
+        Pair(
+            first = avatarMe,
+            second = avatarOther
+        )
+    } else if (timeBalance < balanceCountdownStart) {
+        Pair(
+            first = avatarOther,
+            second = avatarMe
+        )
+    } else {
+        Pair(
+            first = avatarOther,
+            second = avatarMe
+        )
+    }
 }
 
 fun mapBalance(timeBalance: Double): BalanceState {
@@ -127,8 +134,8 @@ data class TimeTrackingUiState(
     val concessionList: List<ConcessionUi> = emptyList(),
     val usersProfile: List<UserProfile> = emptyList(),
 
-    val avatar1: Avatar = Avatar.Default,
-    val avatar2: Avatar = Avatar.Default
+    val avatarCreditor: Avatar = Avatar.Default(0),
+    val avatarDebitor: Avatar = Avatar.Default(0)
 
 ) {
 

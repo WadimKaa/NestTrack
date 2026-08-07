@@ -38,7 +38,7 @@ fun UserProfileResponseDto.toDomain() : UserProfile {
         id = id,
         name = name,
         avatarUrl = if (avatarUrl == null || avatarUrl == "" || avatarUrl == "NULL") {
-            Avatar.Default
+            Avatar.Default(id)
         } else {
             Avatar.Remote(buildUrl(avatarUrl))
         },
